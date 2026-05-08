@@ -4,143 +4,1030 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HOME - SAWANNAKHON CONNECT : EDEN</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Kanit', sans-serif; margin: 0; overflow-x: hidden; background-color: #000; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* ระบบ Slideshow พื้นหลัง (ยกมาเพื่อความต่อเนื่อง) */
-        .slideshow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 2s ease-in-out; }
-        .slide.active { opacity: 1; }
-
-        .bg-overlay {
-            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.4) 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        :root {
+            --eden-green: #4ade80;
+            --eden-sky: #38bdf8;
+            --eden-gold: #fbbf24;
+            --eden-pink: #f472b6;
+            --eden-purple: #a78bfa;
+            --glass-bg: rgba(255,255,255,0.07);
+            --glass-border: rgba(255,255,255,0.15);
         }
 
-        /* Animation EDEN วิ้งๆ */
-        @keyframes shine {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: #020a0f;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ═══════════════════════════════
+           CURSOR CUSTOM
+        ═══════════════════════════════ */
+        .cursor-dot {
+            width: 8px; height: 8px;
+            background: var(--eden-sky);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s;
+        }
+        .cursor-ring {
+            width: 36px; height: 36px;
+            border: 1.5px solid rgba(56,189,248,0.5);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: all 0.15s ease;
+        }
+
+        /* ═══════════════════════════════
+           SLIDESHOW BG
+        ═══════════════════════════════ */
+        .slideshow-container {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; z-index: 0;
+        }
+        .slide {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+            opacity: 0; transition: opacity 2.5s ease-in-out;
+        }
+        .slide.active { opacity: 1; }
+        .slideshow-overlay {
+            position: fixed; inset: 0; z-index: 1;
+            background:
+                radial-gradient(ellipse at top, rgba(0,30,60,0.6) 0%, transparent 60%),
+                radial-gradient(ellipse at bottom, rgba(0,10,20,0.8) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,5,15,0.4) 100%);
+        }
+
+        /* Animated particles */
+        .particles {
+            position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            animation: drift linear infinite;
+        }
+        @keyframes drift {
+            0% { transform: translateY(110vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-10vh) translateX(var(--tx)); opacity: 0; }
+        }
+
+        /* ═══════════════════════════════
+           LAYOUT WRAPPER
+        ═══════════════════════════════ */
+        .page-wrapper {
+            position: relative; z-index: 3;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* ═══════════════════════════════
+           NAV
+        ═══════════════════════════════ */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 48px;
+            height: 72px;
+            background: rgba(2,10,20,0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .nav-logo {
+            display: flex; align-items: center; gap: 14px;
+        }
+        .nav-brand {
+            font-size: 0.9rem; font-weight: 300;
+            letter-spacing: 0.12em; color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+        }
+        .nav-brand strong { color: var(--eden-sky); font-weight: 600; }
+
+        @keyframes shine-eden {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        .eden-text {
-            background: linear-gradient(90deg, #34d399, #3b82f6, #f472b6, #fbbf24, #34d399);
-            background-size: 300% 300%;
-            animation: shine 4s infinite linear;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: bold;
+        .eden-badge {
+            font-size: 1.35rem; font-weight: 700; letter-spacing: 0.25em;
+            background: linear-gradient(90deg, #34d399, #38bdf8, #a78bfa, #f472b6, #fbbf24, #34d399);
+            background-size: 300%;
+            animation: shine-eden 5s linear infinite;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        /* กล่องเมนูแบบลอย (Floating Glass Card) */
-        .menu-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-blur: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .nav-links {
+            display: flex; gap: 40px; list-style: none;
+        }
+        .nav-links li {
+            font-size: 0.85rem; letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.55);
             cursor: pointer;
+            transition: color 0.25s;
+            position: relative; padding-bottom: 4px;
         }
+        .nav-links li::after {
+            content: ''; position: absolute; bottom: 0; left: 0;
+            height: 1px; width: 0;
+            background: var(--eden-sky);
+            transition: width 0.3s ease;
+        }
+        .nav-links li:hover { color: white; }
+        .nav-links li:hover::after { width: 100%; }
+        .nav-links li.active { color: var(--eden-sky); }
+        .nav-links li.active::after { width: 100%; }
+
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+
+        .status-badge {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 999px;
+            font-size: 0.82rem;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            background: var(--eden-green);
+            border-radius: 50%;
+            animation: pulse-green 2s ease infinite;
+            box-shadow: 0 0 0 0 rgba(74,222,128,0.4);
+        }
+        @keyframes pulse-green {
+            0%   { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
+            70%  { box-shadow: 0 0 0 8px rgba(74,222,128,0); }
+            100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+        }
+        .logout-btn {
+            font-size: 0.82rem; color: rgba(255,255,255,0.4);
+            background: none; border: none; cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            letter-spacing: 0.06em; transition: color 0.2s;
+        }
+        .logout-btn:hover { color: white; }
+
+        /* ═══════════════════════════════
+           HERO SECTION
+        ═══════════════════════════════ */
+        .hero {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center;
+            padding: 80px 24px 40px;
+            text-align: center;
+        }
+
+        .hero-eyebrow {
+            font-size: 0.75rem; letter-spacing: 0.35em;
+            color: var(--eden-sky); text-transform: uppercase;
+            margin-bottom: 20px; opacity: 0.8;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 700; line-height: 1.15;
+            color: white;
+            margin-bottom: 12px;
+            text-shadow: 0 0 80px rgba(56,189,248,0.2);
+        }
+        .hero-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, #fff 30%, rgba(56,189,248,0.7));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-divider {
+            width: 80px; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--eden-sky), transparent);
+            margin: 20px auto;
+            box-shadow: 0 0 12px var(--eden-sky);
+        }
+
+        /* ═══════════════════════════════
+           LIVE TICKER STRIP
+        ═══════════════════════════════ */
+        .ticker-wrapper {
+            width: 100%; overflow: hidden;
+            background: rgba(56,189,248,0.06);
+            border-top: 1px solid rgba(56,189,248,0.15);
+            border-bottom: 1px solid rgba(56,189,248,0.15);
+            padding: 10px 0;
+            margin-bottom: 50px;
+        }
+        .ticker-track {
+            display: flex; gap: 64px;
+            animation: ticker 30s linear infinite;
+            white-space: nowrap;
+        }
+        @keyframes ticker {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .ticker-item {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.78rem; color: rgba(255,255,255,0.5);
+            letter-spacing: 0.06em; flex-shrink: 0;
+        }
+        .ticker-item span { color: var(--eden-sky); font-weight: 600; }
+        .ticker-dot {
+            width: 4px; height: 4px; border-radius: 50%;
+            background: var(--eden-sky); opacity: 0.4;
+        }
+
+        /* ═══════════════════════════════
+           MENU CARDS GRID
+        ═══════════════════════════════ */
+        .cards-section { padding: 0 32px 60px; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        /* Base card */
+        .menu-card {
+            position: relative; overflow: hidden;
+            border-radius: 32px;
+            padding: 42px 32px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            cursor: pointer;
+            transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                        border-color 0.3s, background 0.3s;
+            group: card;
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.07) 0%, transparent 65%);
+            opacity: 0; transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .menu-card:hover::before { opacity: 1; }
+
         .menu-card:hover {
-            transform: translateY(-15px) scale(1.05);
-            background: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            transform: translateY(-16px) scale(1.02);
+            background: rgba(255,255,255,0.1);
         }
-        .icon-box {
-            background: linear-gradient(135deg, #4ade80 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+
+        /* Glow line at top */
+        .card-glow-line {
+            position: absolute; top: 0; left: 24px; right: 24px;
+            height: 1px;
+            opacity: 0; transition: opacity 0.4s;
+        }
+        .menu-card:hover .card-glow-line { opacity: 1; }
+
+        /* Card-specific colors */
+        .card-family { --card-accent: #4ade80; }
+        .card-family:hover { border-color: rgba(74,222,128,0.4); box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 40px rgba(74,222,128,0.1); }
+        .card-family .card-glow-line { background: linear-gradient(90deg, transparent, #4ade80, transparent); box-shadow: 0 0 12px #4ade80; }
+        .card-family .card-icon-bg { background: linear-gradient(135deg, rgba(74,222,128,0.2), rgba(56,189,248,0.1)); }
+        .card-family .card-tag { background: rgba(74,222,128,0.12); color: #4ade80; border-color: rgba(74,222,128,0.25); }
+        .card-family .card-btn { background: rgba(74,222,128,0.15); color: #4ade80; border-color: rgba(74,222,128,0.3); }
+        .card-family .card-btn:hover { background: rgba(74,222,128,0.3); }
+        .card-family .card-progress-bar { background: #4ade80; }
+
+        .card-garden { --card-accent: #38bdf8; }
+        .card-garden:hover { border-color: rgba(56,189,248,0.4); box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 40px rgba(56,189,248,0.12); }
+        .card-garden .card-glow-line { background: linear-gradient(90deg, transparent, #38bdf8, transparent); box-shadow: 0 0 12px #38bdf8; }
+        .card-garden .card-icon-bg { background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(167,139,250,0.1)); }
+        .card-garden .card-tag { background: rgba(56,189,248,0.12); color: #38bdf8; border-color: rgba(56,189,248,0.25); }
+        .card-garden .card-btn { background: rgba(56,189,248,0.15); color: #38bdf8; border-color: rgba(56,189,248,0.3); }
+        .card-garden .card-btn:hover { background: rgba(56,189,248,0.3); }
+        .card-garden .card-progress-bar { background: #38bdf8; }
+
+        .card-learn { --card-accent: #fbbf24; }
+        .card-learn:hover { border-color: rgba(251,191,36,0.4); box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 40px rgba(251,191,36,0.08); }
+        .card-learn .card-glow-line { background: linear-gradient(90deg, transparent, #fbbf24, transparent); box-shadow: 0 0 12px #fbbf24; }
+        .card-learn .card-icon-bg { background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(244,114,182,0.1)); }
+        .card-learn .card-tag { background: rgba(251,191,36,0.1); color: #fbbf24; border-color: rgba(251,191,36,0.25); }
+        .card-learn .card-btn { background: rgba(251,191,36,0.12); color: #fbbf24; border-color: rgba(251,191,36,0.3); }
+        .card-learn .card-btn:hover { background: rgba(251,191,36,0.25); }
+        .card-learn .card-progress-bar { background: #fbbf24; }
+
+        .card-event { --card-accent: #f472b6; }
+        .card-event:hover { border-color: rgba(244,114,182,0.4); box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 40px rgba(244,114,182,0.1); }
+        .card-event .card-glow-line { background: linear-gradient(90deg, transparent, #f472b6, transparent); box-shadow: 0 0 12px #f472b6; }
+        .card-event .card-icon-bg { background: linear-gradient(135deg, rgba(244,114,182,0.2), rgba(167,139,250,0.1)); }
+        .card-event .card-tag { background: rgba(244,114,182,0.1); color: #f472b6; border-color: rgba(244,114,182,0.25); }
+        .card-event .card-btn { background: rgba(244,114,182,0.12); color: #f472b6; border-color: rgba(244,114,182,0.3); }
+        .card-event .card-btn:hover { background: rgba(244,114,182,0.25); }
+        .card-event .card-progress-bar { background: #f472b6; }
+
+        .card-icon-wrap {
+            display: flex; align-items: center; justify-content: center;
+            width: 72px; height: 72px; border-radius: 20px;
+            margin-bottom: 24px;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .menu-card:hover .card-icon-wrap { transform: scale(1.15) rotate(-4deg); }
+
+        .card-icon-bg {
+            width: 100%; height: 100%;
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .card-tag {
+            display: inline-block;
+            font-size: 0.65rem; letter-spacing: 0.15em;
+            padding: 3px 10px; border-radius: 999px;
+            border: 1px solid;
+            margin-bottom: 12px; text-transform: uppercase;
+        }
+
+        .card-title {
+            font-size: 1.35rem; font-weight: 700;
+            margin-bottom: 8px; color: white;
+            line-height: 1.2;
+        }
+
+        .card-desc {
+            font-size: 0.82rem; font-weight: 300;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.7; margin-bottom: 24px;
+        }
+
+        /* Live stat row */
+        .card-stats {
+            display: flex; gap: 16px;
+            margin-bottom: 20px;
+        }
+        .card-stat {
+            display: flex; flex-direction: column; gap: 2px;
+        }
+        .card-stat-val {
+            font-size: 1.1rem; font-weight: 700; color: white;
+            line-height: 1;
+        }
+        .card-stat-label {
+            font-size: 0.65rem; color: rgba(255,255,255,0.35);
+            letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        .card-stat-divider {
+            width: 1px; background: rgba(255,255,255,0.08); align-self: stretch;
+        }
+
+        /* Progress */
+        .card-progress-wrap { margin-bottom: 24px; }
+        .card-progress-label {
+            display: flex; justify-content: space-between;
+            font-size: 0.68rem; color: rgba(255,255,255,0.35);
+            letter-spacing: 0.06em; margin-bottom: 8px;
+        }
+        .card-progress-track {
+            height: 3px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden;
+        }
+        .card-progress-bar {
+            height: 100%; border-radius: 99px;
+            transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .card-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 20px; border-radius: 12px;
+            border: 1px solid;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.82rem; font-weight: 400;
+            cursor: pointer; transition: all 0.25s;
+            width: 100%;
+            letter-spacing: 0.06em;
+        }
+
+        /* ═══════════════════════════════
+           BOTTOM ROW : MISSION + COMMUNITY
+        ═══════════════════════════════ */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 0 32px 80px;
+            max-width: 1400px;
+            margin: 0 auto; width: 100%;
+        }
+
+        /* Mission strip */
+        .mission-card {
+            border-radius: 24px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 32px 36px;
+            display: flex; align-items: center; gap: 36px;
+            backdrop-filter: blur(16px);
+            transition: border-color 0.3s, background 0.3s;
+        }
+        .mission-card:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(167,139,250,0.3);
+        }
+        .mission-icon-col { font-size: 3rem; flex-shrink: 0; }
+        .mission-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
+        .mission-desc { font-size: 0.78rem; color: rgba(255,255,255,0.45); line-height: 1.7; }
+        .mission-missions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+        .mission-item {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 0.78rem; color: rgba(255,255,255,0.6);
+        }
+        .mission-check {
+            width: 18px; height: 18px; border-radius: 6px;
+            border: 1.5px solid rgba(167,139,250,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.65rem; flex-shrink: 0;
+        }
+        .mission-check.done { background: rgba(74,222,128,0.2); border-color: rgba(74,222,128,0.5); color: #4ade80; }
+        .mission-pts {
+            margin-left: auto; font-size: 0.7rem;
+            color: var(--eden-gold); letter-spacing: 0.04em;
+        }
+
+        /* Community live */
+        .community-card {
+            border-radius: 24px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 32px 36px;
+            backdrop-filter: blur(16px);
+            transition: border-color 0.3s, background 0.3s;
+        }
+        .community-card:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(56,189,248,0.3);
+        }
+        .community-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;
+        }
+        .community-title { font-size: 1.05rem; font-weight: 600; }
+        .live-dot {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.7rem; color: #f87171; letter-spacing: 0.1em;
+        }
+        .live-dot::before {
+            content: ''; width: 6px; height: 6px;
+            background: #f87171; border-radius: 50%;
+            animation: pulse-red 1.5s infinite;
+            box-shadow: 0 0 0 0 rgba(248,113,113,0.4);
+        }
+        @keyframes pulse-red {
+            0%   { box-shadow: 0 0 0 0 rgba(248,113,113,0.4); }
+            70%  { box-shadow: 0 0 0 6px rgba(248,113,113,0); }
+            100% { box-shadow: 0 0 0 0 rgba(248,113,113,0); }
+        }
+
+        .member-list { display: flex; flex-direction: column; gap: 14px; }
+        .member-row {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .member-avatar {
+            width: 38px; height: 38px; border-radius: 12px;
+            font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+        }
+        .member-info { flex: 1; min-width: 0; }
+        .member-name { font-size: 0.82rem; font-weight: 500; color: white; }
+        .member-action { font-size: 0.7rem; color: rgba(255,255,255,0.38); margin-top: 1px; }
+        .member-time { font-size: 0.68rem; color: rgba(255,255,255,0.25); flex-shrink: 0; }
+
+        /* ═══════════════════════════════
+           FOOTER
+        ═══════════════════════════════ */
+        footer {
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding: 24px 48px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .footer-left {
+            font-size: 0.72rem; letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.2); text-transform: uppercase;
+        }
+        .footer-orbs { display: flex; gap: 8px; }
+        .footer-orb {
+            width: 8px; height: 8px; border-radius: 50%;
+            opacity: 0.4;
+        }
+
+        /* ═══════════════════════════════
+           NOTIFICATION TOAST
+        ═══════════════════════════════ */
+        .toast-container {
+            position: fixed; bottom: 32px; right: 32px;
+            display: flex; flex-direction: column; gap: 12px;
+            z-index: 200;
+        }
+        .toast {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 20px;
+            background: rgba(10,20,35,0.92);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            min-width: 280px;
+            animation: slideInRight 0.5s ease, fadeOut 0.5s ease 4s forwards;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to   { transform: translateX(0);    opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(10px); }
+        }
+        .toast-icon { font-size: 1.3rem; flex-shrink: 0; }
+        .toast-title { font-size: 0.82rem; font-weight: 600; color: white; }
+        .toast-msg   { font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+        /* ═══════════════════════════════
+           PAGE ENTER ANIMATIONS
+        ═══════════════════════════════ */
+        @keyframes fadeUp {
+            from { opacity:0; transform: translateY(30px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+        .animate-in {
+            opacity: 0;
+            animation: fadeUp 0.7s ease forwards;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.35s; }
+        .delay-4 { animation-delay: 0.5s; }
+        .delay-5 { animation-delay: 0.65s; }
+        .delay-6 { animation-delay: 0.8s; }
+        .delay-7 { animation-delay: 0.95s; }
+
+        /* ═══════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════ */
+        @media (max-width: 1100px) {
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+            .bottom-grid { grid-template-columns: 1fr; }
+            nav { padding: 0 24px; }
+            .nav-links { display: none; }
+        }
+        @media (max-width: 600px) {
+            .cards-grid { grid-template-columns: 1fr; }
+            .cards-section, .bottom-grid { padding-left: 16px; padding-right: 16px; }
+            footer { flex-direction: column; gap: 12px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Custom Cursor -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- Background Slideshow -->
     <div class="slideshow-container">
         <div class="slide active" style="background-image: url('HOME1.png');"></div>
         <div class="slide" style="background-image: url('HOME2.png');"></div>
         <div class="slide" style="background-image: url('HOME3.png');"></div>
         <div class="slide" style="background-image: url('HOME4.png');"></div>
     </div>
+    <div class="slideshow-overlay"></div>
 
-    <div class="bg-overlay">
-        
-        <nav class="flex justify-between items-center px-10 py-5 bg-black/20 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
-            <div class="text-xl font-bold flex items-center">
-                <span class="text-white border-r border-white/20 pr-4 mr-4 uppercase tracking-tighter">SAWANNAKHON <span class="text-sky-400 mr-2">CONNECT</span></span>
-                <span class="eden-text ml-1 text-2xl">EDEN</span>
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="page-wrapper">
+
+        <!-- NAV -->
+        <nav>
+            <div class="nav-logo">
+                <div class="nav-brand">SAWANNAKHON <strong>CONNECT</strong></div>
+                <div style="width:1px; height:28px; background:rgba(255,255,255,0.12);"></div>
+                <div class="eden-badge">EDEN</div>
             </div>
 
-            <ul class="hidden lg:flex space-x-10 text-white font-medium">
-                <li class="text-sky-300 border-b-2 border-sky-400 cursor-default">Home</li>
-                <li class="hover:text-sky-300 cursor-pointer transition">Rest</li>
-                <li class="hover:text-sky-300 cursor-pointer transition">Grow</li>
-                <li class="hover:text-sky-300 cursor-pointer transition">Community</li>
-                <li class="hover:text-sky-300 cursor-pointer transition">Support</li>
-                <li class="hover:text-sky-300 cursor-pointer transition">Mission</li>
+            <ul class="nav-links">
+                <li class="active">Home</li>
+                <li>Rest</li>
+                <li>Grow</li>
+                <li>Community</li>
+                <li>Support</li>
+                <li>Mission</li>
             </ul>
 
-            <div class="flex items-center space-x-5">
-                <div class="flex items-center bg-white/20 px-4 py-1.5 rounded-full border border-white/20 shadow-inner">
-                    <span class="w-2.5 h-2.5 bg-green-400 rounded-full mr-3 animate-pulse"></span>
-                    <span class="text-sm text-white font-semibold">ต้นกล้าน้อย</span>
+            <div class="nav-right">
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    <span style="font-size:0.82rem; color:rgba(255,255,255,0.75);">ต้นกล้าน้อย</span>
+                    <span style="font-size:0.7rem; color:var(--eden-gold); margin-left:4px;">Lv.3</span>
                 </div>
-                <button class="text-white hover:text-sky-300 transition">Logout</button>
+                <button class="logout-btn">Logout</button>
             </div>
         </nav>
 
-        <main class="flex-grow flex flex-col items-center justify-center px-6">
-            
-            <div class="mb-12 text-center">
-                <h2 class="text-white text-3xl font-light mb-2 drop-shadow-md tracking-widest">ยินดีต้อนรับกลับบ้าน</h2>
-                <div class="h-1 w-20 bg-sky-400 mx-auto rounded-full shadow-[0_0_10px_#38bdf8]"></div>
+        <!-- HERO -->
+        <div class="hero animate-in delay-1">
+            <p class="hero-eyebrow">✦ ยินดีต้อนรับ · SAWANNAKHON CONNECT ✦</p>
+            <h1 class="hero-title">กลับบ้าน<em>แล้ว</em></h1>
+            <div class="hero-divider"></div>
+        </div>
+
+        <!-- TICKER -->
+        <div class="ticker-wrapper animate-in delay-2">
+            <div class="ticker-track" id="tickerTrack">
+                <!-- JS will duplicate -->
+                <div class="ticker-item"><span>🌱</span> สมาชิกใหม่วันนี้ <span>8 คน</span><div class="ticker-dot"></div></div>
+                <div class="ticker-item"><span>📖</span> บทความใหม่ <span>3 เรื่อง</span><div class="ticker-dot"></div></div>
+                <div class="ticker-item"><span>🎉</span> กิจกรรมคืนนี้ <span>19:00 น.</span><div class="ticker-dot"></div></div>
+                <div class="ticker-item"><span>💬</span> ชุมชนออนไลน์ <span>42 คน</span><div class="ticker-dot"></div></div>
+                <div class="ticker-item"><span>🌳</span> ต้นกล้าน้อย อัพ Level แล้ว!</div>
+                <div class="ticker-dot"></div>
+                <div class="ticker-item"><span>✨</span> EDEN Season 2 <span>กำลังมา</span><div class="ticker-dot"></div></div>
+                <div class="ticker-item"><span>🏆</span> Mission สัปดาห์นี้ <span>เสร็จ 60%</span><div class="ticker-dot"></div></div>
+            </div>
+        </div>
+
+        <!-- MAIN CARDS -->
+        <div class="cards-section">
+            <div class="cards-grid">
+
+                <!-- CARD 1 : ครอบครัว -->
+                <div class="menu-card card-family animate-in delay-3" onclick="showToast('👨‍👩‍👧‍👦', 'ครอบครัว', 'กำลังเข้าสู่พื้นที่ครอบครัว...')">
+                    <div class="card-glow-line"></div>
+                    <div class="card-icon-wrap">
+                        <div class="card-icon-bg">👨‍👩‍👧‍👦</div>
+                    </div>
+                    <div class="card-tag">Community</div>
+                    <h3 class="card-title">ครอบครัว</h3>
+                    <p class="card-desc">ความสัมพันธ์ที่อบอุ่น พื้นที่แบ่งปันและเติบโตไปด้วยกัน</p>
+                    <div class="card-stats">
+                        <div class="card-stat">
+                            <span class="card-stat-val">247</span>
+                            <span class="card-stat-label">สมาชิก</span>
+                        </div>
+                        <div class="card-stat-divider"></div>
+                        <div class="card-stat">
+                            <span class="card-stat-val">42</span>
+                            <span class="card-stat-label">ออนไลน์</span>
+                        </div>
+                        <div class="card-stat-divider"></div>
+                        <div class="card-stat">
+                            <span class="card-stat-val">12</span>
+                            <span class="card-stat-label">โพสต์ใหม่</span>
+                        </div>
+                    </div>
+                    <div class="card-progress-wrap">
+                        <div class="card-progress-label">
+                            <span>ความอบอุ่นชุมชน</span><span>84%</span>
+                        </div>
+                        <div class="card-progress-track">
+                            <div class="card-progress-bar" style="width:84%;"></div>
+                        </div>
+                    </div>
+                    <button class="card-btn">เข้าร่วมชุมชน <span>→</span></button>
+                </div>
+
+                <!-- CARD 2 : สวนของฉัน -->
+                <div class="menu-card card-garden animate-in delay-4" onclick="showToast('🏡', 'สวนของฉัน', 'กำลังโหลดสวนของคุณ...')">
+                    <div class="card-glow-line"></div>
+                    <div class="card-icon-wrap">
+                        <div class="card-icon-bg">🏡</div>
+                    </div>
+                    <div class="card-tag">My Space</div>
+                    <h3 class="card-title">สวนของฉัน</h3>
+                    <p class="card-desc">จัดการพื้นที่ส่วนตัว ติดตาม Level และการเติบโตของคุณ</p>
+                    <div class="card-stats">
+                        <div class="card-stat">
+                            <span class="card-stat-val">Lv.3</span>
+                            <span class="card-stat-label">ระดับ</span>
+                        </div>
+                        <div class="card-stat-divider"></div>
+                        <div class="card-stat">
+                            <span class="card-stat-val">1,240</span>
+                            <span class="card-stat-label">XP</span>
+                        </div>
+                        <div class="card-stat-divider"></div>
+                        <div class="card-stat">
+                            <span class="card-stat-val">7🔥</span>
+                            <span class="card-stat-label">Streak</span>
+                        </div>
+                    </div>
+                    <div class="card-progress-wrap">
+                        <div class="card-progress-label">
+                            <span>XP สู่ Level 4</span><span>1,240 / 2,000</span>
+                        </div>
+                        <div class="card-progress-track">
+                            <div class="card-progress-bar" style="width:62%;"></div>
+                        </div>
+                    </div>
+                    <button class="card-btn">ดูสวนของฉัน <span>→</span></button>
+                </div>
+
+                <!-- CARD 3 : สาระน่ารู้ -->
+                <div class="menu-card card-learn animate-in delay-5" onclick="showToast('📖', 'สาระน่ารู้', 'กำลังเปิดคลังความรู้...')">
+                    <div class="card-glow-line"></div>
+                    <div class="card-icon-wrap">
+                        <div class="card-icon-bg">📖</div>
+                    </div>
+                    <div class="card-tag">Knowledge</div>
+                    <h3 class="card-title">สาระน่ารู้</h3>
+                    <p class="card-desc">คลังบทความ เทคนิคดีๆ และมุมมองชีวิตที่มีคุณภาพ</p>
+                    <div class="card-stats">
+                        <div class="card-stat">
+                            <span class="card-stat-val">136</span>
+                            <span class="card-stat-label">บทความ</span>
+                        </div>
+                        <div class="card-stat-divider"></div>
+                        <div class="card-stat">
+                            <span class="card-stat-val">3</span>
+                            <span class="card-stat-label">ใหม่วันนี้</span>
+                        </div>
+                        <div class="card-stat-divider"></div>
+                        <div class="card-stat">
+                            <span class="card-stat-val">5★</span>
+                            <span class="card-stat-label">คะแนน</span>
+                        </div>
+                    </div>
+                    <div class="card-progress-wrap">
+                        <div class="card-progress-label">
+                            <span>อ่านแล้วเดือนนี้</span><span>8 / 15 เรื่อง</span>
+                        </div>
+                        <div class="card-progress-track">
+                            <div class="card-progress-bar" style="width:53%;"></div>
+                        </div>
+                    </div>
+                    <button class="card-btn">เปิดคลังความรู้ <span>→</span></button>
+                </div>
+
+                <!-- CARD 4 : กิจกรรม -->
+                <div class="menu-card card-event animate-in delay-6" onclick="showToast('📅', 'รายการกิจกรรม', 'กำลังโหลดกิจกรรม...')">
+                    <div class="card-glow-line"></div>
+                    <div class="card-icon-wrap">
+                        <div class="card-icon-bg">📅</div>
+                    </div>
+                    <div class="card-tag">Events</div>
+                    <h3 class="card-title">รายการกิจกรรม</h3>
+                    <p class="card-desc">อัปเดตกิจกรรมล่าสุด เข้าร่วมและพบปะกันในชีวิตจริง</p>
+                    <div class="card-stats">
+                        <div class="card-stat">
+                            <span class="card-stat-val">5</span>
+                            <span class="card-stat-label">กิจกรรม</span>
+                        </div>
+                        <div class="card-stat-divider"></div>
+                        <div class="card-stat">
+                            <span class="card-stat-val" style="color:#f87171;">TODAY</span>
+                            <span class="card-stat-label">คืนนี้ 19:00</span>
+                        </div>
+                        <div class="card-stat-divider"></div>
+                        <div class="card-stat">
+                            <span class="card-stat-val">28</span>
+                            <span class="card-stat-label">จองแล้ว</span>
+                        </div>
+                    </div>
+                    <div class="card-progress-wrap">
+                        <div class="card-progress-label">
+                            <span>ที่นั่งคืนนี้</span><span>28 / 40 คน</span>
+                        </div>
+                        <div class="card-progress-track">
+                            <div class="card-progress-bar" style="width:70%;"></div>
+                        </div>
+                    </div>
+                    <button class="card-btn">ดูกิจกรรมทั้งหมด <span>→</span></button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- BOTTOM ROW -->
+        <div class="bottom-grid animate-in delay-7">
+
+            <!-- DAILY MISSIONS -->
+            <div class="mission-card">
+                <div class="mission-icon-col">🎯</div>
+                <div style="flex:1;">
+                    <div class="mission-title">Mission ประจำวัน</div>
+                    <div class="mission-desc">ทำครบ รับ XP และ Badge พิเศษ</div>
+                    <div class="mission-missions">
+                        <div class="mission-item">
+                            <div class="mission-check done">✓</div>
+                            <span>เข้าสู่ระบบวันนี้</span>
+                            <span class="mission-pts">+50 XP</span>
+                        </div>
+                        <div class="mission-item">
+                            <div class="mission-check done">✓</div>
+                            <span>อ่านบทความ 1 เรื่อง</span>
+                            <span class="mission-pts">+100 XP</span>
+                        </div>
+                        <div class="mission-item">
+                            <div class="mission-check"></div>
+                            <span style="color:rgba(255,255,255,0.35);">โพสต์ในชุมชน</span>
+                            <span class="mission-pts" style="color:rgba(251,191,36,0.35);">+150 XP</span>
+                        </div>
+                        <div class="mission-item">
+                            <div class="mission-check"></div>
+                            <span style="color:rgba(255,255,255,0.35);">เข้าร่วมกิจกรรม</span>
+                            <span class="mission-pts" style="color:rgba(251,191,36,0.35);">+300 XP</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl w-full">
-                
-                <div class="menu-card p-10 rounded-[40px] text-center group">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition duration-300">👨‍👩‍👧‍👦</div>
-                    <h3 class="text-white text-2xl font-bold mb-3">ครอบครัว</h3>
-                    <p class="text-sky-100 text-sm opacity-80 font-light">ความสัมพันธ์ที่อบอุ่นและพื้นที่แบ่งปันของพวกเรา</p>
+            <!-- COMMUNITY LIVE -->
+            <div class="community-card">
+                <div class="community-header">
+                    <div class="community-title">🌿 กำลังมีชีวิตอยู่</div>
+                    <div class="live-dot">LIVE</div>
                 </div>
-
-                <div class="menu-card p-10 rounded-[40px] text-center group">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition duration-300">🏡</div>
-                    <h3 class="text-white text-2xl font-bold mb-3">สวนของฉัน</h3>
-                    <p class="text-sky-100 text-sm opacity-80 font-light">จัดการพื้นที่ส่วนตัวและติดตามการเติบโตของคุณ</p>
+                <div class="member-list">
+                    <div class="member-row">
+                        <div class="member-avatar">🌸</div>
+                        <div class="member-info">
+                            <div class="member-name">น้ำฝน สมใจ</div>
+                            <div class="member-action">โพสต์บทความใหม่ในชุมชน</div>
+                        </div>
+                        <div class="member-time">2 นาที</div>
+                    </div>
+                    <div class="member-row">
+                        <div class="member-avatar">🌿</div>
+                        <div class="member-info">
+                            <div class="member-name">ปิ่นทอง รักดี</div>
+                            <div class="member-action">อัพ Level 5 แล้ว 🎉</div>
+                        </div>
+                        <div class="member-time">5 นาที</div>
+                    </div>
+                    <div class="member-row">
+                        <div class="member-avatar">☀️</div>
+                        <div class="member-info">
+                            <div class="member-name">วิชัย มั่นคง</div>
+                            <div class="member-action">จองที่นั่งกิจกรรมคืนนี้</div>
+                        </div>
+                        <div class="member-time">12 นาที</div>
+                    </div>
+                    <div class="member-row">
+                        <div class="member-avatar">🍃</div>
+                        <div class="member-info">
+                            <div class="member-name">สมาชิกใหม่ 3 คน</div>
+                            <div class="member-action">เข้าร่วม EDEN วันนี้</div>
+                        </div>
+                        <div class="member-time">1 ชม.</div>
+                    </div>
                 </div>
-
-                <div class="menu-card p-10 rounded-[40px] text-center group">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition duration-300">📖</div>
-                    <h3 class="text-white text-2xl font-bold mb-3">สาระน่ารู้</h3>
-                    <p class="text-sky-100 text-sm opacity-80 font-light">คลังบทความและเทคนิคดีๆ เพื่อชีวิตที่มีคุณภาพ</p>
-                </div>
-
-                <div class="menu-card p-10 rounded-[40px] text-center group">
-                    <div class="text-5xl mb-6 group-hover:scale-110 transition duration-300">📅</div>
-                    <h3 class="text-white text-2xl font-bold mb-3">รายการกิจกรรม</h3>
-                    <p class="text-sky-100 text-sm opacity-80 font-light">อัปเดตกิจกรรมล่าสุดและเข้าร่วมงานของทางสวน</p>
-                </div>
-
             </div>
-        </main>
 
-        <footer class="p-6 text-center text-white/40 text-xs tracking-widest">
-            SAWANNAKHON CONNECT : EDEN - HOME INTERFACE
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-left">SAWANNAKHON CONNECT : EDEN — HOME INTERFACE · V2.0</div>
+            <div class="footer-orbs">
+                <div class="footer-orb" style="background:var(--eden-green);"></div>
+                <div class="footer-orb" style="background:var(--eden-sky);"></div>
+                <div class="footer-orb" style="background:var(--eden-gold);"></div>
+                <div class="footer-orb" style="background:var(--eden-pink);"></div>
+            </div>
         </footer>
 
-    </div>
+    </div><!-- end page-wrapper -->
 
     <script>
-        const slides = document.querySelectorAll('.slide');
-        let currentSlide = 0;
-        setInterval(() => {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }, 6000); // ช้าลงนิดนึงให้ดูผ่อนคลายในหน้าบ้าน
+    // ══════════════════════════════════
+    // SLIDESHOW
+    // ══════════════════════════════════
+    const slides = document.querySelectorAll('.slide');
+    let cur = 0;
+    setInterval(() => {
+        slides[cur].classList.remove('active');
+        cur = (cur + 1) % slides.length;
+        slides[cur].classList.add('active');
+    }, 6000);
+
+    // ══════════════════════════════════
+    // PARTICLES
+    // ══════════════════════════════════
+    const pContainer = document.getElementById('particles');
+    for (let i = 0; i < 40; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 3 + 1;
+        const tx = (Math.random() - 0.5) * 200;
+        p.style.cssText = `
+            left: ${Math.random() * 100}%;
+            width: ${size}px; height: ${size}px;
+            opacity: ${Math.random() * 0.5 + 0.1};
+            animation-duration: ${Math.random() * 15 + 10}s;
+            animation-delay: ${Math.random() * 10}s;
+            --tx: ${tx}px;
+        `;
+        pContainer.appendChild(p);
+    }
+
+    // ══════════════════════════════════
+    // CUSTOM CURSOR
+    // ══════════════════════════════════
+    const dot  = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    (function animCursor() {
+        rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+        dot.style.left  = mx + 'px'; dot.style.top  = my + 'px';
+        ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+        requestAnimationFrame(animCursor);
+    })();
+
+    // ══════════════════════════════════
+    // CARD MOUSE GLOW
+    // ══════════════════════════════════
+    document.querySelectorAll('.menu-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top)  / rect.height) * 100;
+            card.style.setProperty('--mx', x + '%');
+            card.style.setProperty('--my', y + '%');
+        });
+    });
+
+    // ══════════════════════════════════
+    // TICKER DUPLICATE
+    // ══════════════════════════════════
+    const track = document.getElementById('tickerTrack');
+    const clone = track.innerHTML;
+    track.innerHTML += clone;
+
+    // ══════════════════════════════════
+    // TOAST NOTIFICATIONS
+    // ══════════════════════════════════
+    function showToast(icon, title, msg) {
+        const c = document.getElementById('toastContainer');
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.innerHTML = `
+            <div class="toast-icon">${icon}</div>
+            <div>
+                <div class="toast-title">${title}</div>
+                <div class="toast-msg">${msg}</div>
+            </div>`;
+        c.appendChild(t);
+        setTimeout(() => t.remove(), 5000);
+    }
+
+    // ══════════════════════════════════
+    // AUTO TOASTS
+    // ══════════════════════════════════
+    const autoToasts = [
+        ['🌱', 'สมาชิกใหม่', 'น้องต้นไม้ เพิ่งเข้าร่วม EDEN!'],
+        ['🎉', 'กิจกรรมอาทิตย์นี้', 'เหลือที่นั่งอีก 27 ที่ — จองเลย!'],
+        ['⭐', 'ความสำเร็จ', 'คุณ Streak 1 วันแล้ว! 🔥'],
+    ];
+    let ti = 0;
+    setTimeout(() => {
+        const fn = () => {
+            const [i, t, m] = autoToasts[ti % autoToasts.length];
+            showToast(i, t, m);
+            ti++;
+        };
+        fn();
+        setInterval(fn, 12000);
+    }, 3000);
+
+    // Animate progress bars on load
+    window.addEventListener('load', () => {
+        document.querySelectorAll('.card-progress-bar').forEach(bar => {
+            const w = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => { bar.style.width = w; }, 600);
+        });
+    });
     </script>
 </body>
 </html>
