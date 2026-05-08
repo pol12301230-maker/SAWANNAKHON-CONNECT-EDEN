@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUPPORT — SAWANNAKHON CONNECT : EDEN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --eden-green: #4ade80;
+            --eden-sky: #38bdf8;
+            --eden-gold: #fbbf24;
+            --eden-pink: #f472b6;
+            --eden-purple: #a78bfa;
+            --support-teal: #2dd4bf;
+            --support-mist: #93c5fd;
+            --glass-bg: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.12);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: #010c15;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ═══════════════════════════════
+           AMBIENT BACKGROUND
+        ═══════════════════════════════ */
+        .ambient-bg {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(45,212,191,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(56,189,248,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 40% at 50% 50%, rgba(167,139,250,0.04) 0%, transparent 70%),
+                linear-gradient(180deg, #010c15 0%, #030f1a 100%);
+        }
+
+        /* Rain drops */
+        .rain {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden;
+        }
+        .raindrop {
+            position: absolute;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(147,197,253,0.25));
+            border-radius: 2px;
+            animation: rain-fall linear infinite;
+        }
+        @keyframes rain-fall {
+            0%   { transform: translateY(-20px); opacity: 0; }
+            5%   { opacity: 1; }
+            95%  { opacity: 0.3; }
+            100% { transform: translateY(110vh); opacity: 0; }
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: fixed; border-radius: 50%;
+            filter: blur(80px); pointer-events: none; z-index: 0;
+            animation: orb-float ease-in-out infinite alternate;
+        }
+        @keyframes orb-float {
+            from { transform: translate(0, 0) scale(1); }
+            to   { transform: translate(30px, -20px) scale(1.05); }
+        }
+
+        /* Particles */
+        .particles { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+        .particle {
+            position: absolute; width: 2px; height: 2px;
+            background: rgba(255,255,255,0.5); border-radius: 50%;
+            animation: drift linear infinite;
+        }
+        @keyframes drift {
+            0%   { transform: translateY(110vh) translateX(0); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 0.4; }
+            100% { transform: translateY(-10vh) translateX(var(--tx)); opacity: 0; }
+        }
+
+        /* ═══════════════════════════════
+           CURSOR
+        ═══════════════════════════════ */
+        .cursor-dot {
+            width: 8px; height: 8px;
+            background: var(--support-teal);
+            border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999;
+            transform: translate(-50%,-50%); transition: transform 0.1s;
+        }
+        .cursor-ring {
+            width: 36px; height: 36px;
+            border: 1.5px solid rgba(45,212,191,0.45);
+            border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998;
+            transform: translate(-50%,-50%); transition: all 0.15s ease;
+        }
+
+        /* ═══════════════════════════════
+           NAV
+        ═══════════════════════════════ */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 48px; height: 72px;
+            background: rgba(1,12,21,0.7);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .nav-logo { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+        .nav-brand {
+            font-size: 0.9rem; font-weight: 300;
+            letter-spacing: 0.12em; color: rgba(255,255,255,0.65); text-transform: uppercase;
+        }
+        .nav-brand strong { color: var(--support-teal); font-weight: 600; }
+        @keyframes shine-eden {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .eden-badge {
+            font-size: 1.35rem; font-weight: 700; letter-spacing: 0.25em;
+            background: linear-gradient(90deg, #2dd4bf, #38bdf8, #a78bfa, #f472b6, #2dd4bf);
+            background-size: 300%;
+            animation: shine-eden 5s linear infinite;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .nav-links { display: flex; gap: 36px; list-style: none; }
+        .nav-links li {
+            font-size: 0.82rem; letter-spacing: 0.07em;
+            color: rgba(255,255,255,0.45); cursor: pointer;
+            transition: color 0.25s; position: relative; padding-bottom: 4px;
+        }
+        .nav-links li::after {
+            content: ''; position: absolute; bottom: 0; left: 0;
+            height: 1px; width: 0; background: var(--support-teal); transition: width 0.3s;
+        }
+        .nav-links li:hover { color: white; }
+        .nav-links li:hover::after { width: 100%; }
+        .nav-links li.active { color: var(--support-teal); }
+        .nav-links li.active::after { width: 100%; }
+        .nav-right { display: flex; align-items: center; gap: 18px; }
+        .status-badge {
+            display: flex; align-items: center; gap: 10px; padding: 6px 16px;
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px; font-size: 0.8rem;
+        }
+        .status-dot {
+            width: 8px; height: 8px; background: var(--support-teal); border-radius: 50%;
+            animation: pulse-teal 2s ease infinite;
+            box-shadow: 0 0 0 0 rgba(45,212,191,0.4);
+        }
+        @keyframes pulse-teal {
+            0%   { box-shadow: 0 0 0 0 rgba(45,212,191,0.4); }
+            70%  { box-shadow: 0 0 0 8px rgba(45,212,191,0); }
+            100% { box-shadow: 0 0 0 0 rgba(45,212,191,0); }
+        }
+
+        /* ═══════════════════════════════
+           PAGE WRAPPER
+        ═══════════════════════════════ */
+        .page-wrapper {
+            position: relative; z-index: 3;
+            min-height: 100vh; display: flex; flex-direction: column;
+        }
+
+        /* ═══════════════════════════════
+           HERO
+        ═══════════════════════════════ */
+        .hero {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; padding: 90px 24px 60px; text-align: center;
+            position: relative;
+        }
+        .hero-eyebrow {
+            font-size: 0.7rem; letter-spacing: 0.45em;
+            color: var(--support-teal); text-transform: uppercase;
+            margin-bottom: 24px; opacity: 0.9;
+            animation: fade-up 0.8s ease both;
+        }
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+            font-weight: 700; line-height: 1.1; color: white;
+            margin-bottom: 16px;
+            text-shadow: 0 0 120px rgba(45,212,191,0.18);
+            animation: fade-up 0.8s 0.1s ease both;
+        }
+        .hero-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, #fff 20%, rgba(45,212,191,0.75));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero-subtitle {
+            font-size: 1.05rem; font-weight: 300;
+            color: rgba(255,255,255,0.5); max-width: 520px; line-height: 1.8;
+            animation: fade-up 0.8s 0.2s ease both;
+        }
+        .hero-divider {
+            width: 60px; height: 1.5px; margin: 28px auto;
+            background: linear-gradient(90deg, transparent, var(--support-teal), transparent);
+            box-shadow: 0 0 16px var(--support-teal);
+            animation: fade-up 0.8s 0.15s ease both;
+        }
+
+        /* Mood check-in pill */
+        .mood-bar {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px; padding: 10px 24px; margin-top: 36px;
+            font-size: 0.82rem; color: rgba(255,255,255,0.55);
+            animation: fade-up 0.8s 0.35s ease both;
+            cursor: default;
+        }
+        .mood-label { margin-right: 6px; }
+        .mood-emoji {
+            font-size: 1.3rem; cursor: pointer;
+            transition: transform 0.25s, filter 0.25s;
+            border-radius: 50%; padding: 2px 4px;
+        }
+        .mood-emoji:hover { transform: scale(1.35); filter: brightness(1.3); }
+        .mood-emoji.selected {
+            background: rgba(45,212,191,0.2);
+            transform: scale(1.2);
+        }
+
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ═══════════════════════════════
+           TICKER
+        ═══════════════════════════════ */
+        .ticker-wrapper {
+            width: 100%; overflow: hidden;
+            background: rgba(45,212,191,0.05);
+            border-top: 1px solid rgba(45,212,191,0.12);
+            border-bottom: 1px solid rgba(45,212,191,0.12);
+            padding: 10px 0; margin-bottom: 64px;
+        }
+        .ticker-track { display: flex; gap: 64px; animation: ticker 35s linear infinite; white-space: nowrap; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .ticker-item {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.75rem; color: rgba(255,255,255,0.45);
+            letter-spacing: 0.07em; flex-shrink: 0;
+        }
+        .ticker-item span { color: var(--support-teal); font-weight: 600; }
+        .ticker-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--support-teal); opacity: 0.4; }
+
+        /* ═══════════════════════════════
+           MAIN GRID LAYOUT
+        ═══════════════════════════════ */
+        .support-main {
+            max-width: 1380px; margin: 0 auto;
+            padding: 0 32px 80px; width: 100%;
+        }
+
+        /* Section heading */
+        .section-label {
+            font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase;
+            color: var(--support-teal); opacity: 0.75; margin-bottom: 8px;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem; font-weight: 700; color: white;
+            margin-bottom: 32px;
+        }
+
+        /* ═══════════════════════════════
+           NEED SOMEONE — BIG CTA
+        ═══════════════════════════════ */
+        .need-someone {
+            position: relative; overflow: hidden;
+            border-radius: 32px;
+            padding: 56px 56px;
+            background: rgba(45,212,191,0.06);
+            border: 1px solid rgba(45,212,191,0.2);
+            margin-bottom: 28px;
+            display: flex; align-items: center; gap: 64px;
+            animation: fade-up 0.7s 0.4s ease both;
+            cursor: default;
+        }
+        .need-someone::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse 60% 80% at 0% 50%, rgba(45,212,191,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .need-glow {
+            position: absolute; right: -40px; bottom: -60px;
+            width: 320px; height: 320px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(45,212,191,0.1) 0%, transparent 70%);
+            filter: blur(40px); pointer-events: none;
+        }
+        .need-text { flex: 1; }
+        .need-tag {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: rgba(45,212,191,0.15); border: 1px solid rgba(45,212,191,0.3);
+            border-radius: 999px; padding: 5px 14px; font-size: 0.72rem;
+            letter-spacing: 0.1em; color: var(--support-teal); margin-bottom: 20px;
+        }
+        .need-tag span { width: 6px; height: 6px; border-radius: 50%; background: var(--support-teal); animation: pulse-teal 2s infinite; }
+        .need-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.6rem, 3.5vw, 2.6rem); font-weight: 700;
+            line-height: 1.2; color: white; margin-bottom: 12px;
+        }
+        .need-desc { font-size: 0.95rem; font-weight: 300; color: rgba(255,255,255,0.5); line-height: 1.8; max-width: 420px; }
+        .need-actions { display: flex; flex-direction: column; gap: 12px; min-width: 240px; }
+        .btn-primary {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 18px 36px; border-radius: 16px; font-size: 0.95rem; font-weight: 600;
+            font-family: 'Kanit', sans-serif; cursor: pointer; border: none;
+            background: linear-gradient(135deg, #2dd4bf, #38bdf8);
+            color: #010c15; letter-spacing: 0.05em;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 32px rgba(45,212,191,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 40px rgba(45,212,191,0.45); }
+        .btn-ghost {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 16px 36px; border-radius: 16px; font-size: 0.9rem; font-weight: 400;
+            font-family: 'Kanit', sans-serif; cursor: pointer;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.7); letter-spacing: 0.05em;
+            transition: all 0.3s;
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,0.1); border-color: rgba(45,212,191,0.3); color: white; }
+
+        /* ═══════════════════════════════
+           SUPPORT GRID — 3 COLUMNS
+        ═══════════════════════════════ */
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 28px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px; }
+
+        /* Base support card */
+        .s-card {
+            position: relative; overflow: hidden; border-radius: 28px;
+            padding: 36px 32px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275),
+                        border-color 0.3s, background 0.3s;
+            cursor: default;
+        }
+        .s-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.06) 0%, transparent 65%);
+            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+        }
+        .s-card:hover::before { opacity: 1; }
+        .s-card:hover { transform: translateY(-10px) scale(1.01); background: rgba(255,255,255,0.07); }
+
+        .s-card.teal   { border-color: rgba(45,212,191,0.18); }
+        .s-card.teal:hover { border-color: rgba(45,212,191,0.4); }
+        .s-card.sky    { border-color: rgba(56,189,248,0.18); }
+        .s-card.sky:hover { border-color: rgba(56,189,248,0.4); }
+        .s-card.purple { border-color: rgba(167,139,250,0.18); }
+        .s-card.purple:hover { border-color: rgba(167,139,250,0.4); }
+        .s-card.pink   { border-color: rgba(244,114,182,0.18); }
+        .s-card.pink:hover { border-color: rgba(244,114,182,0.4); }
+        .s-card.gold   { border-color: rgba(251,191,36,0.18); }
+        .s-card.gold:hover { border-color: rgba(251,191,36,0.4); }
+        .s-card.green  { border-color: rgba(74,222,128,0.18); }
+        .s-card.green:hover { border-color: rgba(74,222,128,0.4); }
+
+        .card-glow-accent {
+            position: absolute; bottom: -30px; right: -30px;
+            width: 150px; height: 150px; border-radius: 50%;
+            filter: blur(50px); pointer-events: none; opacity: 0.4;
+        }
+        .teal  .card-glow-accent { background: #2dd4bf; }
+        .sky   .card-glow-accent { background: #38bdf8; }
+        .purple .card-glow-accent { background: #a78bfa; }
+        .pink  .card-glow-accent { background: #f472b6; }
+        .gold  .card-glow-accent { background: #fbbf24; }
+        .green .card-glow-accent { background: #4ade80; }
+
+        .s-icon {
+            font-size: 2.4rem; margin-bottom: 18px; display: block;
+            animation: float-icon 4s ease-in-out infinite alternate;
+        }
+        @keyframes float-icon {
+            from { transform: translateY(0); }
+            to   { transform: translateY(-5px); }
+        }
+        .s-tag {
+            font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase;
+            padding: 3px 10px; border-radius: 999px; margin-bottom: 12px; display: inline-block;
+            border: 1px solid; font-weight: 600;
+        }
+        .teal  .s-tag { color: #2dd4bf; border-color: rgba(45,212,191,0.35); background: rgba(45,212,191,0.08); }
+        .sky   .s-tag { color: #93c5fd; border-color: rgba(147,197,253,0.35); background: rgba(147,197,253,0.08); }
+        .purple .s-tag { color: #a78bfa; border-color: rgba(167,139,250,0.35); background: rgba(167,139,250,0.08); }
+        .pink  .s-tag { color: #f472b6; border-color: rgba(244,114,182,0.35); background: rgba(244,114,182,0.08); }
+        .gold  .s-tag { color: #fbbf24; border-color: rgba(251,191,36,0.35); background: rgba(251,191,36,0.08); }
+        .green .s-tag { color: #4ade80; border-color: rgba(74,222,128,0.35); background: rgba(74,222,128,0.08); }
+
+        .s-title {
+            font-size: 1.15rem; font-weight: 600; color: white;
+            margin-bottom: 8px; letter-spacing: 0.02em;
+        }
+        .s-desc {
+            font-size: 0.85rem; font-weight: 300; color: rgba(255,255,255,0.45);
+            line-height: 1.75;
+        }
+        .s-footer {
+            margin-top: 24px; padding-top: 18px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .s-stat { font-size: 1.3rem; font-weight: 700; }
+        .s-stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.35); letter-spacing: 0.05em; }
+        .s-btn {
+            font-size: 0.78rem; font-family: 'Kanit', sans-serif;
+            padding: 8px 18px; border-radius: 10px; cursor: pointer; border: 1px solid;
+            background: transparent; font-weight: 400; letter-spacing: 0.06em;
+            transition: all 0.25s;
+        }
+        .teal  .s-btn { color: #2dd4bf; border-color: rgba(45,212,191,0.3); }
+        .teal  .s-btn:hover { background: rgba(45,212,191,0.15); }
+        .sky   .s-btn { color: #93c5fd; border-color: rgba(147,197,253,0.3); }
+        .sky   .s-btn:hover { background: rgba(147,197,253,0.15); }
+        .purple .s-btn { color: #a78bfa; border-color: rgba(167,139,250,0.3); }
+        .purple .s-btn:hover { background: rgba(167,139,250,0.15); }
+        .pink  .s-btn { color: #f472b6; border-color: rgba(244,114,182,0.3); }
+        .pink  .s-btn:hover { background: rgba(244,114,182,0.15); }
+        .gold  .s-btn { color: #fbbf24; border-color: rgba(251,191,36,0.3); }
+        .gold  .s-btn:hover { background: rgba(251,191,36,0.15); }
+        .green .s-btn { color: #4ade80; border-color: rgba(74,222,128,0.3); }
+        .green .s-btn:hover { background: rgba(74,222,128,0.15); }
+
+        /* ═══════════════════════════════
+           ENCOURAGEMENT WALL
+        ═══════════════════════════════ */
+        .wall-card {
+            grid-column: span 2;
+        }
+        .wall-posts {
+            display: flex; flex-direction: column; gap: 12px;
+            margin-top: 20px;
+        }
+        .wall-post {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 14px 18px;
+            display: flex; gap: 14px; align-items: flex-start;
+            transition: background 0.2s;
+        }
+        .wall-post:hover { background: rgba(255,255,255,0.07); }
+        .wall-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255,255,255,0.08); display: flex; align-items: center;
+            justify-content: center; font-size: 1rem; flex-shrink: 0;
+        }
+        .wall-post-text { font-size: 0.84rem; color: rgba(255,255,255,0.65); line-height: 1.6; flex: 1; }
+        .wall-post-name { font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-top: 4px; }
+        .wall-post-heart { font-size: 0.78rem; color: rgba(244,114,182,0.7); cursor: pointer; }
+        .wall-input-row {
+            display: flex; gap: 10px; margin-top: 16px;
+        }
+        .wall-input {
+            flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 12px 16px; font-family: 'Kanit', sans-serif;
+            font-size: 0.85rem; color: white; outline: none;
+            transition: border-color 0.25s;
+        }
+        .wall-input::placeholder { color: rgba(255,255,255,0.25); }
+        .wall-input:focus { border-color: rgba(45,212,191,0.4); }
+        .wall-send {
+            padding: 12px 20px; border-radius: 12px; background: rgba(45,212,191,0.15);
+            border: 1px solid rgba(45,212,191,0.3); color: #2dd4bf;
+            font-family: 'Kanit', sans-serif; font-size: 0.85rem; cursor: pointer;
+            transition: all 0.25s;
+        }
+        .wall-send:hover { background: rgba(45,212,191,0.25); }
+
+        /* ═══════════════════════════════
+           HEALING GARDEN
+        ═══════════════════════════════ */
+        .garden-card {
+            position: relative; overflow: hidden; border-radius: 28px;
+            padding: 40px; background: rgba(74,222,128,0.05);
+            border: 1px solid rgba(74,222,128,0.18); margin-bottom: 28px;
+            animation: fade-up 0.7s 0.5s ease both;
+        }
+        .garden-card:hover { border-color: rgba(74,222,128,0.35); }
+        .garden-scene {
+            display: flex; align-items: flex-end; justify-content: center;
+            gap: 12px; height: 120px; margin: 24px 0;
+            position: relative;
+        }
+        .garden-tree {
+            display: flex; flex-direction: column; align-items: center;
+            cursor: default; animation: tree-sway ease-in-out infinite alternate;
+        }
+        @keyframes tree-sway {
+            from { transform: rotate(-1deg); }
+            to   { transform: rotate(1deg); }
+        }
+        .tree-top {
+            font-size: var(--ts, 2rem);
+            filter: drop-shadow(0 0 8px rgba(74,222,128,0.5));
+            transition: transform 0.3s;
+        }
+        .tree-top:hover { transform: scale(1.15); }
+        .tree-trunk { width: 4px; background: rgba(74,222,128,0.3); border-radius: 2px; height: var(--th, 20px); }
+        .garden-flower {
+            font-size: 1.4rem; cursor: pointer;
+            transition: transform 0.3s;
+            animation: bloom 3s ease-in-out infinite alternate;
+        }
+        @keyframes bloom {
+            from { transform: scale(0.9) rotate(-3deg); }
+            to   { transform: scale(1.05) rotate(3deg); }
+        }
+        .garden-flower:hover { transform: scale(1.3); }
+        .garden-sparkle {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+        }
+        .sparkle-dot {
+            position: absolute; border-radius: 50%;
+            animation: sparkle-anim ease-in-out infinite alternate;
+        }
+        @keyframes sparkle-anim {
+            from { opacity: 0.3; transform: scale(0.8); }
+            to   { opacity: 0.9; transform: scale(1.2); }
+        }
+        .garden-stat-row {
+            display: flex; gap: 32px; justify-content: center; flex-wrap: wrap;
+        }
+        .garden-stat {
+            text-align: center;
+        }
+        .garden-stat-num { font-size: 1.6rem; font-weight: 700; color: #4ade80; }
+        .garden-stat-lbl { font-size: 0.72rem; color: rgba(255,255,255,0.35); letter-spacing: 0.07em; margin-top: 2px; }
+
+        /* ═══════════════════════════════
+           HEALING SPACE (AUDIO)
+        ═══════════════════════════════ */
+        .audio-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+            margin-top: 20px;
+        }
+        .audio-pill {
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            padding: 20px 14px; border-radius: 18px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer; transition: all 0.3s; text-align: center;
+        }
+        .audio-pill:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px); }
+        .audio-pill.playing { background: rgba(45,212,191,0.1); border-color: rgba(45,212,191,0.35); }
+        .audio-icon { font-size: 1.8rem; }
+        .audio-name { font-size: 0.75rem; color: rgba(255,255,255,0.5); letter-spacing: 0.06em; }
+        .audio-playing-bar {
+            display: flex; gap: 3px; align-items: flex-end; height: 16px;
+            opacity: 0;
+        }
+        .audio-pill.playing .audio-playing-bar { opacity: 1; }
+        .audio-bar {
+            width: 3px; background: var(--support-teal); border-radius: 2px;
+            animation: audio-wave 0.6s ease-in-out infinite alternate;
+        }
+        .audio-bar:nth-child(2) { animation-delay: 0.1s; }
+        .audio-bar:nth-child(3) { animation-delay: 0.2s; }
+        .audio-bar:nth-child(4) { animation-delay: 0.15s; }
+        @keyframes audio-wave {
+            from { height: 4px; }
+            to   { height: 16px; }
+        }
+
+        /* ═══════════════════════════════
+           EXPERT SUPPORT PILLS
+        ═══════════════════════════════ */
+        .expert-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+            margin-top: 20px;
+        }
+        .expert-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 20px; border-radius: 16px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer; transition: all 0.25s;
+        }
+        .expert-item:hover { background: rgba(255,255,255,0.08); transform: translateX(4px); }
+        .expert-icon { font-size: 1.4rem; }
+        .expert-label { font-size: 0.85rem; color: rgba(255,255,255,0.65); }
+        .expert-count { font-size: 0.7rem; color: rgba(255,255,255,0.3); margin-top: 2px; }
+        .expert-arrow { margin-left: auto; color: rgba(255,255,255,0.25); font-size: 0.85rem; }
+
+        /* ═══════════════════════════════
+           HEALING MISSIONS
+        ═══════════════════════════════ */
+        .mission-list {
+            display: flex; flex-direction: column; gap: 10px; margin-top: 16px;
+        }
+        .mission-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 18px; border-radius: 14px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer; transition: all 0.25s;
+        }
+        .mission-item:hover { background: rgba(255,255,255,0.07); }
+        .mission-item.done { opacity: 0.5; }
+        .mission-check {
+            width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            font-size: 0.7rem; transition: all 0.25s;
+        }
+        .mission-item.done .mission-check { background: var(--support-teal); border-color: var(--support-teal); color: #010c15; }
+        .mission-emoji { font-size: 1.1rem; }
+        .mission-text { font-size: 0.85rem; color: rgba(255,255,255,0.65); flex: 1; }
+        .mission-xp { font-size: 0.72rem; color: var(--eden-gold); font-weight: 600; }
+
+        /* ═══════════════════════════════
+           SUPPORT ROOMS
+        ═══════════════════════════════ */
+        .rooms-scroll {
+            display: flex; gap: 14px; overflow-x: auto;
+            padding-bottom: 8px; margin-top: 20px;
+            scrollbar-width: none;
+        }
+        .rooms-scroll::-webkit-scrollbar { display: none; }
+        .room-pill {
+            flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;
+            align-items: flex-start; padding: 18px 22px; border-radius: 18px; min-width: 160px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer; transition: all 0.3s;
+        }
+        .room-pill:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px); }
+        .room-pill.active { background: rgba(45,212,191,0.1); border-color: rgba(45,212,191,0.3); }
+        .room-icon { font-size: 1.5rem; }
+        .room-name { font-size: 0.82rem; color: rgba(255,255,255,0.65); font-weight: 400; }
+        .room-count {
+            font-size: 0.7rem; color: rgba(255,255,255,0.3);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .room-live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--support-teal); animation: pulse-teal 2s infinite; }
+
+        /* ═══════════════════════════════
+           DAILY ENCOURAGEMENT
+        ═══════════════════════════════ */
+        .daily-card {
+            position: relative; overflow: hidden; border-radius: 28px;
+            padding: 40px 48px; text-align: center;
+            background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(45,212,191,0.06));
+            border: 1px solid rgba(167,139,250,0.2);
+            margin-bottom: 28px; animation: fade-up 0.7s 0.3s ease both;
+        }
+        .daily-quote {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem); font-style: italic;
+            color: rgba(255,255,255,0.85); line-height: 1.7;
+            margin: 16px 0;
+        }
+        .daily-icon { font-size: 2.5rem; margin-bottom: 8px; }
+        .daily-author { font-size: 0.78rem; color: rgba(255,255,255,0.35); letter-spacing: 0.1em; }
+        .daily-nav { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .daily-nav-btn {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 0.8rem; color: rgba(255,255,255,0.5);
+            transition: all 0.25s;
+        }
+        .daily-nav-btn:hover { background: rgba(255,255,255,0.14); color: white; }
+        .daily-dot-row { display: flex; gap: 6px; justify-content: center; margin-top: 14px; }
+        .daily-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.25s; }
+        .daily-dot.active { background: var(--support-teal); width: 18px; }
+
+        /* ═══════════════════════════════
+           JOURNAL
+        ═══════════════════════════════ */
+        .journal-area {
+            width: 100%; min-height: 100px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px; padding: 18px 20px;
+            font-family: 'Kanit', sans-serif; font-size: 0.9rem;
+            color: white; outline: none; resize: none; line-height: 1.75;
+            transition: border-color 0.3s; margin-top: 16px;
+        }
+        .journal-area::placeholder { color: rgba(255,255,255,0.2); }
+        .journal-area:focus { border-color: rgba(167,139,250,0.4); }
+        .journal-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .journal-tag {
+            font-size: 0.72rem; padding: 5px 12px; border-radius: 999px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.45); cursor: pointer; transition: all 0.2s;
+            letter-spacing: 0.05em;
+        }
+        .journal-tag:hover, .journal-tag.active {
+            background: rgba(167,139,250,0.15); border-color: rgba(167,139,250,0.4);
+            color: #a78bfa;
+        }
+        .journal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+        .journal-mood-row { display: flex; gap: 8px; }
+        .j-mood { font-size: 1.2rem; cursor: pointer; transition: transform 0.2s; opacity: 0.5; }
+        .j-mood:hover, .j-mood.selected { transform: scale(1.25); opacity: 1; }
+
+        /* ═══════════════════════════════
+           MENTOR MATCHING
+        ═══════════════════════════════ */
+        .mentor-list {
+            display: flex; flex-direction: column; gap: 12px; margin-top: 18px;
+        }
+        .mentor-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 18px; border-radius: 16px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer; transition: all 0.25s;
+        }
+        .mentor-row:hover { background: rgba(255,255,255,0.08); transform: translateX(4px); }
+        .mentor-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(255,255,255,0.08); font-size: 1.4rem;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .mentor-name { font-size: 0.88rem; color: white; font-weight: 500; }
+        .mentor-role { font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-top: 2px; }
+        .mentor-tags { display: flex; gap: 6px; margin-top: 4px; }
+        .mentor-tag {
+            font-size: 0.62rem; padding: 2px 8px; border-radius: 999px;
+            background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25);
+            color: #93c5fd;
+        }
+        .mentor-status {
+            margin-left: auto; font-size: 0.7rem; color: var(--support-teal);
+            display: flex; align-items: center; gap: 5px; flex-shrink: 0;
+        }
+        .mentor-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--support-teal); }
+
+        /* ═══════════════════════════════
+           ANONYMOUS SPACE
+        ═══════════════════════════════ */
+        .anon-posts { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+        .anon-post {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 16px 20px; transition: background 0.2s;
+        }
+        .anon-post:hover { background: rgba(255,255,255,0.07); }
+        .anon-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .anon-label {
+            font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+            color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.06);
+            padding: 2px 8px; border-radius: 999px;
+        }
+        .anon-time { font-size: 0.7rem; color: rgba(255,255,255,0.2); margin-left: auto; }
+        .anon-text { font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.7; }
+        .anon-actions { display: flex; gap: 10px; margin-top: 12px; }
+        .anon-btn {
+            font-size: 0.72rem; padding: 4px 12px; border-radius: 8px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.4); cursor: pointer; font-family: 'Kanit', sans-serif;
+            transition: all 0.2s;
+        }
+        .anon-btn:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
+
+        /* ═══════════════════════════════
+           CRISIS SUPPORT BANNER
+        ═══════════════════════════════ */
+        .crisis-banner {
+            border-radius: 24px; padding: 28px 36px;
+            background: linear-gradient(135deg, rgba(244,114,182,0.08), rgba(167,139,250,0.06));
+            border: 1px solid rgba(244,114,182,0.2);
+            display: flex; align-items: center; gap: 32px; margin-bottom: 60px;
+            animation: fade-up 0.7s 0.6s ease both;
+        }
+        .crisis-icon { font-size: 2.8rem; flex-shrink: 0; }
+        .crisis-text h3 { font-size: 1.05rem; font-weight: 600; color: white; margin-bottom: 6px; }
+        .crisis-text p { font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.7; }
+        .crisis-btn {
+            margin-left: auto; flex-shrink: 0;
+            padding: 14px 28px; border-radius: 14px; font-size: 0.88rem;
+            font-family: 'Kanit', sans-serif; cursor: pointer; border: none;
+            background: linear-gradient(135deg, #f472b6, #a78bfa);
+            color: white; font-weight: 600; letter-spacing: 0.05em;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 24px rgba(244,114,182,0.25);
+        }
+        .crisis-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(244,114,182,0.4); }
+
+        /* ═══════════════════════════════
+           ANIMATE IN
+        ═══════════════════════════════ */
+        .animate-in {
+            opacity: 0; transform: translateY(30px);
+            animation: fade-up 0.7s ease forwards;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        .delay-6 { animation-delay: 0.6s; }
+        .delay-7 { animation-delay: 0.7s; }
+
+        /* ═══════════════════════════════
+           FOOTER
+        ═══════════════════════════════ */
+        footer {
+            margin-top: auto; padding: 20px 48px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.72rem; color: rgba(255,255,255,0.2); letter-spacing: 0.08em;
+        }
+        .footer-orbs { display: flex; gap: 8px; }
+        .footer-orb { width: 8px; height: 8px; border-radius: 50%; opacity: 0.5; }
+
+        /* ═══════════════════════════════
+           TOAST
+        ═══════════════════════════════ */
+        .toast-container {
+            position: fixed; bottom: 28px; right: 28px; z-index: 9990;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            display: flex; align-items: flex-start; gap: 14px;
+            background: rgba(15,30,45,0.95); border: 1px solid rgba(45,212,191,0.25);
+            border-radius: 14px; padding: 14px 20px;
+            backdrop-filter: blur(20px); min-width: 280px; max-width: 340px;
+            animation: toast-in 0.4s ease; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        @keyframes toast-in {
+            from { opacity: 0; transform: translateX(30px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .toast-icon { font-size: 1.4rem; flex-shrink: 0; }
+        .toast-title { font-size: 0.85rem; font-weight: 600; color: white; }
+        .toast-msg { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+        /* ═══════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════ */
+        @media (max-width: 1024px) {
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .expert-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .nav-links { display: none; }
+            .support-main { padding: 0 16px 60px; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .need-someone { flex-direction: column; padding: 36px 28px; gap: 32px; }
+            .wall-card { grid-column: span 1; }
+            .crisis-banner { flex-direction: column; text-align: center; }
+            .crisis-btn { margin-left: 0; }
+            .audio-grid { grid-template-columns: repeat(2, 1fr); }
+            .expert-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- AMBIENT -->
+<div class="ambient-bg"></div>
+
+<!-- ORBs -->
+<div class="orb" style="width:500px;height:500px;top:-100px;left:-100px;background:radial-gradient(circle,rgba(45,212,191,0.07),transparent);animation-duration:12s;"></div>
+<div class="orb" style="width:400px;height:400px;bottom:-80px;right:-80px;background:radial-gradient(circle,rgba(56,189,248,0.06),transparent);animation-duration:9s;"></div>
+<div class="orb" style="width:300px;height:300px;top:40%;left:60%;background:radial-gradient(circle,rgba(167,139,250,0.05),transparent);animation-duration:15s;"></div>
+
+<!-- RAIN -->
+<div class="rain" id="rainContainer"></div>
+
+<!-- PARTICLES -->
+<div class="particles" id="particles"></div>
+
+<!-- CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- PAGE -->
+<div class="page-wrapper">
+
+    <!-- NAV -->
+    <nav>
+        <div class="nav-logo" onclick="showToast('🌿','EDEN HOME','กำลังกลับหน้าหลัก...')">
+            <span class="eden-badge">EDEN</span>
+            <span class="nav-brand">SAWANNAKHON CONNECT · <strong>SUPPORT</strong></span>
+        </div>
+        <ul class="nav-links">
+            <li onclick="showToast('🏠','Home','กลับหน้าหลัก')">Home</li>
+            <li onclick="showToast('🌿','Community','ชุมชน')">Community</li>
+            <li onclick="showToast('📖','Learn','สาระน่ารู้')">Learn</li>
+            <li class="active">Support</li>
+            <li onclick="showToast('📅','Events','กิจกรรม')">Events</li>
+            <li onclick="showToast('🏡','Garden','สวนของฉัน')">Garden</li>
+        </ul>
+        <div class="nav-right">
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                <span>มีผู้ดูแล 24/7</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-eyebrow">🌊 EDEN SUPPORT · Safe Space</div>
+        <h1 class="hero-title">
+            You Don't Have To<br>
+            Carry Everything <em>Alone</em>
+        </h1>
+        <div class="hero-divider"></div>
+        <p class="hero-subtitle">พักใจได้ที่นี่ · จะมีคนเดินไปกับคุณเสมอ<br>ไม่ว่าจะเป็นวันที่ยากแค่ไหน</p>
+
+        <!-- Mood check-in -->
+        <div class="mood-bar">
+            <span class="mood-label">วันนี้คุณรู้สึกยังไง?</span>
+            <span class="mood-emoji" onclick="selectMood(this,'😊')">😊</span>
+            <span class="mood-emoji" onclick="selectMood(this,'😐')">😐</span>
+            <span class="mood-emoji" onclick="selectMood(this,'😔')">😔</span>
+            <span class="mood-emoji" onclick="selectMood(this,'😫')">😫</span>
+            <span class="mood-emoji" onclick="selectMood(this,'🌧️')">🌧️</span>
+        </div>
+    </section>
+
+    <!-- TICKER -->
+    <div class="ticker-wrapper">
+        <div class="ticker-track" id="tickerTrack">
+            <div class="ticker-item">🌿 วันนี้มีการส่งกำลังใจ <span>847 ครั้ง</span></div>
+            <div class="ticker-dot"></div>
+            <div class="ticker-item">🫂 มีคนฟังออนไลน์อยู่ <span>24 คน</span></div>
+            <div class="ticker-dot"></div>
+            <div class="ticker-item">🌱 Healing Garden เติบโตแล้ว <span>+12 ต้น</span> วันนี้</div>
+            <div class="ticker-dot"></div>
+            <div class="ticker-item">💬 มีการช่วยเหลือกัน <span>1,203 ครั้ง</span> สัปดาห์นี้</div>
+            <div class="ticker-dot"></div>
+            <div class="ticker-item">🎧 คนกำลังฟัง Healing Space <span>61 คน</span></div>
+            <div class="ticker-dot"></div>
+            <div class="ticker-item">📓 บันทึกความรู้สึกวันนี้ <span>318 รายการ</span></div>
+            <div class="ticker-dot"></div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="support-main">
+
+        <!-- NEED SOMEONE -->
+        <div class="need-someone animate-in delay-1">
+            <div class="need-glow"></div>
+            <div class="need-text">
+                <div class="need-tag"><span></span> ออนไลน์ตลอด 24 ชั่วโมง</div>
+                <h2 class="need-title">อยากคุยกับ<br>ใครสักคน?</h2>
+                <p class="need-desc">ไม่ว่าจะเรื่องอะไรก็ตาม มีทีมรับฟังและ Mentor ที่พร้อมอยู่เสมอ ไม่ตัดสิน ไม่บังคับ แค่รับฟัง</p>
+            </div>
+            <div class="need-actions">
+                <button class="btn-primary" onclick="showToast('💬','กำลังจับคู่','กำลังหาคนฟังให้คุณ...')">
+                    💬 คุยกับคนฟังเลย
+                </button>
+                <button class="btn-ghost" onclick="showToast('🧑‍⚕️','Expert','กำลังเปิดหน้า Expert...')">
+                    🧑‍⚕️ ขอคำแนะนำผู้เชี่ยวชาญ
+                </button>
+                <button class="btn-ghost" onclick="showToast('🔒','Anonymous','โหมดไม่ระบุตัวตน')">
+                    🔒 ไม่ระบุตัวตน (Anonymous)
+                </button>
+            </div>
+        </div>
+
+        <!-- ROW 1: ENCOURAGEMENT WALL + MOOD CHECK -->
+        <div class="grid-3 animate-in delay-2">
+
+            <!-- Encouragement Wall -->
+            <div class="s-card teal wall-card">
+                <div class="card-glow-accent"></div>
+                <span class="s-icon">🌿</span>
+                <span class="s-tag">Encouragement</span>
+                <h3 class="s-title">กำแพงกำลังใจ</h3>
+                <p class="s-desc">ส่งกำลังใจถึงกันในชุมชน EDEN — ไม่ว่าจะรู้จักกันหรือไม่</p>
+                <div class="wall-posts">
+                    <div class="wall-post">
+                        <div class="wall-avatar">🌸</div>
+                        <div style="flex:1;">
+                            <div class="wall-post-text">วันนี้อาจจะยากมาก แต่คุณมาถึงจุดนี้ได้แล้ว นั่นก็คือความกล้าหาญ 🌿</div>
+                            <div class="wall-post-name">น้ำฝน · 2 นาทีที่แล้ว</div>
+                        </div>
+                        <div class="wall-post-heart">❤️ 23</div>
+                    </div>
+                    <div class="wall-post">
+                        <div class="wall-avatar">☀️</div>
+                        <div style="flex:1;">
+                            <div class="wall-post-text">ต้นไม้ไม่ได้โตในวันเดียว แต่มันโตทุกวัน เหมือนกับตัวคุณนั่นแหละ</div>
+                            <div class="wall-post-name">Anonymous · 15 นาทีที่แล้ว</div>
+                        </div>
+                        <div class="wall-post-heart">❤️ 41</div>
+                    </div>
+                </div>
+                <div class="wall-input-row">
+                    <input class="wall-input" placeholder="ส่งกำลังใจถึงชุมชน..." id="wallInput">
+                    <button class="wall-send" onclick="sendEncouragement()">ส่ง 🌱</button>
+                </div>
+            </div>
+
+            <!-- Daily Encouragement (right column) -->
+            <div class="s-card purple" style="display:flex;flex-direction:column;justify-content:space-between;">
+                <div class="card-glow-accent"></div>
+                <div>
+                    <span class="s-icon">🌙</span>
+                    <span class="s-tag">Daily</span>
+                    <h3 class="s-title">คำกำลังใจวันนี้</h3>
+                </div>
+                <div style="text-align:center;padding:20px 0;">
+                    <div style="font-size:2rem;margin-bottom:12px;" id="dailyEmojiMain">🌱</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-style:italic;color:rgba(255,255,255,0.8);line-height:1.7;" id="dailyQuoteMain">
+                        "วันนี้คุณทำดีที่สุดแล้ว<br>แม้ไม่มีใครเห็น ตัวคุณเห็น"
+                    </div>
+                </div>
+                <div class="s-footer">
+                    <div>
+                        <div class="s-stat" style="color:#a78bfa;">Day 7</div>
+                        <div class="s-stat-label">Streak กำลังใจ</div>
+                    </div>
+                    <button class="s-btn" onclick="nextQuote()">ถัดไป →</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- DAILY ENCOURAGEMENT CARD -->
+        <div class="daily-card">
+            <div class="daily-icon" id="dailyBigIcon">🌿</div>
+            <div style="font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(167,139,250,0.7);margin-bottom:12px;">คำแห่งวัน · WORD OF THE DAY</div>
+            <div class="daily-quote" id="dailyBigQuote">"การที่คุณยังพยายามอยู่ แม้จะเหนื่อย นั่นคือความกล้าหาญที่ยิ่งใหญ่ที่สุด"</div>
+            <div class="daily-author">— EDEN SUPPORT TEAM</div>
+            <div class="daily-nav">
+                <div class="daily-nav-btn" onclick="cycleDailyBack()">←</div>
+                <div class="daily-nav-btn" onclick="cycleDailyNext()">→</div>
+            </div>
+            <div class="daily-dot-row" id="dailyDots">
+                <div class="daily-dot active"></div>
+                <div class="daily-dot"></div>
+                <div class="daily-dot"></div>
+                <div class="daily-dot"></div>
+            </div>
+        </div>
+
+        <!-- ROW 2: HEALING SPACE + JOURNAL + MISSIONS -->
+        <div class="grid-3 animate-in delay-3">
+
+            <!-- Healing Space -->
+            <div class="s-card sky">
+                <div class="card-glow-accent"></div>
+                <span class="s-icon">🎧</span>
+                <span class="s-tag">Healing Space</span>
+                <h3 class="s-title">พื้นที่รักษาใจ</h3>
+                <p class="s-desc">เลือกเสียงที่ทำให้ใจสงบ เพื่อช่วยให้คุณผ่อนคลายและอยู่กับตัวเอง</p>
+                <div class="audio-grid">
+                    <div class="audio-pill playing" onclick="toggleAudio(this,'🌧️','ฝน')">
+                        <div class="audio-icon">🌧️</div>
+                        <div class="audio-name">ฝน</div>
+                        <div class="audio-playing-bar">
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                        </div>
+                    </div>
+                    <div class="audio-pill" onclick="toggleAudio(this,'🌊','คลื่น')">
+                        <div class="audio-icon">🌊</div>
+                        <div class="audio-name">คลื่น</div>
+                        <div class="audio-playing-bar">
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                        </div>
+                    </div>
+                    <div class="audio-pill" onclick="toggleAudio(this,'🔥','กองไฟ')">
+                        <div class="audio-icon">🔥</div>
+                        <div class="audio-name">กองไฟ</div>
+                        <div class="audio-playing-bar">
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                        </div>
+                    </div>
+                    <div class="audio-pill" onclick="toggleAudio(this,'🌲','ป่า')">
+                        <div class="audio-icon">🌲</div>
+                        <div class="audio-name">ป่า</div>
+                        <div class="audio-playing-bar">
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="s-footer">
+                    <div>
+                        <div class="s-stat" style="color:#93c5fd;">61</div>
+                        <div class="s-stat-label">กำลังฟังอยู่</div>
+                    </div>
+                    <button class="s-btn" onclick="showToast('🎧','Healing Space','เปิดโหมดเต็มจอ...')">เปิดเต็ม →</button>
+                </div>
+            </div>
+
+            <!-- Emotional Journal -->
+            <div class="s-card purple">
+                <div class="card-glow-accent"></div>
+                <span class="s-icon">📓</span>
+                <span class="s-tag">Journal</span>
+                <h3 class="s-title">บันทึกความรู้สึก</h3>
+                <p class="s-desc">พื้นที่เขียนสิ่งที่อยู่ในใจ ไม่มีใครอ่าน มีแค่คุณและความรู้สึกของคุณ</p>
+                <div class="journal-tags">
+                    <span class="journal-tag" onclick="toggleTag(this)">😊 ขอบคุณ</span>
+                    <span class="journal-tag" onclick="toggleTag(this)">😤 ระบาย</span>
+                    <span class="journal-tag" onclick="toggleTag(this)">🌱 เติบโต</span>
+                    <span class="journal-tag" onclick="toggleTag(this)">💭 ฝัน</span>
+                    <span class="journal-tag" onclick="toggleTag(this)">😔 หนักใจ</span>
+                </div>
+                <textarea class="journal-area" placeholder="วันนี้รู้สึกยังไงบ้าง..." rows="3" id="journalText"></textarea>
+                <div class="journal-footer">
+                    <div class="journal-mood-row">
+                        <span class="j-mood" onclick="selectJMood(this)">😊</span>
+                        <span class="j-mood" onclick="selectJMood(this)">😐</span>
+                        <span class="j-mood" onclick="selectJMood(this)">😔</span>
+                        <span class="j-mood" onclick="selectJMood(this)">😫</span>
+                    </div>
+                    <button class="s-btn" style="border-color:rgba(167,139,250,0.3);color:#a78bfa;" onclick="saveJournal()">บันทึก ✓</button>
+                </div>
+            </div>
+
+            <!-- Healing Missions -->
+            <div class="s-card green">
+                <div class="card-glow-accent"></div>
+                <span class="s-icon">🎮</span>
+                <span class="s-tag">Missions</span>
+                <h3 class="s-title">ภารกิจดูแลใจ</h3>
+                <p class="s-desc">ทำสิ่งเล็กๆ ทุกวัน เพื่อดูแลตัวเองและสะสม XP</p>
+                <div class="mission-list">
+                    <div class="mission-item done" onclick="toggleMission(this)">
+                        <div class="mission-check">✓</div>
+                        <span class="mission-emoji">🌅</span>
+                        <span class="mission-text">เข้าสู่ระบบวันนี้</span>
+                        <span class="mission-xp">+30 XP</span>
+                    </div>
+                    <div class="mission-item done" onclick="toggleMission(this)">
+                        <div class="mission-check">✓</div>
+                        <span class="mission-emoji">💧</span>
+                        <span class="mission-text">ดื่มน้ำ 8 แก้ว</span>
+                        <span class="mission-xp">+20 XP</span>
+                    </div>
+                    <div class="mission-item" onclick="toggleMission(this)">
+                        <div class="mission-check"></div>
+                        <span class="mission-emoji">🚶</span>
+                        <span class="mission-text">เดินเล่น 10 นาที</span>
+                        <span class="mission-xp">+50 XP</span>
+                    </div>
+                    <div class="mission-item" onclick="toggleMission(this)">
+                        <div class="mission-check"></div>
+                        <span class="mission-emoji">💌</span>
+                        <span class="mission-text">ส่งกำลังใจให้เพื่อน</span>
+                        <span class="mission-xp">+40 XP</span>
+                    </div>
+                    <div class="mission-item" onclick="toggleMission(this)">
+                        <div class="mission-check"></div>
+                        <span class="mission-emoji">📵</span>
+                        <span class="mission-text">พักจาก Social Media 1 ชม.</span>
+                        <span class="mission-xp">+80 XP</span>
+                    </div>
+                </div>
+                <div class="s-footer">
+                    <div>
+                        <div class="s-stat" style="color:#4ade80;">2/5</div>
+                        <div class="s-stat-label">ทำแล้ววันนี้</div>
+                    </div>
+                    <button class="s-btn" onclick="showToast('🎮','Missions','ดูภารกิจทั้งหมด...')">ดูทั้งหมด →</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- HEALING GARDEN (full width) -->
+        <div class="garden-card animate-in delay-2">
+            <div class="card-glow-accent" style="background:#4ade80;position:absolute;bottom:-40px;right:-40px;width:200px;height:200px;border-radius:50%;filter:blur(60px);opacity:0.25;"></div>
+            <div class="section-label">🌳 HEALING GARDEN · ชุมชนปลูกด้วยกัน</div>
+            <h3 class="section-title" style="margin-bottom:8px;">สวนแห่งการรักษาใจ</h3>
+            <p style="font-size:0.85rem;color:rgba(255,255,255,0.4);margin-bottom:0;">ทุกครั้งที่คุณช่วยกัน ส่งกำลังใจ หรือดูแลตัวเอง — สวนนี้จะเติบโตขึ้น</p>
+            <div class="garden-scene">
+                <div class="garden-sparkle" id="gardenSparkle"></div>
+                <div class="garden-flower" style="animation-delay:0.2s;" onclick="bloomFlower(this)">🌸</div>
+                <div class="garden-tree" style="animation-delay:0s;animation-duration:5s;">
+                    <div class="tree-top" style="--ts:1.8rem;font-size:1.8rem;">🌿</div>
+                    <div class="tree-trunk" style="--th:15px;height:15px;"></div>
+                </div>
+                <div class="garden-tree" style="animation-delay:0.5s;animation-duration:6s;">
+                    <div class="tree-top" style="font-size:2.8rem;">🌳</div>
+                    <div class="tree-trunk" style="height:30px;"></div>
+                </div>
+                <div class="garden-tree" style="animation-delay:1s;animation-duration:4.5s;">
+                    <div class="tree-top" style="font-size:3.6rem;">🌲</div>
+                    <div class="tree-trunk" style="height:40px;"></div>
+                </div>
+                <div class="garden-tree" style="animation-delay:0.3s;animation-duration:7s;">
+                    <div class="tree-top" style="font-size:2.2rem;">🌴</div>
+                    <div class="tree-trunk" style="height:28px;"></div>
+                </div>
+                <div class="garden-tree" style="animation-delay:0.7s;animation-duration:5.5s;">
+                    <div class="tree-top" style="font-size:1.6rem;">🌱</div>
+                    <div class="tree-trunk" style="height:10px;"></div>
+                </div>
+                <div class="garden-flower" style="animation-delay:0.8s;" onclick="bloomFlower(this)">🌺</div>
+                <div class="garden-flower" style="animation-delay:1.2s;" onclick="bloomFlower(this)">🌻</div>
+                <div class="garden-flower" style="animation-delay:0.4s;" onclick="bloomFlower(this)">🌼</div>
+            </div>
+            <div class="garden-stat-row">
+                <div class="garden-stat">
+                    <div class="garden-stat-num">1,248</div>
+                    <div class="garden-stat-lbl">ต้นไม้ทั้งหมด</div>
+                </div>
+                <div class="garden-stat">
+                    <div class="garden-stat-num">847</div>
+                    <div class="garden-stat-lbl">กำลังใจวันนี้</div>
+                </div>
+                <div class="garden-stat">
+                    <div class="garden-stat-num">🌸 214</div>
+                    <div class="garden-stat-lbl">ดอกไม้บาน</div>
+                </div>
+                <div class="garden-stat">
+                    <div class="garden-stat-num">Level 8</div>
+                    <div class="garden-stat-lbl">ความอุดมสมบูรณ์</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 3: MENTOR MATCHING + EXPERT + ANONYMOUS -->
+        <div class="grid-3 animate-in delay-3">
+
+            <!-- Mentor Matching -->
+            <div class="s-card sky">
+                <div class="card-glow-accent"></div>
+                <span class="s-icon">🤝</span>
+                <span class="s-tag">Matching</span>
+                <h3 class="s-title">จับคู่ Mentor</h3>
+                <p class="s-desc">เจอกับคนที่เข้าใจคุณ ไม่ว่าจะเป็นพี่เลี้ยง คนฟัง หรือ Study Buddy</p>
+                <div class="mentor-list">
+                    <div class="mentor-row" onclick="showToast('🤝','น้ำฝน','กำลังส่งคำขอ...')">
+                        <div class="mentor-avatar">🌸</div>
+                        <div style="flex:1;">
+                            <div class="mentor-name">น้ำฝน สมใจ</div>
+                            <div class="mentor-role">Career Mentor · 3 ปีประสบการณ์</div>
+                            <div class="mentor-tags">
+                                <span class="mentor-tag">งาน</span>
+                                <span class="mentor-tag">ชีวิต</span>
+                            </div>
+                        </div>
+                        <div class="mentor-status">ออนไลน์</div>
+                    </div>
+                    <div class="mentor-row" onclick="showToast('🤝','ปิ่นทอง','กำลังส่งคำขอ...')">
+                        <div class="mentor-avatar">🌿</div>
+                        <div style="flex:1;">
+                            <div class="mentor-name">ปิ่นทอง รักดี</div>
+                            <div class="mentor-role">Life Guide · นักจิตวิทยา</div>
+                            <div class="mentor-tags">
+                                <span class="mentor-tag">ใจ</span>
+                                <span class="mentor-tag">ความสัมพันธ์</span>
+                            </div>
+                        </div>
+                        <div class="mentor-status">ออนไลน์</div>
+                    </div>
+                    <div class="mentor-row" onclick="showToast('🤝','วิชัย','กำลังส่งคำขอ...')">
+                        <div class="mentor-avatar">☀️</div>
+                        <div style="flex:1;">
+                            <div class="mentor-name">วิชัย มั่นคง</div>
+                            <div class="mentor-role">Study Buddy · ป.เอก</div>
+                            <div class="mentor-tags">
+                                <span class="mentor-tag">เรียน</span>
+                                <span class="mentor-tag">เป้าหมาย</span>
+                            </div>
+                        </div>
+                        <div class="mentor-status" style="color:rgba(255,255,255,0.3);">15 นาที</div>
+                    </div>
+                </div>
+                <div class="s-footer">
+                    <div>
+                        <div class="s-stat" style="color:#93c5fd;">24</div>
+                        <div class="s-stat-label">Mentor ออนไลน์</div>
+                    </div>
+                    <button class="s-btn" onclick="showToast('🤝','Matching','กำลังจับคู่ให้คุณ...')">จับคู่เลย →</button>
+                </div>
+            </div>
+
+            <!-- Expert Support -->
+            <div class="s-card gold">
+                <div class="card-glow-accent"></div>
+                <span class="s-icon">🧑‍⚕️</span>
+                <span class="s-tag">Expert</span>
+                <h3 class="s-title">ผู้เชี่ยวชาญ</h3>
+                <p class="s-desc">ถามผู้เชี่ยวชาญในด้านที่คุณต้องการคำแนะนำ ฟรีและปลอดภัย</p>
+                <div class="expert-grid">
+                    <div class="expert-item" onclick="showToast('⚖️','กฎหมาย','กำลังเปิด...')">
+                        <span class="expert-icon">⚖️</span>
+                        <div>
+                            <div class="expert-label">กฎหมาย</div>
+                            <div class="expert-count">3 ผู้เชี่ยวชาญ</div>
+                        </div>
+                        <span class="expert-arrow">›</span>
+                    </div>
+                    <div class="expert-item" onclick="showToast('🩺','สุขภาพ','กำลังเปิด...')">
+                        <span class="expert-icon">🩺</span>
+                        <div>
+                            <div class="expert-label">สุขภาพ</div>
+                            <div class="expert-count">5 ผู้เชี่ยวชาญ</div>
+                        </div>
+                        <span class="expert-arrow">›</span>
+                    </div>
+                    <div class="expert-item" onclick="showToast('💼','งาน/ธุรกิจ','กำลังเปิด...')">
+                        <span class="expert-icon">💼</span>
+                        <div>
+                            <div class="expert-label">งาน/ธุรกิจ</div>
+                            <div class="expert-count">4 ผู้เชี่ยวชาญ</div>
+                        </div>
+                        <span class="expert-arrow">›</span>
+                    </div>
+                    <div class="expert-item" onclick="showToast('🎓','การเรียน','กำลังเปิด...')">
+                        <span class="expert-icon">🎓</span>
+                        <div>
+                            <div class="expert-label">การเรียน</div>
+                            <div class="expert-count">6 ผู้เชี่ยวชาญ</div>
+                        </div>
+                        <span class="expert-arrow">›</span>
+                    </div>
+                    <div class="expert-item" onclick="showToast('❤️','ความสัมพันธ์','กำลังเปิด...')">
+                        <span class="expert-icon">❤️</span>
+                        <div>
+                            <div class="expert-label">ความสัมพันธ์</div>
+                            <div class="expert-count">4 ผู้เชี่ยวชาญ</div>
+                        </div>
+                        <span class="expert-arrow">›</span>
+                    </div>
+                    <div class="expert-item" onclick="showToast('🧠','Mental Health','กำลังเปิด...')">
+                        <span class="expert-icon">🧠</span>
+                        <div>
+                            <div class="expert-label">Mental Health</div>
+                            <div class="expert-count">7 ผู้เชี่ยวชาญ</div>
+                        </div>
+                        <span class="expert-arrow">›</span>
+                    </div>
+                </div>
+                <div class="s-footer">
+                    <div>
+                        <div class="s-stat" style="color:#fbbf24;">Free</div>
+                        <div class="s-stat-label">สำหรับสมาชิก EDEN</div>
+                    </div>
+                    <button class="s-btn" onclick="showToast('🧑‍⚕️','Expert','ดูผู้เชี่ยวชาญทั้งหมด...')">ดูทั้งหมด →</button>
+                </div>
+            </div>
+
+            <!-- Anonymous Space -->
+            <div class="s-card pink">
+                <div class="card-glow-accent"></div>
+                <span class="s-icon">🔒</span>
+                <span class="s-tag">Safe Space</span>
+                <h3 class="s-title">พื้นที่นิรนาม</h3>
+                <p class="s-desc">โพสต์ระบาย ขอคำแนะนำ หรือแค่อยากให้มีคนฟัง โดยไม่เปิดเผยตัวตน</p>
+                <div class="anon-posts">
+                    <div class="anon-post">
+                        <div class="anon-header">
+                            <span class="anon-label">🌿 Anonymous</span>
+                            <span class="anon-time">12 นาทีที่แล้ว</span>
+                        </div>
+                        <div class="anon-text">วันนี้เหนื่อยมาก ไม่รู้ว่าทำได้ถูกต้องไหม แค่อยากระบาย...</div>
+                        <div class="anon-actions">
+                            <button class="anon-btn" onclick="showToast('💬','ตอบกลับ','เปิดหน้าตอบ...')">💬 ตอบกลับ</button>
+                            <button class="anon-btn" onclick="showToast('❤️','ส่งกำลังใจ','ส่งแล้ว!')">❤️ ส่งกำลังใจ</button>
+                        </div>
+                    </div>
+                    <div class="anon-post">
+                        <div class="anon-header">
+                            <span class="anon-label">🌿 Anonymous</span>
+                            <span class="anon-time">1 ชม.ที่แล้ว</span>
+                        </div>
+                        <div class="anon-text">ขอบคุณทุกคนในชุมชนนี้มากๆ เมื่อวานหนักมาก แต่วันนี้ดีขึ้นแล้ว 🌱</div>
+                        <div class="anon-actions">
+                            <button class="anon-btn" onclick="showToast('❤️','','ส่งกำลังใจแล้ว!')">❤️ 34</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="s-footer">
+                    <div>
+                        <div class="s-stat" style="color:#f472b6;">🔒 ปลอดภัย</div>
+                        <div class="s-stat-label">ไม่มีใครรู้ว่าคือใคร</div>
+                    </div>
+                    <button class="s-btn" onclick="showToast('🔒','Anonymous','เปิดพื้นที่นิรนาม...')">โพสต์ →</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SUPPORT ROOMS (scrollable) -->
+        <div class="animate-in delay-4" style="margin-bottom:28px;">
+            <div class="section-label">🚪 SUPPORT ROOMS</div>
+            <h3 class="section-title">ห้องรับฟังเฉพาะทาง</h3>
+            <div class="rooms-scroll">
+                <div class="room-pill active" onclick="showToast('🌙','ห้องดึก','กำลังเข้าห้อง...')">
+                    <div class="room-icon">🌙</div>
+                    <div class="room-name">ห้องพักใจตอนดึก</div>
+                    <div class="room-count"><div class="room-live-dot"></div> 18 คน</div>
+                </div>
+                <div class="room-pill" onclick="showToast('💼','ห้องงาน','กำลังเข้าห้อง...')">
+                    <div class="room-icon">💼</div>
+                    <div class="room-name">ห้องคนเหนื่อยงาน</div>
+                    <div class="room-count"><div class="room-live-dot"></div> 31 คน</div>
+                </div>
+                <div class="room-pill" onclick="showToast('💔','ห้องอกหัก','กำลังเข้าห้อง...')">
+                    <div class="room-icon">💔</div>
+                    <div class="room-name">ห้องคนอกหัก</div>
+                    <div class="room-count"><div class="room-live-dot"></div> 12 คน</div>
+                </div>
+                <div class="room-pill" onclick="showToast('🎓','ห้องวัยเรียน','กำลังเข้าห้อง...')">
+                    <div class="room-icon">🎓</div>
+                    <div class="room-name">ห้องวัยเรียน</div>
+                    <div class="room-count"><div class="room-live-dot"></div> 24 คน</div>
+                </div>
+                <div class="room-pill" onclick="showToast('🤫','ห้อง Introvert','กำลังเข้าห้อง...')">
+                    <div class="room-icon">🤫</div>
+                    <div class="room-name">ห้องคน Introvert</div>
+                    <div class="room-count"><div class="room-live-dot"></div> 9 คน</div>
+                </div>
+                <div class="room-pill" onclick="showToast('🌱','ห้องเริ่มใหม่','กำลังเข้าห้อง...')">
+                    <div class="room-icon">🌱</div>
+                    <div class="room-name">ห้องคนเริ่มต้นใหม่</div>
+                    <div class="room-count"><div class="room-live-dot"></div> 7 คน</div>
+                </div>
+                <div class="room-pill" onclick="showToast('😰','ห้อง Anxiety','กำลังเข้าห้อง...')">
+                    <div class="room-icon">😰</div>
+                    <div class="room-name">ห้อง Anxiety & Stress</div>
+                    <div class="room-count"><div class="room-live-dot"></div> 22 คน</div>
+                </div>
+                <div class="room-pill" onclick="showToast('💭','ห้องความฝัน','กำลังเข้าห้อง...')">
+                    <div class="room-icon">💭</div>
+                    <div class="room-name">ห้องตามความฝัน</div>
+                    <div class="room-count"><div class="room-live-dot"></div> 15 คน</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MENTAL WELLNESS CARDS (4 grid) -->
+        <div class="animate-in delay-4" style="margin-bottom:28px;">
+            <div class="section-label">🧠 MENTAL WELLNESS</div>
+            <h3 class="section-title">ดูแลสุขภาพใจ</h3>
+            <div class="grid-4">
+                <div class="s-card teal" onclick="showToast('🔥','Burnout','กำลังเปิดบทความ...')">
+                    <div class="card-glow-accent"></div>
+                    <span class="s-icon" style="font-size:1.8rem;margin-bottom:12px;animation-delay:0.1s;">🔥</span>
+                    <h3 class="s-title" style="font-size:0.95rem;">Burnout</h3>
+                    <p class="s-desc" style="font-size:0.78rem;">รับมือกับความเหนื่อยล้าสะสม</p>
+                </div>
+                <div class="s-card sky" onclick="showToast('😰','Anxiety','กำลังเปิดบทความ...')">
+                    <div class="card-glow-accent"></div>
+                    <span class="s-icon" style="font-size:1.8rem;margin-bottom:12px;animation-delay:0.2s;">😰</span>
+                    <h3 class="s-title" style="font-size:0.95rem;">Anxiety</h3>
+                    <p class="s-desc" style="font-size:0.78rem;">จัดการความวิตกกังวล</p>
+                </div>
+                <div class="s-card purple" onclick="showToast('🌑','Loneliness','กำลังเปิดบทความ...')">
+                    <div class="card-glow-accent"></div>
+                    <span class="s-icon" style="font-size:1.8rem;margin-bottom:12px;animation-delay:0.3s;">🌑</span>
+                    <h3 class="s-title" style="font-size:0.95rem;">Loneliness</h3>
+                    <p class="s-desc" style="font-size:0.78rem;">รับมือกับความโดดเดี่ยว</p>
+                </div>
+                <div class="s-card pink" onclick="showToast('💪','Self-worth','กำลังเปิดบทความ...')">
+                    <div class="card-glow-accent"></div>
+                    <span class="s-icon" style="font-size:1.8rem;margin-bottom:12px;animation-delay:0.4s;">💪</span>
+                    <h3 class="s-title" style="font-size:0.95rem;">Self-worth</h3>
+                    <p class="s-desc" style="font-size:0.78rem;">เพิ่มคุณค่าในตัวเอง</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CRISIS SUPPORT -->
+        <div class="crisis-banner animate-in delay-5">
+            <div class="crisis-icon">🕊️</div>
+            <div class="crisis-text">
+                <h3>Crisis Support · ถ้าวันนี้หนักมาก</h3>
+                <p>ถ้ารู้สึกเครียดหนัก โดดเดี่ยว หรือต้องการความช่วยเหลือด่วน<br>มีทีมพร้อมรับสายตลอด 24 ชั่วโมง — คุณไม่ต้องผ่านสิ่งนี้คนเดียว</p>
+            </div>
+            <button class="crisis-btn" onclick="showToast('🕊️','Crisis Support','กำลังเชื่อมต่อทีมสนับสนุน...')">
+                ขอความช่วยเหลือตอนนี้
+            </button>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div>SAWANNAKHON CONNECT : EDEN — SUPPORT INTERFACE · V2.0 · "คุณไม่ได้อยู่คนเดียว"</div>
+        <div class="footer-orbs">
+            <div class="footer-orb" style="background:#2dd4bf;"></div>
+            <div class="footer-orb" style="background:#38bdf8;"></div>
+            <div class="footer-orb" style="background:#a78bfa;"></div>
+            <div class="footer-orb" style="background:#f472b6;"></div>
+        </div>
+    </footer>
+
+</div><!-- end page-wrapper -->
+
+<script>
+// ══════════════════════════════════
+// RAIN
+// ══════════════════════════════════
+const rainCont = document.getElementById('rainContainer');
+for (let i = 0; i < 60; i++) {
+    const r = document.createElement('div');
+    r.className = 'raindrop';
+    const h = Math.random() * 60 + 20;
+    r.style.cssText = `
+        left: ${Math.random() * 100}%;
+        height: ${h}px;
+        opacity: ${Math.random() * 0.4 + 0.1};
+        animation-duration: ${Math.random() * 3 + 2}s;
+        animation-delay: ${Math.random() * 5}s;
+    `;
+    rainCont.appendChild(r);
+}
+
+// ══════════════════════════════════
+// PARTICLES
+// ══════════════════════════════════
+const pCont = document.getElementById('particles');
+for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const tx = (Math.random() - 0.5) * 200;
+    p.style.cssText = `
+        left: ${Math.random() * 100}%;
+        opacity: ${Math.random() * 0.4 + 0.1};
+        animation-duration: ${Math.random() * 15 + 10}s;
+        animation-delay: ${Math.random() * 10}s;
+        --tx: ${tx}px;
+    `;
+    pCont.appendChild(p);
+}
+
+// ══════════════════════════════════
+// CURSOR
+// ══════════════════════════════════
+const dot  = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function animCursor() {
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    dot.style.left  = mx + 'px'; dot.style.top  = my + 'px';
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+})();
+
+// ══════════════════════════════════
+// TICKER DUPLICATE
+// ══════════════════════════════════
+const tickerTrack = document.getElementById('tickerTrack');
+tickerTrack.innerHTML += tickerTrack.innerHTML;
+
+// ══════════════════════════════════
+// CARD MOUSE GLOW
+// ══════════════════════════════════
+document.querySelectorAll('.s-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width * 100) + '%');
+        card.style.setProperty('--my', ((e.clientY - rect.top)  / rect.height * 100) + '%');
+    });
+});
+
+// ══════════════════════════════════
+// TOAST
+// ══════════════════════════════════
+function showToast(icon, title, msg) {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = `<div class="toast-icon">${icon}</div><div><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
+    c.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(30px)'; t.style.transition='all 0.4s'; setTimeout(()=>t.remove(),400); }, 4000);
+}
+
+// ══════════════════════════════════
+// MOOD SELECTOR
+// ══════════════════════════════════
+function selectMood(el, emoji) {
+    document.querySelectorAll('.mood-emoji').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    const msgs = {'😊':'ดีใจที่คุณรู้สึกดี! ✨', '😐':'ผ่านไปได้นะ 🌿', '😔':'มีคนอยู่ด้วยเสมอ 🫂', '😫':'พักก่อนนะ คุณเหนื่อยมาพอแล้ว 🌧️', '🌧️':'วันนี้หนัก — แต่คุณแข็งแกร่งมาก 💙'};
+    showToast(emoji, 'Mood Check-In', msgs[emoji] || 'ขอบคุณที่บอกเรา');
+}
+
+// ══════════════════════════════════
+// JOURNAL
+// ══════════════════════════════════
+function toggleTag(el) { el.classList.toggle('active'); }
+function selectJMood(el) { document.querySelectorAll('.j-mood').forEach(e=>e.classList.remove('selected')); el.classList.add('selected'); }
+function saveJournal() {
+    const txt = document.getElementById('journalText').value;
+    if (!txt.trim()) { showToast('📓','Journal','กรุณาเขียนบางอย่างก่อน'); return; }
+    showToast('📓','บันทึกแล้ว','ความรู้สึกของคุณถูกบันทึกอย่างปลอดภัย 🌿');
+    document.getElementById('journalText').value = '';
+}
+
+// ══════════════════════════════════
+// ENCOURAGEMENT WALL
+// ══════════════════════════════════
+function sendEncouragement() {
+    const input = document.getElementById('wallInput');
+    const txt = input.value.trim();
+    if (!txt) return;
+    showToast('🌱','ส่งแล้ว!','กำลังใจของคุณถูกส่งไปยังชุมชน ❤️');
+    input.value = '';
+}
+
+// ══════════════════════════════════
+// AUDIO TOGGLE
+// ══════════════════════════════════
+function toggleAudio(el, icon, name) {
+    const wasPlaying = el.classList.contains('playing');
+    document.querySelectorAll('.audio-pill').forEach(p => p.classList.remove('playing'));
+    if (!wasPlaying) {
+        el.classList.add('playing');
+        showToast(icon, 'กำลังเล่น: ' + name, 'ปิดเสียงรอบข้างสักครู่ ผ่อนคลายได้เลย 🎧');
+    }
+}
+
+// ══════════════════════════════════
+// HEALING MISSIONS
+// ══════════════════════════════════
+function toggleMission(el) {
+    const wasDone = el.classList.contains('done');
+    if (!wasDone) {
+        el.classList.add('done');
+        el.querySelector('.mission-check').textContent = '✓';
+        showToast('✅','ทำสำเร็จ!','ยอดเยี่ยมมาก! คุณดูแลตัวเองได้ดีมาก 🌱');
+    }
+}
+
+// ══════════════════════════════════
+// DAILY QUOTES
+// ══════════════════════════════════
+const quotes = [
+    { e:'🌿', q:'"การที่คุณยังพยายามอยู่ แม้จะเหนื่อย นั่นคือความกล้าหาญที่ยิ่งใหญ่ที่สุด"' },
+    { e:'🌱', q:'"ต้นไม้ไม่ได้โตในวันเดียว แต่มันโตทุกวัน — เหมือนกับตัวคุณ"' },
+    { e:'🌊', q:'"คลื่นที่ใหญ่ที่สุด ก็ยังกลับเป็นน้ำสงบ — และคุณก็เช่นกัน"' },
+    { e:'☀️', q:'"พรุ่งนี้คือวันใหม่ ที่มีโอกาสใหม่ รอคุณอยู่เสมอ"' },
+];
+let qIdx = 0;
+function cycleDailyNext() {
+    qIdx = (qIdx + 1) % quotes.length;
+    updateQuote();
+}
+function cycleDailyBack() {
+    qIdx = (qIdx - 1 + quotes.length) % quotes.length;
+    updateQuote();
+}
+function nextQuote() { cycleDailyNext(); }
+function updateQuote() {
+    const q = quotes[qIdx];
+    document.getElementById('dailyBigIcon').textContent = q.e;
+    document.getElementById('dailyBigQuote').textContent = q.q;
+    document.getElementById('dailyEmojiMain').textContent = q.e;
+    document.getElementById('dailyQuoteMain').innerHTML = q.q;
+    document.querySelectorAll('.daily-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === qIdx);
+    });
+}
+
+// ══════════════════════════════════
+// BLOOM FLOWER
+// ══════════════════════════════════
+function bloomFlower(el) {
+    el.style.transform = 'scale(1.5) rotate(20deg)';
+    setTimeout(() => { el.style.transform = ''; }, 500);
+    showToast('🌸','Healing Garden','ดอกไม้บานแล้ว! ขอบคุณที่ดูแลสวน 🌿');
+}
+
+// Garden sparkles
+function addSparkles() {
+    const container = document.getElementById('gardenSparkle');
+    const colors = ['#4ade80','#2dd4bf','#fbbf24','#f472b6'];
+    for (let i = 0; i < 12; i++) {
+        const s = document.createElement('div');
+        s.className = 'sparkle-dot';
+        const size = Math.random() * 6 + 3;
+        s.style.cssText = `
+            left: ${Math.random() * 100}%; top: ${Math.random() * 100}%;
+            width: ${size}px; height: ${size}px;
+            background: ${colors[Math.floor(Math.random() * colors.length)]};
+            animation-delay: ${Math.random() * 3}s;
+            animation-duration: ${Math.random() * 2 + 1.5}s;
+            border-radius: 50%;
+        `;
+        container.appendChild(s);
+    }
+}
+addSparkles();
+
+// ══════════════════════════════════
+// AUTO TOASTS
+// ══════════════════════════════════
+const autoToasts = [
+    ['🌱','สมาชิกใหม่','น้องดาว เพิ่งเข้าร่วม EDEN Support!'],
+    ['💌','กำลังใจ','คุณได้รับกำลังใจจากชุมชน 3 ครั้ง ❤️'],
+    ['🌳','Healing Garden','สวนของชุมชนเพิ่งได้ต้นไม้ใหม่!'],
+    ['🎧','Healing Space','61 คนกำลังผ่อนคลายด้วยกัน'],
+];
+let ati = 0;
+setTimeout(() => {
+    const fn = () => { const [i,t,m] = autoToasts[ati % autoToasts.length]; showToast(i,t,m); ati++; };
+    fn(); setInterval(fn, 14000);
+}, 4000);
+</script>
+</body>
+</html>

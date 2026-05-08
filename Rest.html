@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REST - SAWANNAKHON CONNECT : EDEN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --night: #05080f;
+            --deep: #080d1c;
+            --indigo: #1a1f3a;
+            --moon: #c8d8f0;
+            --moon-dim: rgba(200,216,240,0.5);
+            --aurora1: #7c6af7;
+            --aurora2: #4fb8c9;
+            --aurora3: #a78ce6;
+            --star: rgba(255,255,255,0.85);
+            --glass: rgba(255,255,255,0.05);
+            --glass-border: rgba(255,255,255,0.1);
+            --lavender: #b8a9e8;
+            --mint: #7ed8c4;
+            --amber: #f4c87a;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: var(--night);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ══════════════ CURSOR ══════════════ */
+        .cursor-dot {
+            width: 6px; height: 6px;
+            background: var(--moon);
+            border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9999;
+            transform: translate(-50%,-50%);
+        }
+        .cursor-ring {
+            width: 32px; height: 32px;
+            border: 1px solid rgba(200,216,240,0.35);
+            border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: all 0.18s ease;
+        }
+
+        /* ══════════════ NIGHT SKY BG ══════════════ */
+        .sky {
+            position: fixed; inset: 0; z-index: 0;
+            background: radial-gradient(ellipse at 20% 0%, #1a1240 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 10%, #0d1f3a 0%, transparent 55%),
+                        radial-gradient(ellipse at 50% 100%, #0a0f1e 0%, transparent 60%),
+                        linear-gradient(180deg, #05080f 0%, #080d1c 100%);
+        }
+
+        /* Stars canvas */
+        #starsCanvas {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+        }
+
+        /* Aurora */
+        .aurora-wrap {
+            position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden;
+        }
+        .aurora {
+            position: absolute; top: -20%; left: -10%;
+            width: 120%; height: 55%;
+            background: linear-gradient(180deg,
+                rgba(124,106,247,0.12) 0%,
+                rgba(79,184,201,0.08) 40%,
+                rgba(167,140,230,0.06) 70%,
+                transparent 100%);
+            filter: blur(40px);
+            animation: auroraShift 18s ease-in-out infinite alternate;
+            border-radius: 50%;
+        }
+        .aurora2 {
+            left: 30%; top: -30%;
+            background: linear-gradient(160deg,
+                rgba(79,184,201,0.09) 0%,
+                rgba(124,106,247,0.07) 50%,
+                transparent 100%);
+            animation: auroraShift2 22s ease-in-out infinite alternate;
+        }
+        @keyframes auroraShift {
+            0%  { transform: translateX(-5%) scaleY(0.9) rotate(-2deg); opacity: 0.7; }
+            50% { transform: translateX(3%)  scaleY(1.1) rotate(1deg);  opacity: 1;   }
+            100%{ transform: translateX(-3%) scaleY(0.95) rotate(-1deg);opacity: 0.8; }
+        }
+        @keyframes auroraShift2 {
+            0%  { transform: translateX(5%) scaleX(0.9); opacity: 0.6; }
+            100%{ transform: translateX(-5%) scaleX(1.1); opacity: 0.9; }
+        }
+
+        /* Moon */
+        .moon {
+            position: fixed; top: 60px; right: 120px; z-index: 3;
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #f0f4ff, #c8d8f0 60%, #8aa8d0);
+            box-shadow: 0 0 40px rgba(200,216,240,0.25), 0 0 100px rgba(200,216,240,0.08);
+            animation: moonFloat 8s ease-in-out infinite;
+        }
+        .moon::after {
+            content: '';
+            position: absolute; inset: 0; border-radius: 50%;
+            background: radial-gradient(circle at 60% 40%, rgba(255,255,255,0.15), transparent 50%);
+        }
+        @keyframes moonFloat {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-8px); }
+        }
+
+        /* ══════════════ LAYOUT ══════════════ */
+        .page-wrapper {
+            position: relative; z-index: 10;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* ══════════════ NAV ══════════════ */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 48px; height: 72px;
+            background: rgba(5,8,15,0.7);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .nav-logo { display: flex; align-items: center; gap: 14px; }
+        .nav-brand { font-size: 0.85rem; font-weight: 300; letter-spacing: 0.12em; color: rgba(255,255,255,0.5); text-transform: uppercase; }
+        .nav-brand strong { color: var(--moon); font-weight: 600; }
+
+        @keyframes shine-eden {
+            0%   { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        .eden-badge {
+            font-size: 1.2rem; font-weight: 700; letter-spacing: 0.2em;
+            background: linear-gradient(90deg, #a78bfa,#7ed8c4,#c8d8f0,#f4c87a,#a78bfa);
+            background-size: 300%;
+            animation: shine-eden 6s linear infinite;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .nav-links { display: flex; gap: 36px; list-style: none; }
+        .nav-links li {
+            font-size: 0.82rem; letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.4); cursor: pointer;
+            transition: color 0.25s; position: relative; padding-bottom: 4px;
+        }
+        .nav-links li::after {
+            content: ''; position: absolute; bottom: 0; left: 0;
+            height: 1px; width: 0; background: var(--moon);
+            transition: width 0.3s;
+        }
+        .nav-links li:hover { color: white; }
+        .nav-links li:hover::after { width: 100%; }
+        .nav-links li.active { color: var(--moon); }
+        .nav-links li.active::after { width: 100%; }
+
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .status-badge {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 16px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px; font-size: 0.8rem;
+        }
+        .status-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: #7ed8c4;
+            animation: pulse-mint 2.5s ease infinite;
+        }
+        @keyframes pulse-mint {
+            0%,100% { box-shadow: 0 0 0 0 rgba(126,216,196,0.4); }
+            50%      { box-shadow: 0 0 0 7px rgba(126,216,196,0); }
+        }
+        .logout-btn {
+            font-size: 0.8rem; color: rgba(255,255,255,0.3);
+            background: none; border: none; cursor: pointer;
+            font-family: 'Kanit',sans-serif; letter-spacing: 0.06em; transition: color 0.2s;
+        }
+        .logout-btn:hover { color: white; }
+
+        /* ══════════════ HERO ══════════════ */
+        .hero {
+            text-align: center;
+            padding: 70px 24px 20px;
+        }
+        .hero-eyebrow {
+            font-size: 0.72rem; letter-spacing: 0.35em;
+            color: var(--lavender); text-transform: uppercase; margin-bottom: 18px; opacity: 0.7;
+        }
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            font-weight: 300; font-style: italic;
+            color: var(--moon);
+            line-height: 1.05;
+            text-shadow: 0 0 80px rgba(200,216,240,0.2);
+            margin-bottom: 14px;
+        }
+        .hero-title strong { font-weight: 600; font-style: normal; }
+        .hero-sub {
+            font-size: 0.88rem; font-weight: 300;
+            color: rgba(255,255,255,0.35); letter-spacing: 0.12em;
+        }
+        .hero-divider {
+            width: 60px; height: 1px; margin: 22px auto;
+            background: linear-gradient(90deg, transparent, var(--lavender), transparent);
+            box-shadow: 0 0 10px var(--lavender);
+        }
+
+        /* ══════════════ BREATHE WIDGET ══════════════ */
+        .breathe-section {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 10px 24px 50px;
+        }
+        .breathe-orb-wrap {
+            position: relative;
+            width: 220px; height: 220px;
+            cursor: pointer;
+            margin-bottom: 28px;
+        }
+        .breathe-ring {
+            position: absolute; inset: 0; border-radius: 50%;
+            border: 1px solid rgba(167,139,250,0.3);
+            animation: ringPulse 4s ease-in-out infinite;
+        }
+        .breathe-ring:nth-child(2) { inset: -12px; animation-delay: 0.5s; border-color: rgba(167,139,250,0.15); }
+        .breathe-ring:nth-child(3) { inset: -24px; animation-delay: 1s;   border-color: rgba(167,139,250,0.07); }
+        @keyframes ringPulse {
+            0%,100% { transform: scale(1); opacity: 0.8; }
+            50%      { transform: scale(1.05); opacity: 0.4; }
+        }
+        .breathe-orb {
+            position: absolute; inset: 20px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(124,106,247,0.4) 0%, rgba(79,184,201,0.15) 60%, transparent 100%);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(167,139,250,0.3);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            box-shadow: 0 0 60px rgba(124,106,247,0.15), inset 0 0 40px rgba(255,255,255,0.03);
+            transition: all 0.5s ease;
+        }
+        .breathe-orb.inhale {
+            animation: breatheIn 4s ease-in-out forwards;
+        }
+        .breathe-orb.exhale {
+            animation: breatheOut 6s ease-in-out forwards;
+        }
+        .breathe-orb.hold {
+            animation: breatheHold 4s ease-in-out forwards;
+        }
+        @keyframes breatheIn {
+            from { transform: scale(0.9); background: radial-gradient(circle, rgba(124,106,247,0.35) 0%, rgba(79,184,201,0.1) 60%, transparent 100%); }
+            to   { transform: scale(1.12); background: radial-gradient(circle, rgba(124,106,247,0.6) 0%, rgba(79,184,201,0.25) 60%, transparent 100%); }
+        }
+        @keyframes breatheOut {
+            from { transform: scale(1.12); background: radial-gradient(circle, rgba(124,106,247,0.6) 0%, rgba(79,184,201,0.25) 60%, transparent 100%); }
+            to   { transform: scale(0.9);  background: radial-gradient(circle, rgba(124,106,247,0.25) 0%, rgba(79,184,201,0.08) 60%, transparent 100%); }
+        }
+        @keyframes breatheHold {
+            0%,100% { transform: scale(1.12); box-shadow: 0 0 80px rgba(124,106,247,0.3); }
+            50%      { transform: scale(1.13); box-shadow: 0 0 100px rgba(124,106,247,0.4); }
+        }
+        .breathe-label {
+            font-size: 0.78rem; letter-spacing: 0.2em; color: var(--lavender);
+            text-transform: uppercase; margin-bottom: 6px;
+        }
+        .breathe-count {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem; font-weight: 300; color: white; line-height: 1;
+        }
+        .breathe-controls { display: flex; gap: 16px; align-items: center; }
+        .breathe-btn {
+            padding: 10px 28px; border-radius: 999px;
+            background: rgba(124,106,247,0.15);
+            border: 1px solid rgba(167,139,250,0.3);
+            color: var(--lavender);
+            font-family: 'Kanit',sans-serif;
+            font-size: 0.82rem; letter-spacing: 0.08em;
+            cursor: pointer; transition: all 0.25s;
+        }
+        .breathe-btn:hover { background: rgba(124,106,247,0.3); color: white; }
+        .breathe-btn.active {
+            background: rgba(124,106,247,0.35);
+            border-color: var(--lavender);
+            color: white;
+        }
+        .breathe-mode-label {
+            font-size: 0.72rem; color: rgba(255,255,255,0.35);
+            letter-spacing: 0.12em; text-align: center; margin-top: 12px;
+        }
+
+        /* ══════════════ MAIN GRID ══════════════ */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr 1fr;
+            gap: 20px;
+            padding: 0 32px 32px;
+            max-width: 1400px; margin: 0 auto; width: 100%;
+        }
+
+        /* Glass card base */
+        .g-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            backdrop-filter: blur(20px);
+            padding: 32px;
+            transition: border-color 0.3s, background 0.3s, transform 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+        .g-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-6px);
+        }
+
+        .card-section-label {
+            font-size: 0.65rem; letter-spacing: 0.22em;
+            color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 20px;
+        }
+        .card-title-lg {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem; font-weight: 300; color: var(--moon);
+            margin-bottom: 6px; line-height: 1.2;
+        }
+        .card-desc {
+            font-size: 0.78rem; color: rgba(255,255,255,0.4);
+            line-height: 1.7; margin-bottom: 24px; font-weight: 300;
+        }
+
+        /* ══════════════ SOUND PLAYER ══════════════ */
+        .sound-card { border-color: rgba(124,106,247,0.25); }
+        .sound-card:hover { border-color: rgba(124,106,247,0.45); }
+
+        .sound-list { display: flex; flex-direction: column; gap: 10px; }
+        .sound-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 16px; border-radius: 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            cursor: pointer; transition: all 0.25s;
+        }
+        .sound-item:hover { background: rgba(124,106,247,0.12); border-color: rgba(124,106,247,0.25); }
+        .sound-item.playing { background: rgba(124,106,247,0.18); border-color: rgba(167,139,250,0.4); }
+
+        .sound-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: rgba(124,106,247,0.15);
+            border: 1px solid rgba(167,139,250,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; flex-shrink: 0;
+            transition: transform 0.3s;
+        }
+        .sound-item.playing .sound-icon { transform: scale(1.1); background: rgba(124,106,247,0.3); }
+
+        .sound-info { flex: 1; min-width: 0; }
+        .sound-name { font-size: 0.85rem; font-weight: 500; color: white; }
+        .sound-type { font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-top: 2px; }
+
+        .sound-wave {
+            display: flex; align-items: center; gap: 2px; height: 20px;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .sound-item.playing .sound-wave { opacity: 1; }
+        .wave-bar {
+            width: 3px; border-radius: 2px;
+            background: var(--lavender);
+            animation: waveDance 0.8s ease-in-out infinite alternate;
+        }
+        .wave-bar:nth-child(1) { animation-delay: 0s;    height: 8px; }
+        .wave-bar:nth-child(2) { animation-delay: 0.1s;  height: 14px; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s;  height: 10px; }
+        .wave-bar:nth-child(4) { animation-delay: 0.15s; height: 16px; }
+        .wave-bar:nth-child(5) { animation-delay: 0.05s; height: 8px; }
+        @keyframes waveDance {
+            from { transform: scaleY(0.5); }
+            to   { transform: scaleY(1.2); }
+        }
+
+        /* Volume slider */
+        .vol-row {
+            display: flex; align-items: center; gap: 12px; margin-top: 20px;
+        }
+        .vol-label { font-size: 0.7rem; color: rgba(255,255,255,0.35); flex-shrink: 0; }
+        input[type=range].vol-slider {
+            flex: 1; height: 3px; -webkit-appearance: none;
+            background: rgba(255,255,255,0.1); border-radius: 99px; outline: none;
+        }
+        input[type=range].vol-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: var(--lavender);
+            box-shadow: 0 0 8px rgba(167,139,250,0.6);
+            cursor: pointer;
+        }
+
+        /* ══════════════ SLEEP TIMER ══════════════ */
+        .sleep-card { border-color: rgba(79,184,201,0.2); }
+        .sleep-card:hover { border-color: rgba(79,184,201,0.4); }
+
+        .sleep-clock-wrap { text-align: center; margin-bottom: 28px; }
+        .sleep-time {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 5rem; font-weight: 300;
+            color: var(--moon); line-height: 1;
+            text-shadow: 0 0 40px rgba(200,216,240,0.2);
+            letter-spacing: -0.02em;
+        }
+        .sleep-date {
+            font-size: 0.75rem; color: rgba(255,255,255,0.3);
+            letter-spacing: 0.2em; margin-top: 6px; text-transform: uppercase;
+        }
+
+        .sleep-targets {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; margin-bottom: 24px;
+        }
+        .sleep-target {
+            padding: 14px; border-radius: 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            text-align: center; cursor: pointer; transition: all 0.25s;
+        }
+        .sleep-target:hover { background: rgba(79,184,201,0.1); border-color: rgba(79,184,201,0.3); }
+        .sleep-target.selected { background: rgba(79,184,201,0.15); border-color: rgba(126,216,196,0.4); }
+        .sleep-target-hrs {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem; font-weight: 300; color: var(--mint);
+        }
+        .sleep-target-label { font-size: 0.65rem; color: rgba(255,255,255,0.35); letter-spacing: 0.08em; }
+
+        .sleep-bar-wrap { margin-bottom: 20px; }
+        .sleep-bar-label {
+            display: flex; justify-content: space-between;
+            font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-bottom: 8px;
+        }
+        .sleep-bar-track {
+            height: 6px; background: rgba(255,255,255,0.06);
+            border-radius: 99px; overflow: hidden; position: relative;
+        }
+        .sleep-bar-fill {
+            height: 100%; border-radius: 99px;
+            background: linear-gradient(90deg, var(--aurora1), var(--aurora2));
+            box-shadow: 0 0 10px rgba(79,184,201,0.4);
+            transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .sleep-schedule { display: flex; flex-direction: column; gap: 10px; }
+        .sleep-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 14px; border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .sleep-row-label { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
+        .sleep-row-val { font-size: 0.82rem; color: var(--mint); font-weight: 500; }
+
+        .set-alarm-btn {
+            width: 100%; margin-top: 20px;
+            padding: 12px; border-radius: 14px;
+            background: rgba(79,184,201,0.12);
+            border: 1px solid rgba(126,216,196,0.3);
+            color: var(--mint); font-family: 'Kanit',sans-serif;
+            font-size: 0.82rem; letter-spacing: 0.08em;
+            cursor: pointer; transition: all 0.25s;
+        }
+        .set-alarm-btn:hover { background: rgba(79,184,201,0.25); }
+
+        /* ══════════════ HEALTH TIPS ══════════════ */
+        .health-card { border-color: rgba(244,200,122,0.2); }
+        .health-card:hover { border-color: rgba(244,200,122,0.35); }
+
+        .health-list { display: flex; flex-direction: column; gap: 12px; }
+        .health-item {
+            display: flex; gap: 14px; align-items: flex-start;
+            padding: 14px 16px; border-radius: 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            cursor: pointer; transition: all 0.25s;
+        }
+        .health-item:hover { background: rgba(244,200,122,0.07); border-color: rgba(244,200,122,0.2); }
+        .health-item-icon {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: rgba(244,200,122,0.1);
+            border: 1px solid rgba(244,200,122,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .health-item-title { font-size: 0.82rem; font-weight: 500; color: white; margin-bottom: 3px; }
+        .health-item-desc { font-size: 0.7rem; color: rgba(255,255,255,0.4); line-height: 1.5; }
+
+        /* ══════════════ BOTTOM ROW ══════════════ */
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 0.8fr;
+            gap: 20px;
+            padding: 0 32px 80px;
+            max-width: 1400px; margin: 0 auto; width: 100%;
+        }
+
+        /* Meditation timer */
+        .meditation-card { border-color: rgba(167,139,250,0.2); }
+        .meditation-card:hover { border-color: rgba(167,139,250,0.4); }
+
+        .med-times { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+        .med-time-btn {
+            padding: 8px 18px; border-radius: 999px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            font-family: 'Kanit',sans-serif; font-size: 0.78rem;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .med-time-btn.active {
+            background: rgba(167,139,250,0.2);
+            border-color: var(--lavender); color: var(--lavender);
+        }
+        .med-time-btn:hover { color: white; border-color: rgba(255,255,255,0.3); }
+
+        .med-display {
+            text-align: center; margin-bottom: 20px;
+        }
+        .med-timer-num {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4rem; font-weight: 300; color: var(--lavender); line-height: 1;
+        }
+        .med-timer-label { font-size: 0.65rem; color: rgba(255,255,255,0.3); letter-spacing: 0.2em; margin-top: 4px; }
+
+        .med-btn-row { display: flex; gap: 12px; }
+        .med-ctrl {
+            flex: 1; padding: 11px;
+            border-radius: 12px;
+            font-family: 'Kanit',sans-serif; font-size: 0.82rem;
+            cursor: pointer; transition: all 0.2s; letter-spacing: 0.06em;
+        }
+        .med-start {
+            background: rgba(167,139,250,0.2);
+            border: 1px solid rgba(167,139,250,0.35);
+            color: var(--lavender);
+        }
+        .med-start:hover { background: rgba(167,139,250,0.35); }
+        .med-reset {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.35);
+        }
+        .med-reset:hover { color: white; }
+
+        /* Body scan */
+        .bodyscan-card { border-color: rgba(126,216,196,0.2); }
+        .bodyscan-card:hover { border-color: rgba(126,216,196,0.35); }
+
+        .body-svg-wrap {
+            display: flex; justify-content: center; margin-bottom: 16px;
+            position: relative;
+        }
+        .body-figure {
+            width: 80px; height: 160px;
+            position: relative;
+        }
+        .scan-line {
+            position: absolute; left: -10px; right: -10px; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--mint), transparent);
+            box-shadow: 0 0 10px var(--mint);
+            animation: scanDown 3s ease-in-out infinite;
+            opacity: 0.7;
+        }
+        @keyframes scanDown {
+            0%   { top: 0%; opacity: 0; }
+            10%  { opacity: 0.7; }
+            90%  { opacity: 0.7; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .body-zones { display: flex; flex-direction: column; gap: 8px; }
+        .body-zone {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.75rem;
+        }
+        .zone-dot {
+            width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+        }
+        .zone-name { color: rgba(255,255,255,0.5); flex: 1; }
+        .zone-status { font-size: 0.68rem; }
+
+        /* Mood tracker */
+        .mood-card { border-color: rgba(244,200,122,0.2); }
+        .mood-card:hover { border-color: rgba(244,200,122,0.35); }
+
+        .mood-emojis { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .mood-btn {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            font-size: 1.5rem; cursor: pointer; transition: all 0.25s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .mood-btn:hover { transform: scale(1.15); background: rgba(255,255,255,0.1); }
+        .mood-btn.selected { transform: scale(1.2); background: rgba(244,200,122,0.15); border-color: rgba(244,200,122,0.4); }
+
+        .mood-note {
+            width: 100%; padding: 10px 14px; border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: white; font-family: 'Kanit',sans-serif; font-size: 0.78rem;
+            resize: none; outline: none; margin-bottom: 14px;
+            transition: border-color 0.2s;
+        }
+        .mood-note:focus { border-color: rgba(244,200,122,0.4); }
+        .mood-save {
+            width: 100%; padding: 10px; border-radius: 12px;
+            background: rgba(244,200,122,0.12);
+            border: 1px solid rgba(244,200,122,0.25);
+            color: var(--amber); font-family: 'Kanit',sans-serif;
+            font-size: 0.8rem; letter-spacing: 0.08em;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .mood-save:hover { background: rgba(244,200,122,0.25); }
+
+        /* ══════════════ TOAST ══════════════ */
+        .toast-container { position: fixed; bottom: 28px; right: 28px; z-index: 200; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 18px;
+            background: rgba(8,13,28,0.94);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; backdrop-filter: blur(20px);
+            min-width: 260px;
+            animation: slideIn 0.4s ease, fadeOut 0.5s ease 4s forwards;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(8px); } }
+        .toast-icon { font-size: 1.2rem; }
+        .toast-title { font-size: 0.8rem; font-weight: 600; color: white; }
+        .toast-msg   { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 1px; }
+
+        /* ══════════════ FOOTER ══════════════ */
+        footer {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 22px 48px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .footer-txt { font-size: 0.7rem; letter-spacing: 0.18em; color: rgba(255,255,255,0.15); text-transform: uppercase; }
+
+        /* ══════════════ ANIMATE ══════════════ */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .an { opacity: 0; animation: fadeUp 0.7s ease forwards; }
+        .d1 { animation-delay: 0.1s; } .d2 { animation-delay: 0.2s; }
+        .d3 { animation-delay: 0.35s; } .d4 { animation-delay: 0.5s; }
+        .d5 { animation-delay: 0.65s; } .d6 { animation-delay: 0.8s; }
+        .d7 { animation-delay: 0.95s; } .d8 { animation-delay: 1.1s; }
+
+        /* ══════════════ RESPONSIVE ══════════════ */
+        @media (max-width: 1100px) {
+            .main-grid { grid-template-columns: 1fr 1fr; }
+            .bottom-row { grid-template-columns: 1fr 1fr; }
+            nav { padding: 0 24px; }
+            .nav-links { display: none; }
+        }
+        @media (max-width: 640px) {
+            .main-grid, .bottom-row { grid-template-columns: 1fr; padding-left: 16px; padding-right: 16px; }
+            .breathe-orb-wrap { width: 180px; height: 180px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-dot" id="cDot"></div>
+    <div class="cursor-ring" id="cRing"></div>
+
+    <!-- Night sky -->
+    <div class="sky"></div>
+    <canvas id="starsCanvas"></canvas>
+    <div class="aurora-wrap">
+        <div class="aurora"></div>
+        <div class="aurora aurora2"></div>
+    </div>
+    <div class="moon"></div>
+
+    <div class="toast-container" id="toastCont"></div>
+
+    <div class="page-wrapper">
+
+        <!-- NAV -->
+        <nav>
+            <div class="nav-logo">
+                <div class="nav-brand">SAWANNAKHON <strong>CONNECT</strong></div>
+                <div style="width:1px;height:24px;background:rgba(255,255,255,0.1);"></div>
+                <div class="eden-badge">EDEN</div>
+            </div>
+            <ul class="nav-links">
+                <li>Home</li>
+                <li class="active">Rest</li>
+                <li>Grow</li>
+                <li>Community</li>
+                <li>Support</li>
+                <li>Mission</li>
+            </ul>
+            <div class="nav-right">
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    <span style="color:rgba(255,255,255,0.7);">ต้นกล้าน้อย</span>
+                    <span style="font-size:0.7rem;color:var(--amber);margin-left:4px;">Lv.3</span>
+                </div>
+                <button class="logout-btn">Logout</button>
+            </div>
+        </nav>
+
+        <!-- HERO -->
+        <div class="hero an d1">
+            <p class="hero-eyebrow">✦ พักผ่อน · REST & RESTORE ✦</p>
+            <h1 class="hero-title">ให้ร่างกาย<strong>ได้หายใจ</strong></h1>
+            <div class="hero-divider"></div>
+            <p class="hero-sub">เสียงธรรมชาติ · การหายใจ · นาฬิกาการนอน · สุขภาพองค์รวม</p>
+        </div>
+
+        <!-- BREATHE SECTION -->
+        <div class="breathe-section an d2">
+            <div class="breathe-orb-wrap" id="breatheWrap" onclick="toggleBreathe()">
+                <div class="breathe-ring"></div>
+                <div class="breathe-ring"></div>
+                <div class="breathe-ring"></div>
+                <div class="breathe-orb" id="breatheOrb">
+                    <div class="breathe-label" id="breatheLabel">แตะเพื่อเริ่ม</div>
+                    <div class="breathe-count" id="breatheCount">●</div>
+                </div>
+            </div>
+            <div class="breathe-controls">
+                <button class="breathe-btn active" id="modeBtn478" onclick="setMode('478')">4-7-8</button>
+                <button class="breathe-btn" id="modeBoxBtn" onclick="setMode('box')">Box</button>
+                <button class="breathe-btn" id="mode365Btn" onclick="setMode('365')">3-6-5</button>
+            </div>
+            <div class="breathe-mode-label" id="modeDesc">4 หายใจเข้า · 7 กลั้น · 8 หายใจออก (ลดความเครียด)</div>
+        </div>
+
+        <!-- MAIN GRID -->
+        <div class="main-grid">
+
+            <!-- SOUND PLAYER -->
+            <div class="g-card sound-card an d3">
+                <div class="card-section-label">🎵 เสียงธรรมชาติ</div>
+                <div class="card-title-lg">Natural Sounds</div>
+                <div class="card-desc">เปิดเสียงธรรมชาติเพื่อผ่อนคลายและหลับลึก</div>
+
+                <div class="sound-list" id="soundList">
+                    <!-- generated by JS -->
+                </div>
+
+                <div class="vol-row">
+                    <span class="vol-label">🔈</span>
+                    <input type="range" class="vol-slider" id="volSlider" min="0" max="100" value="60" oninput="setVolume(this.value)">
+                    <span class="vol-label" id="volVal">60%</span>
+                </div>
+            </div>
+
+            <!-- SLEEP TIMER (center, taller) -->
+            <div class="g-card sleep-card an d4" style="display:flex;flex-direction:column;">
+                <div class="card-section-label">🌙 นาฬิกาการนอน</div>
+
+                <div class="sleep-clock-wrap">
+                    <div class="sleep-time" id="liveClock">--:--</div>
+                    <div class="sleep-date" id="liveDate">กำลังโหลด...</div>
+                </div>
+
+                <div class="card-title-lg">เป้าหมายการนอน</div>
+                <div class="card-desc" style="margin-bottom:16px;">ผู้ใหญ่ควรนอน 7–9 ชั่วโมงต่อคืน</div>
+
+                <div class="sleep-targets">
+                    <div class="sleep-target selected" onclick="selectSleep(this,'7')">
+                        <div class="sleep-target-hrs">7</div>
+                        <div class="sleep-target-label">ชั่วโมง</div>
+                    </div>
+                    <div class="sleep-target" onclick="selectSleep(this,'7.5')">
+                        <div class="sleep-target-hrs">7.5</div>
+                        <div class="sleep-target-label">ชั่วโมง</div>
+                    </div>
+                    <div class="sleep-target" onclick="selectSleep(this,'8')">
+                        <div class="sleep-target-hrs">8</div>
+                        <div class="sleep-target-label">ชั่วโมง</div>
+                    </div>
+                    <div class="sleep-target" onclick="selectSleep(this,'9')">
+                        <div class="sleep-target-hrs">9</div>
+                        <div class="sleep-target-label">ชั่วโมง</div>
+                    </div>
+                </div>
+
+                <div class="sleep-bar-wrap">
+                    <div class="sleep-bar-label">
+                        <span>การนอนเมื่อคืน</span>
+                        <span id="sleepHrsVal">6.5 / 7 ชม.</span>
+                    </div>
+                    <div class="sleep-bar-track">
+                        <div class="sleep-bar-fill" id="sleepBarFill" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <div class="sleep-schedule" style="flex:1;">
+                    <div class="sleep-row">
+                        <span class="sleep-row-label">⏰ ควรเข้านอนก่อน</span>
+                        <span class="sleep-row-val" id="bedtime">22:30</span>
+                    </div>
+                    <div class="sleep-row">
+                        <span class="sleep-row-label">🌅 ตื่นเวลา</span>
+                        <span class="sleep-row-val" id="wakeTime">05:30</span>
+                    </div>
+                    <div class="sleep-row">
+                        <span class="sleep-row-label">😴 คุณภาพการนอน</span>
+                        <span class="sleep-row-val" style="color:var(--amber);">ดีมาก ⭐</span>
+                    </div>
+                    <div class="sleep-row">
+                        <span class="sleep-row-label">🔥 Sleep Streak</span>
+                        <span class="sleep-row-val">5 คืนติดต่อกัน</span>
+                    </div>
+                </div>
+
+                <button class="set-alarm-btn" onclick="toast('⏰','ตั้งนาฬิกาปลุกแล้ว','ระบบจะปลุกคุณตรงเวลา 🌅')">
+                    ตั้งนาฬิกาปลุก →
+                </button>
+            </div>
+
+            <!-- HEALTH TIPS -->
+            <div class="g-card health-card an d5">
+                <div class="card-section-label">💛 ดูแลสุขภาพ</div>
+                <div class="card-title-lg">คำแนะนำ</div>
+                <div class="card-desc">เคล็ดลับเพื่อร่างกายและจิตใจที่แข็งแรง</div>
+
+                <div class="health-list">
+                    <div class="health-item" onclick="toast('💧','ดื่มน้ำ','ควรดื่มน้ำ 8 แก้วต่อวัน ช่วยให้ร่างกายสดชื่น')">
+                        <div class="health-item-icon">💧</div>
+                        <div>
+                            <div class="health-item-title">ดื่มน้ำเพียงพอ</div>
+                            <div class="health-item-desc">8 แก้วต่อวัน ช่วยระบบเผาผลาญและผิวพรรณ</div>
+                        </div>
+                    </div>
+                    <div class="health-item" onclick="toast('🚶','เดินออกกำลัง','เดิน 30 นาที/วัน ลดความเสี่ยงโรคหัวใจได้ 35%')">
+                        <div class="health-item-icon">🚶</div>
+                        <div>
+                            <div class="health-item-title">เดิน 30 นาทีต่อวัน</div>
+                            <div class="health-item-desc">ลดความเครียด เสริมสร้างกระดูกและข้อต่อ</div>
+                        </div>
+                    </div>
+                    <div class="health-item" onclick="toast('📵','ไม่มือถือก่อนนอน','วาง Screen 1 ชม.ก่อนนอน ช่วยสมองเตรียมหลับ')">
+                        <div class="health-item-icon">📵</div>
+                        <div>
+                            <div class="health-item-title">วางหน้าจอก่อนนอน</div>
+                            <div class="health-item-desc">1 ชั่วโมงก่อนนอน ช่วยหลับลึกและฝันดี</div>
+                        </div>
+                    </div>
+                    <div class="health-item" onclick="toast('🥗','โภชนาการ','กินผักและผลไม้ 5 ส่วนต่อวันเพื่อภูมิคุ้มกันที่แข็งแรง')">
+                        <div class="health-item-icon">🥗</div>
+                        <div>
+                            <div class="health-item-title">โภชนาการสมดุล</div>
+                            <div class="health-item-desc">ผักผลไม้ 5 ส่วน/วัน เสริมภูมิและพลังงาน</div>
+                        </div>
+                    </div>
+                    <div class="health-item" onclick="toast('🧘','ผ่อนคลาย','นั่งสมาธิ 10 นาที ลด Cortisol ได้จริง')">
+                        <div class="health-item-icon">🧘</div>
+                        <div>
+                            <div class="health-item-title">นั่งสมาธิ 10 นาที</div>
+                            <div class="health-item-desc">ลดฮอร์โมนเครียด เพิ่มสมาธิและความสุข</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BOTTOM ROW -->
+        <div class="bottom-row">
+
+            <!-- MEDITATION TIMER -->
+            <div class="g-card meditation-card an d6">
+                <div class="card-section-label">🧘 นั่งสมาธิ</div>
+                <div class="card-title-lg">Meditation Timer</div>
+                <div class="card-desc" style="margin-bottom:16px;">ตั้งเวลานั่งสมาธิ พร้อมเสียงระฆัง</div>
+
+                <div class="med-times">
+                    <button class="med-time-btn" onclick="setMedTime(5,this)">5 นาที</button>
+                    <button class="med-time-btn active" onclick="setMedTime(10,this)">10 นาที</button>
+                    <button class="med-time-btn" onclick="setMedTime(15,this)">15 นาที</button>
+                    <button class="med-time-btn" onclick="setMedTime(20,this)">20 นาที</button>
+                    <button class="med-time-btn" onclick="setMedTime(30,this)">30 นาที</button>
+                </div>
+
+                <div class="med-display">
+                    <div class="med-timer-num" id="medDisplay">10:00</div>
+                    <div class="med-timer-label" id="medStatus">พร้อมเริ่ม</div>
+                </div>
+
+                <div class="med-btn-row">
+                    <button class="med-ctrl med-start" id="medStartBtn" onclick="toggleMed()">▶ เริ่ม</button>
+                    <button class="med-ctrl med-reset" onclick="resetMed()">↺ รีเซ็ต</button>
+                </div>
+            </div>
+
+            <!-- BODY SCAN -->
+            <div class="g-card bodyscan-card an d7">
+                <div class="card-section-label">🌿 Body Check</div>
+                <div class="card-title-lg">ตรวจสอบร่างกาย</div>
+                <div class="card-desc" style="margin-bottom:16px;">สแกนความตึงเครียดในแต่ละส่วน</div>
+
+                <div class="body-svg-wrap">
+                    <div class="body-figure">
+                        <!-- Simple body SVG -->
+                        <svg width="80" height="160" viewBox="0 0 80 160">
+                            <!-- Head -->
+                            <circle cx="40" cy="16" r="14" fill="rgba(200,216,240,0.1)" stroke="rgba(200,216,240,0.25)" stroke-width="1.5"/>
+                            <!-- Neck -->
+                            <rect x="35" y="29" width="10" height="8" rx="3" fill="rgba(200,216,240,0.08)" stroke="rgba(200,216,240,0.2)" stroke-width="1"/>
+                            <!-- Body -->
+                            <rect x="22" y="37" width="36" height="44" rx="8" fill="rgba(200,216,240,0.08)" stroke="rgba(200,216,240,0.2)" stroke-width="1.5"/>
+                            <!-- Arms -->
+                            <rect x="7"  y="38" width="14" height="36" rx="7" fill="rgba(200,216,240,0.06)" stroke="rgba(200,216,240,0.15)" stroke-width="1"/>
+                            <rect x="59" y="38" width="14" height="36" rx="7" fill="rgba(200,216,240,0.06)" stroke="rgba(200,216,240,0.15)" stroke-width="1"/>
+                            <!-- Legs -->
+                            <rect x="24" y="81" width="14" height="50" rx="7" fill="rgba(200,216,240,0.06)" stroke="rgba(200,216,240,0.15)" stroke-width="1"/>
+                            <rect x="42" y="81" width="14" height="50" rx="7" fill="rgba(200,216,240,0.06)" stroke="rgba(200,216,240,0.15)" stroke-width="1"/>
+                        </svg>
+                        <div class="scan-line"></div>
+                    </div>
+                </div>
+
+                <div class="body-zones">
+                    <div class="body-zone">
+                        <div class="zone-dot" style="background:#4ade80;box-shadow:0 0 6px #4ade80;"></div>
+                        <span class="zone-name">ศีรษะและคอ</span>
+                        <span class="zone-status" style="color:#4ade80;font-size:0.72rem;">ผ่อนคลาย</span>
+                    </div>
+                    <div class="body-zone">
+                        <div class="zone-dot" style="background:var(--amber);box-shadow:0 0 6px var(--amber);"></div>
+                        <span class="zone-name">ไหล่และหลังบน</span>
+                        <span class="zone-status" style="color:var(--amber);font-size:0.72rem;">ตึงเล็กน้อย</span>
+                    </div>
+                    <div class="body-zone">
+                        <div class="zone-dot" style="background:#4ade80;box-shadow:0 0 6px #4ade80;"></div>
+                        <span class="zone-name">ช่วงอก</span>
+                        <span class="zone-status" style="color:#4ade80;font-size:0.72rem;">ผ่อนคลาย</span>
+                    </div>
+                    <div class="body-zone">
+                        <div class="zone-dot" style="background:#f87171;box-shadow:0 0 6px #f87171;"></div>
+                        <span class="zone-name">หลังล่าง</span>
+                        <span class="zone-status" style="color:#f87171;font-size:0.72rem;">ควรยืดเหยียด</span>
+                    </div>
+                    <div class="body-zone">
+                        <div class="zone-dot" style="background:#4ade80;box-shadow:0 0 6px #4ade80;"></div>
+                        <span class="zone-name">ขาและเท้า</span>
+                        <span class="zone-status" style="color:#4ade80;font-size:0.72rem;">ผ่อนคลาย</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MOOD TRACKER -->
+            <div class="g-card mood-card an d8">
+                <div class="card-section-label">💛 Mood Today</div>
+                <div class="card-title-lg">ความรู้สึกวันนี้</div>
+                <div class="card-desc" style="margin-bottom:16px;">บันทึกอารมณ์เพื่อติดตามสุขภาพจิต</div>
+
+                <div class="mood-emojis">
+                    <div class="mood-btn" onclick="selectMood(this,'😔')">😔</div>
+                    <div class="mood-btn" onclick="selectMood(this,'😐')">😐</div>
+                    <div class="mood-btn" onclick="selectMood(this,'🙂')">🙂</div>
+                    <div class="mood-btn" onclick="selectMood(this,'😊')">😊</div>
+                    <div class="mood-btn" onclick="selectMood(this,'🌟')">🌟</div>
+                </div>
+
+                <textarea class="mood-note" id="moodNote" rows="3" placeholder="บันทึกความรู้สึกของคุณ..."></textarea>
+                <button class="mood-save" onclick="saveMood()">บันทึกอารมณ์วันนี้ ✨</button>
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-txt">EDEN REST · ดูแลตัวเองก่อน เติบโตร่วมกัน</div>
+            <div style="display:flex;gap:8px;">
+                <div style="width:6px;height:6px;border-radius:50%;background:var(--aurora1);opacity:0.4;"></div>
+                <div style="width:6px;height:6px;border-radius:50%;background:var(--aurora2);opacity:0.4;"></div>
+                <div style="width:6px;height:6px;border-radius:50%;background:var(--lavender);opacity:0.4;"></div>
+            </div>
+        </footer>
+
+    </div><!-- end page-wrapper -->
+
+<script>
+// ══════════ CURSOR ══════════
+const cDot = document.getElementById('cDot');
+const cRing = document.getElementById('cRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function animC(){
+    rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+    cDot.style.left=mx+'px'; cDot.style.top=my+'px';
+    cRing.style.left=rx+'px'; cRing.style.top=ry+'px';
+    requestAnimationFrame(animC);
+})();
+
+// ══════════ STARS ══════════
+const canvas = document.getElementById('starsCanvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+function initStars(){
+    stars=[];
+    for(let i=0;i<220;i++){
+        stars.push({
+            x: Math.random()*canvas.width,
+            y: Math.random()*canvas.height,
+            r: Math.random()*1.4+0.3,
+            a: Math.random(),
+            speed: Math.random()*0.5+0.2,
+            phase: Math.random()*Math.PI*2
+        });
+    }
+}
+function drawStars(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const t = Date.now()/1000;
+    stars.forEach(s=>{
+        const twinkle = 0.4+0.6*Math.sin(t*s.speed+s.phase);
+        ctx.beginPath();
+        ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,255,255,${s.a*twinkle})`;
+        ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+}
+resizeCanvas(); initStars(); drawStars();
+window.addEventListener('resize',()=>{resizeCanvas();initStars();});
+
+// ══════════ LIVE CLOCK ══════════
+function updateClock(){
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('liveClock').textContent = h+':'+m;
+    const days=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+    const months=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    document.getElementById('liveDate').textContent = `วัน${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()+543}`;
+}
+setInterval(updateClock,1000); updateClock();
+
+// ══════════ SLEEP TARGET ══════════
+function selectSleep(el, hrs){
+    document.querySelectorAll('.sleep-target').forEach(t=>t.classList.remove('selected'));
+    el.classList.add('selected');
+    const pct = Math.min((6.5/parseFloat(hrs))*100,100);
+    document.getElementById('sleepBarFill').style.width = pct+'%';
+    document.getElementById('sleepHrsVal').textContent = `6.5 / ${hrs} ชม.`;
+    // compute bedtime
+    const now = new Date();
+    const wakeH = 5, wakeM = 30;
+    const sleepH = parseFloat(hrs);
+    let bedH = wakeH - sleepH;
+    if(bedH < 0) bedH += 24;
+    const bedM = (sleepH % 1)*60;
+    document.getElementById('bedtime').textContent = `${String(Math.floor(bedH)).padStart(2,'0')}:${String(bedM).padStart(2,'0')}`;
+    toast('🌙','เป้าหมายการนอน',`ตั้งเป้า ${hrs} ชั่วโมง — นอนก่อน ${document.getElementById('bedtime').textContent}`);
+}
+setTimeout(()=>{ document.getElementById('sleepBarFill').style.width='93%'; },700);
+
+// ══════════ SOUND PLAYER (Web Audio API) ══════════
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+let activeSounds = {};
+let masterGain;
+
+const SOUNDS = [
+    { id:'rain',    name:'ฝนตกเบาๆ',       emoji:'🌧️', type:'ผ่อนคลาย' },
+    { id:'forest',  name:'เสียงป่า',         emoji:'🌿', type:'ธรรมชาติ' },
+    { id:'ocean',   name:'คลื่นทะเล',        emoji:'🌊', type:'ธรรมชาติ' },
+    { id:'fire',    name:'เสียงไฟ',          emoji:'🔥', type:'อบอุ่น'   },
+    { id:'wind',    name:'ลมอ่อนๆ',          emoji:'💨', type:'สดชื่น'   },
+    { id:'birds',   name:'เสียงนก',          emoji:'🐦', type:'ธรรมชาติ' },
+];
+
+function getAudioCtx(){
+    if(!audioCtx){ audioCtx = new AudioCtx(); masterGain = audioCtx.createGain(); masterGain.connect(audioCtx.destination); masterGain.gain.value = 0.6; }
+    return audioCtx;
+}
+
+// Generate noise buffers
+function createNoiseNode(type){
+    const ac = getAudioCtx();
+    const buf = ac.createBuffer(1, ac.sampleRate*3, ac.sampleRate);
+    const data = buf.getChannelData(0);
+    for(let i=0;i<data.length;i++) data[i] = Math.random()*2-1;
+    const src = ac.createBufferSource();
+    src.buffer = buf; src.loop = true;
+    const filter = ac.createBiquadFilter();
+    const gainNode = ac.createGain();
+    gainNode.gain.value = 0.15;
+
+    if(type==='rain'){   filter.type='bandpass'; filter.frequency.value=2000; filter.Q.value=0.5; gainNode.gain.value=0.2; }
+    if(type==='ocean'){  filter.type='lowpass';  filter.frequency.value=400;  gainNode.gain.value=0.25;
+        // LFO for wave
+        const lfo = ac.createOscillator(); const lfog = ac.createGain();
+        lfo.frequency.value=0.15; lfog.gain.value=180;
+        lfo.connect(lfog); lfog.connect(filter.frequency); lfo.start(); }
+    if(type==='wind'){   filter.type='bandpass'; filter.frequency.value=600;  filter.Q.value=0.3; gainNode.gain.value=0.12; }
+    if(type==='forest'){ filter.type='bandpass'; filter.frequency.value=1200; filter.Q.value=0.4; gainNode.gain.value=0.1;  }
+    if(type==='fire'){   filter.type='lowpass';  filter.frequency.value=800;  gainNode.gain.value=0.18; }
+    if(type==='birds'){
+        // tonal chirps
+        const osc = ac.createOscillator(); const bg = ac.createGain();
+        osc.type='sine'; osc.frequency.value=1800; bg.gain.value=0;
+        let chirpInterval = setInterval(()=>{
+            if(!activeSounds['birds']) { clearInterval(chirpInterval); return; }
+            bg.gain.setTargetAtTime(0.08, ac.currentTime, 0.02);
+            osc.frequency.linearRampToValueAtTime(2200, ac.currentTime+0.1);
+            bg.gain.setTargetAtTime(0, ac.currentTime+0.15, 0.05);
+            setTimeout(()=>{
+                bg.gain.setTargetAtTime(0.06, ac.currentTime, 0.02);
+                osc.frequency.linearRampToValueAtTime(1600, ac.currentTime+0.08);
+                bg.gain.setTargetAtTime(0, ac.currentTime+0.1, 0.04);
+            }, 200);
+        }, Math.random()*2000+1500);
+        osc.connect(bg); bg.connect(masterGain); osc.start();
+        src.connect(filter); filter.connect(gainNode); gainNode.connect(masterGain); src.start();
+        return { src, filter, gainNode, osc, bg };
+    }
+
+    src.connect(filter); filter.connect(gainNode); gainNode.connect(masterGain); src.start();
+    return { src, filter, gainNode };
+}
+
+function toggleSound(id){
+    getAudioCtx();
+    if(activeSounds[id]){
+        // stop
+        try{ activeSounds[id].src.stop(); if(activeSounds[id].osc) activeSounds[id].osc.stop(); } catch(e){}
+        delete activeSounds[id];
+        document.getElementById('si_'+id).classList.remove('playing');
+        toast('🔇', 'หยุดเสียง', SOUNDS.find(s=>s.id===id).name);
+    } else {
+        activeSounds[id] = createNoiseNode(id);
+        document.getElementById('si_'+id).classList.add('playing');
+        toast('🎵', 'กำลังเล่น', SOUNDS.find(s=>s.id===id).name+' 🌿');
+    }
+}
+
+function setVolume(val){
+    document.getElementById('volVal').textContent = val+'%';
+    if(masterGain) masterGain.gain.value = val/100;
+}
+
+// Build sound list
+const sl = document.getElementById('soundList');
+SOUNDS.forEach(s=>{
+    sl.innerHTML += `
+    <div class="sound-item" id="si_${s.id}" onclick="toggleSound('${s.id}')">
+        <div class="sound-icon">${s.emoji}</div>
+        <div class="sound-info">
+            <div class="sound-name">${s.name}</div>
+            <div class="sound-type">${s.type}</div>
+        </div>
+        <div class="sound-wave">
+            <div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+        </div>
+    </div>`;
+});
+
+// ══════════ BREATHE ══════════
+const MODES = {
+    '478': { in:4, hold:7, out:8, label:'4-7-8 (ลดความเครียด)' },
+    'box':  { in:4, hold:4, out:4, label:'Box Breathing (โฟกัส)' },
+    '365':  { in:3, hold:6, out:5, label:'3-6-5 (ผ่อนคลาย)' },
+};
+let breatheMode = '478';
+let breatheActive = false;
+let breatheTimer = null;
+
+function setMode(m){
+    breatheMode=m;
+    document.querySelectorAll('.breathe-btn').forEach(b=>b.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('modeDesc').textContent = MODES[m].label;
+    if(breatheActive){ stopBreathe(); }
+}
+
+function toggleBreathe(){
+    if(breatheActive) stopBreathe(); else startBreathe();
+}
+
+function startBreathe(){
+    breatheActive=true;
+    runCycle();
+}
+
+function stopBreathe(){
+    breatheActive=false;
+    clearTimeout(breatheTimer);
+    const orb = document.getElementById('breatheOrb');
+    orb.className='breathe-orb';
+    document.getElementById('breatheLabel').textContent='แตะเพื่อเริ่ม';
+    document.getElementById('breatheCount').textContent='●';
+}
+
+function runCycle(){
+    if(!breatheActive) return;
+    const mode = MODES[breatheMode];
+    phase('หายใจเข้า', mode.in, 'inhale', ()=>{
+        phase('กลั้นหายใจ', mode.hold, 'hold', ()=>{
+            phase('หายใจออก', mode.out, 'exhale', ()=>{
+                if(breatheActive) runCycle();
+            });
+        });
+    });
+}
+
+function phase(label, secs, cls, cb){
+    if(!breatheActive) return;
+    const orb = document.getElementById('breatheOrb');
+    const lbl = document.getElementById('breatheLabel');
+    const cnt = document.getElementById('breatheCount');
+    orb.className='breathe-orb '+cls;
+    lbl.textContent=label;
+    let t=secs;
+    cnt.textContent=t;
+    const iv = setInterval(()=>{
+        t--;
+        cnt.textContent=t;
+        if(t<=0){ clearInterval(iv); cb(); }
+    },1000);
+}
+
+// ══════════ MEDITATION TIMER ══════════
+let medTotal=600, medLeft=600, medRunning=false, medIv=null;
+
+function setMedTime(mins, btn){
+    document.querySelectorAll('.med-time-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    medTotal=mins*60; medLeft=medTotal;
+    updateMedDisplay();
+    if(medRunning){ clearInterval(medIv); medRunning=false; document.getElementById('medStartBtn').textContent='▶ เริ่ม'; }
+    document.getElementById('medStatus').textContent='พร้อมเริ่ม';
+}
+
+function updateMedDisplay(){
+    const m=String(Math.floor(medLeft/60)).padStart(2,'0');
+    const s=String(medLeft%60).padStart(2,'0');
+    document.getElementById('medDisplay').textContent=m+':'+s;
+}
+
+function toggleMed(){
+    if(medRunning){
+        clearInterval(medIv); medRunning=false;
+        document.getElementById('medStartBtn').textContent='▶ เริ่ม';
+        document.getElementById('medStatus').textContent='หยุดชั่วคราว';
+    } else {
+        medRunning=true;
+        document.getElementById('medStartBtn').textContent='⏸ หยุด';
+        document.getElementById('medStatus').textContent='กำลังนั่งสมาธิ... 🧘';
+        medIv=setInterval(()=>{
+            medLeft--;
+            updateMedDisplay();
+            if(medLeft<=0){
+                clearInterval(medIv); medRunning=false;
+                document.getElementById('medStartBtn').textContent='▶ เริ่ม';
+                document.getElementById('medStatus').textContent='✅ เสร็จแล้ว — ดีมาก!';
+                toast('🔔','สมาธิเสร็จแล้ว!','คุณทำได้ดีมาก ✨ +50 XP');
+                bellSound();
+            }
+        },1000);
+    }
+}
+
+function resetMed(){
+    clearInterval(medIv); medRunning=false;
+    medLeft=medTotal; updateMedDisplay();
+    document.getElementById('medStartBtn').textContent='▶ เริ่ม';
+    document.getElementById('medStatus').textContent='พร้อมเริ่ม';
+}
+
+function bellSound(){
+    const ac = getAudioCtx();
+    const osc=ac.createOscillator(), g=ac.createGain();
+    osc.type='sine'; osc.frequency.value=528;
+    g.gain.setValueAtTime(0,ac.currentTime);
+    g.gain.linearRampToValueAtTime(0.3,ac.currentTime+0.05);
+    g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+3);
+    osc.connect(g); g.connect(ac.destination);
+    osc.start(); osc.stop(ac.currentTime+3);
+}
+
+// ══════════ MOOD ══════════
+let selectedMood='';
+function selectMood(el,emoji){
+    document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedMood=emoji;
+}
+function saveMood(){
+    const note=document.getElementById('moodNote').value;
+    if(!selectedMood){ toast('⚠️','เลือกอารมณ์','กรุณาเลือก Mood ก่อนบันทึก'); return; }
+    toast('💛','บันทึกแล้ว!',`อารมณ์วันนี้: ${selectedMood} ${note?'— "'+note.slice(0,20)+'..."':''}`);
+    document.getElementById('moodNote').value='';
+    document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
+    selectedMood='';
+}
+
+// ══════════ TOAST ══════════
+function toast(icon,title,msg){
+    const c=document.getElementById('toastCont');
+    const t=document.createElement('div');
+    t.className='toast';
+    t.innerHTML=`<div class="toast-icon">${icon}</div><div><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
+    c.appendChild(t);
+    setTimeout(()=>t.remove(),5000);
+}
+
+// ══════════ AUTO TOAST ══════════
+setTimeout(()=>toast('🌙','ยินดีต้อนรับสู่ Rest','ลองเปิดเสียงธรรมชาติแล้วนั่งหายใจดูนะ 🌿'),1500);
+setTimeout(()=>toast('💧','Reminder','อย่าลืมดื่มน้ำก่อนนอน 1 แก้ว'),20000);
+</script>
+</body>
+</html>

@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community — SAWANNAKHON CONNECT : EDEN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --eden-green: #4ade80;
+            --eden-sky: #38bdf8;
+            --eden-gold: #fbbf24;
+            --eden-pink: #f472b6;
+            --eden-purple: #a78bfa;
+            --eden-coral: #fb923c;
+            --glass-bg: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.12);
+            --bg: #020a0f;
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: var(--bg);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ══ CURSOR ══ */
+        .cursor-dot {
+            width: 8px; height: 8px;
+            background: var(--eden-sky);
+            border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9999;
+            transform: translate(-50%,-50%);
+        }
+        .cursor-ring {
+            width: 36px; height: 36px;
+            border: 1.5px solid rgba(56,189,248,0.45);
+            border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: all 0.15s ease;
+        }
+
+        /* ══ BG ══ */
+        .bg-layer {
+            position: fixed; inset: 0; z-index: 0;
+            background: radial-gradient(ellipse 80% 60% at 20% 0%, rgba(16,60,40,0.5) 0%, transparent 60%),
+                        radial-gradient(ellipse 60% 50% at 80% 100%, rgba(10,30,60,0.6) 0%, transparent 60%),
+                        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(167,139,250,0.07) 0%, transparent 70%),
+                        #020a0f;
+        }
+        .particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+        .particle {
+            position: absolute; border-radius: 50%;
+            animation: drift linear infinite;
+        }
+        @keyframes drift {
+            0%   { transform: translateY(110vh) translateX(0); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 0.4; }
+            100% { transform: translateY(-10vh) translateX(var(--tx)); opacity: 0; }
+        }
+
+        /* ══ NAV ══ */
+        nav {
+            position: sticky; top: 0; z-index: 200;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 48px; height: 72px;
+            background: rgba(2,10,20,0.65);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .nav-logo { display: flex; align-items: center; gap: 14px; }
+        .nav-brand { font-size: 0.85rem; font-weight: 300; letter-spacing: 0.12em; color: rgba(255,255,255,0.6); text-transform: uppercase; }
+        .nav-brand strong { color: var(--eden-sky); font-weight: 600; }
+        @keyframes shine-eden {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .eden-badge {
+            font-size: 1.3rem; font-weight: 700; letter-spacing: 0.25em;
+            background: linear-gradient(90deg, #34d399,#38bdf8,#a78bfa,#f472b6,#fbbf24,#34d399);
+            background-size: 300%; animation: shine-eden 5s linear infinite;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .nav-links { display: flex; gap: 36px; list-style: none; }
+        .nav-links li {
+            font-size: 0.82rem; letter-spacing: 0.08em; color: rgba(255,255,255,0.5);
+            cursor: pointer; transition: color 0.25s; position: relative; padding-bottom: 4px;
+        }
+        .nav-links li::after {
+            content: ''; position: absolute; bottom: 0; left: 0; height: 1px; width: 0;
+            background: var(--eden-sky); transition: width 0.3s;
+        }
+        .nav-links li:hover { color: white; }
+        .nav-links li:hover::after { width: 100%; }
+        .nav-links li.active { color: var(--eden-green); }
+        .nav-links li.active::after { width: 100%; background: var(--eden-green); }
+        .nav-right { display: flex; align-items: center; gap: 18px; }
+        .status-badge {
+            display: flex; align-items: center; gap: 8px;
+            padding: 5px 14px; background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 999px; font-size: 0.8rem;
+        }
+        .status-dot {
+            width: 7px; height: 7px; background: var(--eden-green); border-radius: 50%;
+            animation: pulse-green 2s ease infinite;
+        }
+        @keyframes pulse-green {
+            0%   { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
+            70%  { box-shadow: 0 0 0 7px rgba(74,222,128,0); }
+            100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+        }
+        .login-btn {
+            font-size: 0.8rem; color: rgba(255,255,255,0.35);
+            background: none; border: none; cursor: pointer;
+            font-family: 'Kanit', sans-serif; letter-spacing: 0.06em; transition: color 0.2s;
+        }
+        .login-btn:hover { color: white; }
+
+        /* ══ PAGE WRAPPER ══ */
+        .page-wrapper { position: relative; z-index: 10; min-height: 100vh; }
+
+        /* ══ HERO ══ */
+        .hero {
+            padding: 70px 48px 50px;
+            text-align: center;
+            position: relative;
+        }
+        .hero-eyebrow {
+            font-size: 0.7rem; letter-spacing: 0.4em; color: var(--eden-green);
+            text-transform: uppercase; margin-bottom: 18px; opacity: 0.9;
+        }
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.8rem, 6vw, 5rem);
+            font-weight: 700; line-height: 1.1; margin-bottom: 16px;
+            text-shadow: 0 0 60px rgba(74,222,128,0.15);
+        }
+        .hero-title .highlight {
+            background: linear-gradient(135deg, var(--eden-green), var(--eden-sky));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero-sub {
+            font-size: 1rem; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; max-width: 520px; margin: 0 auto 36px;
+        }
+        /* LIVE STATS BAR */
+        .live-stats-bar {
+            display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;
+        }
+        .live-stat {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px; padding: 7px 16px; font-size: 0.8rem;
+        }
+        .live-stat .stat-icon { font-size: 1rem; }
+        .live-stat .stat-num { color: var(--eden-gold); font-weight: 700; }
+        .live-pulse {
+            display: inline-block; width: 6px; height: 6px; background: #f87171;
+            border-radius: 50%; animation: pulse-red 1.2s ease infinite; margin-right: 2px;
+        }
+        @keyframes pulse-red {
+            0%,100% { box-shadow: 0 0 0 0 rgba(248,113,113,0.5); }
+            50% { box-shadow: 0 0 0 5px rgba(248,113,113,0); }
+        }
+
+        /* ══ MAIN GRID LAYOUT ══ */
+        .main-content {
+            max-width: 1400px; margin: 0 auto;
+            padding: 0 32px 60px;
+            display: grid;
+            grid-template-columns: 280px 1fr 300px;
+            grid-template-rows: auto;
+            gap: 20px;
+        }
+
+        /* ══ GLASS CARD BASE ══ */
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 22px;
+            backdrop-filter: blur(12px);
+            position: relative; overflow: hidden;
+        }
+        .glass-card::before {
+            content: ''; position: absolute; inset: 0; border-radius: inherit;
+            background: radial-gradient(ellipse at var(--mx,50%) var(--my,30%), rgba(255,255,255,0.04) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .card-title {
+            font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
+            color: rgba(255,255,255,0.4); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+        }
+        .card-title .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+        /* ══ LEFT SIDEBAR ══ */
+        .left-col { display: flex; flex-direction: column; gap: 16px; }
+
+        /* Profile Card */
+        .profile-card {
+            text-align: center; padding: 28px 22px;
+        }
+        .profile-avatar {
+            width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 12px;
+            background: linear-gradient(135deg, var(--eden-green), var(--eden-sky));
+            display: flex; align-items: center; justify-content: center; font-size: 2rem;
+            border: 2px solid rgba(74,222,128,0.4);
+            box-shadow: 0 0 24px rgba(74,222,128,0.2);
+        }
+        .profile-name { font-size: 1rem; font-weight: 600; margin-bottom: 2px; }
+        .profile-level {
+            font-size: 0.72rem; color: var(--eden-gold); letter-spacing: 0.15em; margin-bottom: 14px;
+        }
+        .profile-xp-bar {
+            background: rgba(255,255,255,0.08); border-radius: 999px; height: 5px; overflow: hidden; margin-bottom: 6px;
+        }
+        .profile-xp-fill {
+            height: 100%; width: 68%;
+            background: linear-gradient(90deg, var(--eden-green), var(--eden-sky));
+            border-radius: 999px;
+            transition: width 1s ease;
+        }
+        .profile-xp-label { font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-bottom: 18px; }
+        .profile-stats {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+        }
+        .profile-stat-item { text-align: center; }
+        .profile-stat-num { font-size: 1.1rem; font-weight: 700; color: var(--eden-sky); }
+        .profile-stat-label { font-size: 0.62rem; color: rgba(255,255,255,0.35); letter-spacing: 0.08em; }
+
+        /* Mood Card */
+        .mood-card { padding: 18px 22px; }
+        .mood-label { font-size: 0.72rem; color: rgba(255,255,255,0.4); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 12px; }
+        .mood-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .mood-btn {
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px; padding: 6px 12px; font-size: 0.78rem; cursor: pointer;
+            transition: all 0.2s; color: rgba(255,255,255,0.6); font-family: 'Kanit', sans-serif;
+        }
+        .mood-btn:hover, .mood-btn.active {
+            background: rgba(74,222,128,0.15); border-color: var(--eden-green);
+            color: var(--eden-green);
+        }
+
+        /* Circles / Groups */
+        .circles-card { }
+        .circle-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .circle-item:last-child { border-bottom: none; }
+        .circle-item:hover { opacity: 1 !important; }
+        .circle-item:hover .circle-name { color: white; }
+        .circle-icon {
+            width: 36px; height: 36px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .circle-name { font-size: 0.82rem; font-weight: 600; margin-bottom: 1px; }
+        .circle-count { font-size: 0.65rem; color: rgba(255,255,255,0.3); }
+        .circle-badge {
+            margin-left: auto; background: rgba(74,222,128,0.15); color: var(--eden-green);
+            font-size: 0.6rem; padding: 2px 7px; border-radius: 999px; border: 1px solid rgba(74,222,128,0.25);
+        }
+        .join-btn {
+            margin-left: auto; background: rgba(56,189,248,0.1); color: var(--eden-sky);
+            font-size: 0.6rem; padding: 2px 8px; border-radius: 999px;
+            border: 1px solid rgba(56,189,248,0.2); cursor: pointer; font-family: 'Kanit', sans-serif;
+            transition: all 0.2s;
+        }
+        .join-btn:hover { background: rgba(56,189,248,0.2); }
+
+        /* ══ CENTER FEED ══ */
+        .center-col { display: flex; flex-direction: column; gap: 16px; }
+
+        /* Post Composer */
+        .composer-card {
+            display: flex; flex-direction: column; gap: 12px; padding: 18px 22px;
+        }
+        .composer-top { display: flex; gap: 12px; align-items: center; }
+        .composer-avatar {
+            width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--eden-green), var(--eden-sky));
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+        }
+        .composer-input {
+            flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px; padding: 10px 18px; color: rgba(255,255,255,0.5);
+            font-size: 0.82rem; font-family: 'Kanit', sans-serif; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .composer-input:hover { border-color: rgba(74,222,128,0.3); color: rgba(255,255,255,0.7); }
+        .composer-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .composer-action-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 999px; padding: 5px 12px; font-size: 0.72rem; cursor: pointer;
+            color: rgba(255,255,255,0.4); font-family: 'Kanit', sans-serif; transition: all 0.2s;
+        }
+        .composer-action-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .composer-post-btn {
+            background: linear-gradient(135deg, rgba(74,222,128,0.25), rgba(56,189,248,0.15));
+            border: 1px solid rgba(74,222,128,0.3);
+            border-radius: 999px; padding: 5px 16px; font-size: 0.78rem; cursor: pointer;
+            color: var(--eden-green); font-family: 'Kanit', sans-serif; font-weight: 600;
+            transition: all 0.2s;
+        }
+        .composer-post-btn:hover { background: rgba(74,222,128,0.2); box-shadow: 0 0 12px rgba(74,222,128,0.15); }
+
+        /* Feed Tabs */
+        .feed-tabs { display: flex; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.07); padding-bottom: 0; }
+        .feed-tab {
+            font-size: 0.78rem; color: rgba(255,255,255,0.35); padding: 8px 16px;
+            cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
+            letter-spacing: 0.06em;
+        }
+        .feed-tab.active { color: var(--eden-green); border-bottom-color: var(--eden-green); }
+        .feed-tab:hover { color: rgba(255,255,255,0.7); }
+
+        /* Feed Post */
+        .post-card { padding: 20px 22px; }
+        .post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .post-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+            flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.1);
+        }
+        .post-meta { flex: 1; }
+        .post-author { font-size: 0.88rem; font-weight: 600; }
+        .post-time { font-size: 0.68rem; color: rgba(255,255,255,0.3); letter-spacing: 0.05em; }
+        .post-level-tag {
+            font-size: 0.6rem; padding: 1px 7px; border-radius: 999px;
+            border: 1px solid; margin-left: 6px; vertical-align: middle;
+        }
+        .post-content { font-size: 0.85rem; line-height: 1.7; color: rgba(255,255,255,0.75); margin-bottom: 14px; }
+        .post-content .tag { color: var(--eden-sky); }
+        .post-image {
+            width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 14px;
+            background: linear-gradient(135deg, rgba(74,222,128,0.1), rgba(56,189,248,0.1));
+            height: 200px; display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; border: 1px solid rgba(255,255,255,0.06);
+        }
+        .post-reactions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+        .reaction-btn {
+            display: flex; align-items: center; gap: 5px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 999px; padding: 5px 12px; font-size: 0.75rem; cursor: pointer;
+            color: rgba(255,255,255,0.5); font-family: 'Kanit', sans-serif;
+            transition: all 0.2s;
+        }
+        .reaction-btn:hover { background: rgba(255,255,255,0.1); color: white; transform: scale(1.05); }
+        .reaction-btn.active { background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.3); color: var(--eden-green); }
+        .reaction-count { font-weight: 700; }
+        .post-footer { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: rgba(255,255,255,0.25); }
+
+        /* Anonymous Post */
+        .anon-badge {
+            background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.2);
+            color: var(--eden-purple); font-size: 0.6rem; padding: 2px 8px; border-radius: 999px;
+        }
+
+        /* ══ RIGHT SIDEBAR ══ */
+        .right-col { display: flex; flex-direction: column; gap: 16px; }
+
+        /* Community Tree */
+        .tree-card { text-align: center; padding: 24px 22px; }
+        .tree-visual {
+            margin: 0 auto 16px; position: relative; width: 120px; height: 120px;
+        }
+        .tree-svg { width: 100%; height: 100%; }
+        .tree-level-label { font-size: 0.68rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; margin-bottom: 4px; }
+        .tree-name { font-size: 1.1rem; font-weight: 700; color: var(--eden-green); margin-bottom: 12px; }
+        .tree-progress-bar {
+            background: rgba(255,255,255,0.07); border-radius: 999px; height: 4px; overflow: hidden; margin-bottom: 6px;
+        }
+        .tree-progress-fill {
+            height: 100%; width: 72%;
+            background: linear-gradient(90deg, #34d399, #22d3ee);
+            border-radius: 999px;
+        }
+        .tree-progress-label { font-size: 0.68rem; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
+        .tree-contributors {
+            display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;
+        }
+        .tree-contrib-avatar {
+            width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+        }
+
+        /* Live Activity */
+        .live-card { }
+        .live-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .live-label { font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+        .live-indicator {
+            display: flex; align-items: center; gap: 5px;
+            background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.2);
+            border-radius: 999px; padding: 2px 8px; font-size: 0.6rem; color: #f87171;
+            letter-spacing: 0.1em;
+        }
+        .activity-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-avatar {
+            width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+        }
+        .activity-text { font-size: 0.75rem; color: rgba(255,255,255,0.6); line-height: 1.5; flex: 1; }
+        .activity-text strong { color: rgba(255,255,255,0.9); }
+        .activity-time { font-size: 0.62rem; color: rgba(255,255,255,0.25); flex-shrink: 0; }
+
+        /* Events Card */
+        .events-card { }
+        .event-item {
+            display: flex; gap: 12px; padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: opacity 0.2s;
+        }
+        .event-item:last-child { border-bottom: none; }
+        .event-item:hover { opacity: 0.85; }
+        .event-date {
+            width: 42px; height: 44px; border-radius: 10px; flex-shrink: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .event-day { font-size: 1.1rem; font-weight: 700; line-height: 1; }
+        .event-month { font-size: 0.55rem; color: rgba(255,255,255,0.35); letter-spacing: 0.05em; }
+        .event-info { flex: 1; }
+        .event-title { font-size: 0.82rem; font-weight: 600; margin-bottom: 3px; }
+        .event-meta { font-size: 0.65rem; color: rgba(255,255,255,0.35); }
+        .event-tag {
+            font-size: 0.58rem; padding: 1px 7px; border-radius: 999px;
+            border: 1px solid; margin-top: 4px; display: inline-block;
+        }
+
+        /* Challenges */
+        .challenge-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;
+        }
+        .challenge-item:last-child { border-bottom: none; }
+        .challenge-icon { font-size: 1.4rem; flex-shrink: 0; }
+        .challenge-info { flex: 1; }
+        .challenge-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 3px; }
+        .challenge-progress { height: 3px; background: rgba(255,255,255,0.07); border-radius: 999px; overflow: hidden; }
+        .challenge-fill { height: 100%; border-radius: 999px; }
+        .challenge-reward { font-size: 0.65rem; color: var(--eden-gold); letter-spacing: 0.05em; flex-shrink: 0; }
+
+        /* Find Companion */
+        .companion-card { }
+        .companion-item {
+            display: flex; align-items: center; gap: 12px; padding: 9px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .companion-item:last-child { border-bottom: none; }
+        .companion-avatar {
+            width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+            border: 1.5px solid rgba(255,255,255,0.1);
+        }
+        .companion-info { flex: 1; }
+        .companion-name { font-size: 0.82rem; font-weight: 600; }
+        .companion-role { font-size: 0.65rem; color: rgba(255,255,255,0.35); }
+        .companion-tags { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+        .companion-tag {
+            font-size: 0.58rem; padding: 1px 6px; border-radius: 999px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.45);
+        }
+        .connect-btn {
+            background: rgba(56,189,248,0.1); color: var(--eden-sky);
+            border: 1px solid rgba(56,189,248,0.2); border-radius: 999px;
+            padding: 4px 10px; font-size: 0.65rem; cursor: pointer;
+            font-family: 'Kanit', sans-serif; transition: all 0.2s; flex-shrink: 0;
+        }
+        .connect-btn:hover { background: rgba(56,189,248,0.2); }
+
+        /* Skill Zone */
+        .skill-zone-card { }
+        .skill-share-items { display: flex; flex-direction: column; gap: 8px; }
+        .skill-item {
+            display: flex; align-items: center; gap: 12px;
+            background: rgba(255,255,255,0.03); border-radius: 12px; padding: 10px 14px;
+            cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .skill-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+        .skill-icon { font-size: 1.4rem; }
+        .skill-info { flex: 1; }
+        .skill-name { font-size: 0.8rem; font-weight: 600; }
+        .skill-teacher { font-size: 0.65rem; color: rgba(255,255,255,0.35); }
+        .skill-students { font-size: 0.65rem; color: var(--eden-gold); letter-spacing: 0.05em; }
+
+        /* Cozy Spaces */
+        .cozy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .cozy-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 6px; padding: 16px 10px; border-radius: 16px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+            cursor: pointer; transition: all 0.25s; text-align: center;
+        }
+        .cozy-item:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .cozy-icon { font-size: 1.6rem; }
+        .cozy-name { font-size: 0.72rem; font-weight: 600; }
+        .cozy-count { font-size: 0.6rem; color: rgba(255,255,255,0.3); }
+
+        /* Encouragement floating */
+        .encourage-float {
+            position: fixed; bottom: 28px; right: 28px; z-index: 500;
+        }
+        .encourage-main-btn {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: linear-gradient(135deg, #34d399, #38bdf8);
+            border: none; cursor: pointer; font-size: 1.5rem;
+            box-shadow: 0 8px 24px rgba(52,211,153,0.35);
+            transition: all 0.3s; display: flex; align-items: center; justify-content: center;
+        }
+        .encourage-main-btn:hover { transform: scale(1.1); box-shadow: 0 12px 32px rgba(52,211,153,0.5); }
+        .encourage-popup {
+            position: absolute; bottom: 68px; right: 0;
+            background: rgba(2,10,20,0.95); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px; padding: 14px;
+            display: none; flex-direction: column; gap: 8px; min-width: 160px;
+            backdrop-filter: blur(20px);
+        }
+        .encourage-popup.open { display: flex; }
+        .encourage-option {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border-radius: 10px; cursor: pointer;
+            transition: all 0.2s; font-size: 0.8rem;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+        }
+        .encourage-option:hover { background: rgba(255,255,255,0.1); }
+        .encourage-option .e-icon { font-size: 1.1rem; }
+
+        /* Toast */
+        .toast-container {
+            position: fixed; top: 88px; right: 24px; z-index: 9000;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .toast {
+            background: rgba(2,15,30,0.92); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 12px 16px;
+            display: flex; gap: 12px; align-items: center;
+            min-width: 240px; max-width: 300px;
+            backdrop-filter: blur(20px);
+            animation: toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .toast-icon { font-size: 1.3rem; }
+        .toast-title { font-size: 0.82rem; font-weight: 600; }
+        .toast-msg { font-size: 0.72rem; color: rgba(255,255,255,0.45); }
+
+        /* Anonymous Section */
+        .anon-post {
+            background: rgba(167,139,250,0.05); border-color: rgba(167,139,250,0.12);
+        }
+        .anon-avatar { background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.2); }
+
+        /* Animations */
+        .animate-in {
+            opacity: 0; transform: translateY(20px);
+            animation: fadeSlideUp 0.6s ease forwards;
+        }
+        @keyframes fadeSlideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .delay-1 { animation-delay: 0.05s; }
+        .delay-2 { animation-delay: 0.1s; }
+        .delay-3 { animation-delay: 0.15s; }
+        .delay-4 { animation-delay: 0.2s; }
+        .delay-5 { animation-delay: 0.25s; }
+        .delay-6 { animation-delay: 0.3s; }
+
+        /* Responsive */
+        @media (max-width: 1100px) {
+            .main-content { grid-template-columns: 240px 1fr; }
+            .right-col { display: none; }
+        }
+        @media (max-width: 780px) {
+            nav { padding: 0 20px; }
+            .nav-links { display: none; }
+            .main-content { grid-template-columns: 1fr; padding: 0 16px 40px; }
+            .left-col { display: none; }
+            .hero { padding: 40px 20px 30px; }
+        }
+
+        /* Footer */
+        footer {
+            position: relative; z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 48px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            background: rgba(0,0,0,0.2);
+        }
+        .footer-left { font-size: 0.68rem; letter-spacing: 0.12em; color: rgba(255,255,255,0.2); text-transform: uppercase; }
+        .footer-orbs { display: flex; gap: 6px; }
+        .footer-orb { width: 6px; height: 6px; border-radius: 50%; opacity: 0.5; }
+
+        /* Glow lines */
+        .glow-divider {
+            height: 1px; margin: 0 0 16px;
+            background: linear-gradient(90deg, transparent, rgba(74,222,128,0.3), transparent);
+        }
+    </style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- BG -->
+<div class="bg-layer"></div>
+<div class="particles" id="particles"></div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ENCOURAGE FLOAT -->
+<div class="encourage-float">
+    <div class="encourage-popup" id="encouragePopup">
+        <div class="encourage-option" onclick="sendEncouragement('🌱','ส่งเมล็ดพันธุ์')">
+            <span class="e-icon">🌱</span> <span>ส่งเมล็ดพันธุ์</span>
+        </div>
+        <div class="encourage-option" onclick="sendEncouragement('☀️','ส่งแสงแดด')">
+            <span class="e-icon">☀️</span> <span>ส่งแสงแดด</span>
+        </div>
+        <div class="encourage-option" onclick="sendEncouragement('💧','รดน้ำใจ')">
+            <span class="e-icon">💧</span> <span>รดน้ำใจ</span>
+        </div>
+        <div class="encourage-option" onclick="sendEncouragement('🕊️','ส่งกำลังใจ')">
+            <span class="e-icon">🕊️</span> <span>ส่งกำลังใจ</span>
+        </div>
+    </div>
+    <button class="encourage-main-btn" onclick="toggleEncourage()" title="ส่งกำลังใจ">🌿</button>
+</div>
+
+<div class="page-wrapper">
+
+<!-- NAV -->
+<nav>
+    <div class="nav-logo">
+        <div class="nav-brand"><span class="eden-badge">EDEN</span></div>
+        <div class="nav-brand">SAWANNAKHON <strong>CONNECT</strong></div>
+    </div>
+    <ul class="nav-links">
+        <li><a href="home.html" style="color:inherit;text-decoration:none;">Home</a></li>
+        <li>Rest</li>
+        <li>Grow</li>
+        <li class="active">Community</li>
+        <li>Support</li>
+        <li>Mission</li>
+    </ul>
+    <div class="nav-right">
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            <span>เมล็ดพันธุ์ดี</span>
+        </div>
+        <button class="login-btn">Login</button>
+    </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero animate-in delay-1">
+    <div class="hero-eyebrow">🌿 Community Garden</div>
+    <h1 class="hero-title">ไม่มีใครต้องเติบโต<br><span class="highlight">เพียงลำพัง</span></h1>
+    <p class="hero-sub">หมู่บ้านดิจิทัลที่ทุกคนมาเจอกัน แชร์ชีวิต และเติบโตด้วยกัน</p>
+    <div class="live-stats-bar">
+        <div class="live-stat">
+            <span class="stat-icon">👥</span>
+            <span>สมาชิก <span class="stat-num">2,847</span> คน</span>
+        </div>
+        <div class="live-stat">
+            <span class="live-pulse"></span>
+            <span>ออนไลน์ <span class="stat-num">134</span> คน</span>
+        </div>
+        <div class="live-stat">
+            <span class="stat-icon">💬</span>
+            <span>กำลังใจ <span class="stat-num">1,204</span> ครั้งวันนี้</span>
+        </div>
+        <div class="live-stat">
+            <span class="stat-icon">🎉</span>
+            <span>กิจกรรมคืนนี้ <span class="stat-num">19:00</span></span>
+        </div>
+        <div class="live-stat">
+            <span class="stat-icon">🌱</span>
+            <span>สมาชิกใหม่วันนี้ <span class="stat-num">28</span> คน</span>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+    <!-- LEFT COL -->
+    <div class="left-col">
+
+        <!-- Profile -->
+        <div class="glass-card profile-card animate-in delay-2">
+            <div class="profile-avatar">🌸</div>
+            <div class="profile-name">น้ำฝน สมใจ</div>
+            <div class="profile-level">🌿 LV.7 — ต้นกล้าผู้เบิกบาน</div>
+            <div class="profile-xp-bar"><div class="profile-xp-fill"></div></div>
+            <div class="profile-xp-label">2,340 / 3,500 XP</div>
+            <div class="profile-stats">
+                <div class="profile-stat-item">
+                    <div class="profile-stat-num">47</div>
+                    <div class="profile-stat-label">โพสต์</div>
+                </div>
+                <div class="profile-stat-item">
+                    <div class="profile-stat-num">183</div>
+                    <div class="profile-stat-label">เพื่อน</div>
+                </div>
+                <div class="profile-stat-item">
+                    <div class="profile-stat-num">12</div>
+                    <div class="profile-stat-label">กลุ่ม</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mood -->
+        <div class="glass-card mood-card animate-in delay-2">
+            <div class="mood-label">อารมณ์วันนี้</div>
+            <div class="mood-options">
+                <button class="mood-btn active">🌞 สดใส</button>
+                <button class="mood-btn">😌 สงบ</button>
+                <button class="mood-btn">💪 มุ่งมั่น</button>
+                <button class="mood-btn">🌧 เหนื่อยหน่อย</button>
+                <button class="mood-btn">🌱 อยากเรียนรู้</button>
+            </div>
+        </div>
+
+        <!-- Circles -->
+        <div class="glass-card circles-card animate-in delay-3">
+            <div class="card-title"><span class="dot" style="background:var(--eden-sky)"></span>กลุ่มของฉัน</div>
+            <div class="circle-item">
+                <div class="circle-icon" style="background:rgba(251,191,36,0.12); border:1px solid rgba(251,191,36,0.2);">☕</div>
+                <div>
+                    <div class="circle-name">Coffee Lovers</div>
+                    <div class="circle-count">284 สมาชิก</div>
+                </div>
+                <div class="circle-badge">ใหม่ 3</div>
+            </div>
+            <div class="circle-item">
+                <div class="circle-icon" style="background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.2);">🤖</div>
+                <div>
+                    <div class="circle-name">AI Creator</div>
+                    <div class="circle-count">1,042 สมาชิก</div>
+                </div>
+                <div class="circle-badge">ไลฟ์</div>
+            </div>
+            <div class="circle-item">
+                <div class="circle-icon" style="background:rgba(74,222,128,0.12); border:1px solid rgba(74,222,128,0.2);">🌿</div>
+                <div>
+                    <div class="circle-name">Healing Space</div>
+                    <div class="circle-count">567 สมาชิก</div>
+                </div>
+            </div>
+            <div class="circle-item" style="opacity:0.6;">
+                <div class="circle-icon" style="background:rgba(244,114,182,0.1); border:1px solid rgba(244,114,182,0.15);">🎵</div>
+                <div>
+                    <div class="circle-name">นักดนตรี</div>
+                    <div class="circle-count">390 สมาชิก</div>
+                </div>
+                <button class="join-btn">เข้าร่วม</button>
+            </div>
+            <div class="circle-item" style="opacity:0.6;">
+                <div class="circle-icon" style="background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.15);">🎮</div>
+                <div>
+                    <div class="circle-name">เกมเมอร์</div>
+                    <div class="circle-count">721 สมาชิก</div>
+                </div>
+                <button class="join-btn">เข้าร่วม</button>
+            </div>
+        </div>
+
+        <!-- Challenges -->
+        <div class="glass-card animate-in delay-4">
+            <div class="card-title"><span class="dot" style="background:var(--eden-gold)"></span>Challenges วันนี้</div>
+            <div class="challenge-item">
+                <div class="challenge-icon">🌱</div>
+                <div class="challenge-info">
+                    <div class="challenge-title">ส่งกำลังใจ 5 คน</div>
+                    <div class="challenge-progress">
+                        <div class="challenge-fill" style="width:60%; background:var(--eden-green);"></div>
+                    </div>
+                </div>
+                <div class="challenge-reward">+150 XP</div>
+            </div>
+            <div class="challenge-item">
+                <div class="challenge-icon">📖</div>
+                <div class="challenge-info">
+                    <div class="challenge-title">โพสต์เรื่องราวดีๆ</div>
+                    <div class="challenge-progress">
+                        <div class="challenge-fill" style="width:0%; background:var(--eden-sky);"></div>
+                    </div>
+                </div>
+                <div class="challenge-reward">+200 XP</div>
+            </div>
+            <div class="challenge-item">
+                <div class="challenge-icon">🤝</div>
+                <div class="challenge-info">
+                    <div class="challenge-title">ชวนเพื่อนเข้ากลุ่ม</div>
+                    <div class="challenge-progress">
+                        <div class="challenge-fill" style="width:100%; background:var(--eden-gold);"></div>
+                    </div>
+                </div>
+                <div class="challenge-reward">✓ สำเร็จ</div>
+            </div>
+            <div class="challenge-item">
+                <div class="challenge-icon">🎨</div>
+                <div class="challenge-info">
+                    <div class="challenge-title">แชร์ผลงานตัวเอง</div>
+                    <div class="challenge-progress">
+                        <div class="challenge-fill" style="width:0%; background:var(--eden-pink);"></div>
+                    </div>
+                </div>
+                <div class="challenge-reward">+300 XP</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CENTER FEED -->
+    <div class="center-col">
+
+        <!-- Composer -->
+        <div class="glass-card composer-card animate-in delay-1">
+            <div class="composer-top">
+                <div class="composer-avatar">🌸</div>
+                <div class="composer-input" onclick="openCompose(this)">แชร์เรื่องราวดีๆ หรือขอกำลังใจ…</div>
+            </div>
+            <div class="composer-actions">
+                <button class="composer-action-btn">🌿 ส่งกำลังใจ</button>
+                <button class="composer-action-btn">🎨 แชร์ผลงาน</button>
+                <button class="composer-action-btn">🌑 Anonymous</button>
+                <button class="composer-post-btn">โพสต์</button>
+            </div>
+        </div>
+
+        <!-- Feed Tabs -->
+        <div class="glass-card" style="padding: 0 22px;">
+            <div class="feed-tabs">
+                <div class="feed-tab active" onclick="switchTab(this)">🌿 ทั้งหมด</div>
+                <div class="feed-tab" onclick="switchTab(this)">⭐ ไฮไลท์</div>
+                <div class="feed-tab" onclick="switchTab(this)">🤝 กลุ่มฉัน</div>
+                <div class="feed-tab" onclick="switchTab(this)">🌑 Safe Space</div>
+                <div class="feed-tab" onclick="switchTab(this)">🎨 Creator</div>
+            </div>
+        </div>
+
+        <!-- POST 1 -->
+        <div class="glass-card post-card animate-in delay-2">
+            <div class="post-header">
+                <div class="post-avatar" style="background:rgba(74,222,128,0.1); border-color:rgba(74,222,128,0.2);">🌿</div>
+                <div class="post-meta">
+                    <div class="post-author">ปิ่นทอง รักดี
+                        <span class="post-level-tag" style="color:var(--eden-gold); border-color:rgba(251,191,36,0.3);">LV.12</span>
+                    </div>
+                    <div class="post-time">15 นาทีที่แล้ว · กลุ่ม AI Creator 🤖</div>
+                </div>
+            </div>
+            <div class="post-content">
+                เพิ่งเรียนจบ course AI ตัวแรกในชีวิต! 🎉 รู้สึกว่าประตูบานใหม่เปิดออกมาให้ เดินเข้าไปได้เลย ขอบคุณทุกคนใน <span class="tag">#AICreator</span> ที่ช่วยตอบคำถามตลอดเดือนที่ผ่านมา 🙏<br><br>ถ้าใครอยากเริ่มต้นเรียน AI ตามมาคุยได้เลย!
+            </div>
+            <div class="post-image">🎓✨</div>
+            <div class="post-reactions">
+                <button class="reaction-btn active" onclick="toggleReaction(this)">🌱 <span class="reaction-count">42</span> เมล็ดพันธุ์</button>
+                <button class="reaction-btn" onclick="toggleReaction(this)">☀️ <span class="reaction-count">28</span> แสงแดด</button>
+                <button class="reaction-btn" onclick="toggleReaction(this)">💧 <span class="reaction-count">15</span> น้ำใจ</button>
+                <button class="reaction-btn" onclick="toggleReaction(this)">💬 <span class="reaction-count">8</span> ความคิดเห็น</button>
+            </div>
+            <div class="post-footer">
+                <span>🌟 Achievement Unlocked!</span>
+            </div>
+        </div>
+
+        <!-- POST 2 -->
+        <div class="glass-card post-card animate-in delay-3">
+            <div class="post-header">
+                <div class="post-avatar" style="background:rgba(251,191,36,0.08); border-color:rgba(251,191,36,0.2);">☀️</div>
+                <div class="post-meta">
+                    <div class="post-author">วิชัย มั่นคง
+                        <span class="post-level-tag" style="color:var(--eden-sky); border-color:rgba(56,189,248,0.3);">LV.8</span>
+                    </div>
+                    <div class="post-time">32 นาทีที่แล้ว · กลุ่ม Coffee Lovers ☕</div>
+                </div>
+            </div>
+            <div class="post-content">
+                เช้านี้ตื่นมาชงกาแฟดริปแรก แล้วก็นั่งดูหมอกกลางทุ่ง 🌫️☕ ชีวิตดีมากเลยเพื่อน บางทีความสุขมันแค่นี้เอง<br><br><span class="tag">#MorningVibes</span> <span class="tag">#SlowLife</span> <span class="tag">#CoffeeLover</span>
+            </div>
+            <div class="post-reactions">
+                <button class="reaction-btn" onclick="toggleReaction(this)">🌱 <span class="reaction-count">67</span> เมล็ดพันธุ์</button>
+                <button class="reaction-btn" onclick="toggleReaction(this)">☀️ <span class="reaction-count">91</span> แสงแดด</button>
+                <button class="reaction-btn" onclick="toggleReaction(this)">💧 <span class="reaction-count">23</span> น้ำใจ</button>
+                <button class="reaction-btn" onclick="toggleReaction(this)">💬 <span class="reaction-count">14</span> ความคิดเห็น</button>
+            </div>
+        </div>
+
+        <!-- POST 3 — Anonymous Safe Space -->
+        <div class="glass-card post-card anon-post animate-in delay-3">
+            <div class="post-header">
+                <div class="post-avatar anon-avatar" style="background:rgba(167,139,250,0.1); border-color:rgba(167,139,250,0.2);">🌑</div>
+                <div class="post-meta">
+                    <div class="post-author">ไม่ประสงค์ออกนาม
+                        <span class="anon-badge">Anonymous</span>
+                    </div>
+                    <div class="post-time">1 ชั่วโมงที่แล้ว · Safe Space</div>
+                </div>
+            </div>
+            <div class="post-content" style="color:rgba(255,255,255,0.65);">
+                เดือนนี้เจอแรงกดดันจากงานเยอะมาก รู้สึกเหมือนวิ่งตลอดเวลาแต่ไม่ถึงไหน ใครมีวิธีจัดการกับความรู้สึกแบบนี้บ้างคะ?
+            </div>
+            <div class="post-reactions">
+                <button class="reaction-btn" onclick="toggleReaction(this)">🕊️ <span class="reaction-count">34</span> ส่งกำลังใจ</button>
+                <button class="reaction-btn" onclick="toggleReaction(this)">💧 <span class="reaction-count">48</span> น้ำใจ</button>
+                <button class="reaction-btn" onclick="toggleReaction(this)">💬 <span class="reaction-count">22</span> แนะนำ</button>
+            </div>
+            <div class="post-footer" style="color:rgba(167,139,250,0.4);">
+                🛡️ ปลอดภัย 100% · ไม่เปิดเผยตัวตน
+            </div>
+        </div>
+
+        <!-- POST 4 — Creator -->
+        <div class="glass-card post-card animate-in delay-4">
+            <div class="post-header">
+                <div class="post-avatar" style="background:rgba(244,114,182,0.08); border-color:rgba(244,114,182,0.2);">🎨</div>
+                <div class="post-meta">
+                    <div class="post-author">สาวิตรี ใจดี
+                        <span class="post-level-tag" style="color:var(--eden-pink); border-color:rgba(244,114,182,0.3);">Creator</span>
+                    </div>
+                    <div class="post-time">2 ชั่วโมงที่แล้ว · Creator Zone 🎨</div>
+                </div>
+            </div>
+            <div class="post-content">
+                ผลงาน Digital Art ชิ้นใหม่ที่ใช้เวลา 3 วัน 🎨 แรงบันดาลใจมาจากสวน EDEN นี่แหละ อยากให้ธรรมชาติกับเทคโนโลยีอยู่ร่วมกันได้<br><br><span class="tag">#DigitalArt</span> <span class="tag">#EDEN</span> <span class="tag">#CreatorZone</span>
+            </div>
+            <div class="post-image" style="background:linear-gradient(135deg, rgba(244,114,182,0.1), rgba(167,139,250,0.1)); height:220px;">🖼️🌿✨</div>
+            <div class="post-reactions">
+                <button class="reaction-btn" onclick="toggleReaction(this)">🌱 <span class="reaction-count">112</span> เมล็ดพันธุ์</button>
+                <button class="reaction-btn" onclick="toggleReaction(this)">☀️ <span class="reaction-count">76</span> แสงแดด</button>
+                <button class="reaction-btn" onclick="toggleReaction(this)">💬 <span class="reaction-count">31</span> ความคิดเห็น</button>
+            </div>
+        </div>
+
+        <!-- Skill Zone -->
+        <div class="glass-card skill-zone-card animate-in delay-4">
+            <div class="card-title"><span class="dot" style="background:var(--eden-coral)"></span>🧠 Skill Sharing Zone</div>
+            <div class="glow-divider"></div>
+            <div class="skill-share-items">
+                <div class="skill-item">
+                    <div class="skill-icon">🤖</div>
+                    <div class="skill-info">
+                        <div class="skill-name">เริ่มต้น AI ใน 30 วัน</div>
+                        <div class="skill-teacher">โดย ปิ่นทอง รักดี · LV.12</div>
+                    </div>
+                    <div class="skill-students">👤 142 คน</div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">📸</div>
+                    <div class="skill-info">
+                        <div class="skill-name">ถ่ายภาพมือถือให้สวย</div>
+                        <div class="skill-teacher">โดย มาลี จันทร์หอม · LV.9</div>
+                    </div>
+                    <div class="skill-students">👤 89 คน</div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🎵</div>
+                    <div class="skill-info">
+                        <div class="skill-name">ทฤษฎีดนตรีเบื้องต้น</div>
+                        <div class="skill-teacher">โดย โน้ต ดนตรีดี · LV.15</div>
+                    </div>
+                    <div class="skill-students">👤 204 คน</div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">💼</div>
+                    <div class="skill-info">
+                        <div class="skill-name">Freelance เริ่มต้นยังไง</div>
+                        <div class="skill-teacher">โดย สมหวัง ก้าวหน้า · LV.11</div>
+                    </div>
+                    <div class="skill-students">👤 317 คน</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cozy Spaces -->
+        <div class="glass-card animate-in delay-5">
+            <div class="card-title"><span class="dot" style="background:var(--eden-purple)"></span>☕ Cozy Spaces</div>
+            <div class="cozy-grid">
+                <div class="cozy-item" style="border-color:rgba(251,191,36,0.12);">
+                    <div class="cozy-icon">☕</div>
+                    <div class="cozy-name">มุมคาเฟ่</div>
+                    <div class="cozy-count">23 คนอยู่ในนั้น</div>
+                </div>
+                <div class="cozy-item" style="border-color:rgba(56,189,248,0.12);">
+                    <div class="cozy-icon">📚</div>
+                    <div class="cozy-name">Study Garden</div>
+                    <div class="cozy-count">47 คนอยู่ในนั้น</div>
+                </div>
+                <div class="cozy-item" style="border-color:rgba(244,114,182,0.12);">
+                    <div class="cozy-icon">🎵</div>
+                    <div class="cozy-name">Music Garden</div>
+                    <div class="cozy-count">12 คนอยู่ในนั้น</div>
+                </div>
+                <div class="cozy-item" style="border-color:rgba(167,139,250,0.12);">
+                    <div class="cozy-icon">🔥</div>
+                    <div class="cozy-name">Night Campfire</div>
+                    <div class="cozy-count">8 คนอยู่ในนั้น</div>
+                </div>
+                <div class="cozy-item" style="border-color:rgba(74,222,128,0.12);">
+                    <div class="cozy-icon">🌧</div>
+                    <div class="cozy-name">Rain Room</div>
+                    <div class="cozy-count">31 คนอยู่ในนั้น</div>
+                </div>
+                <div class="cozy-item" style="border-color:rgba(251,146,60,0.12);">
+                    <div class="cozy-icon">🙏</div>
+                    <div class="cozy-name">Prayer Garden</div>
+                    <div class="cozy-count">18 คนอยู่ในนั้น</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RIGHT COL -->
+    <div class="right-col">
+
+        <!-- Community Tree -->
+        <div class="glass-card tree-card animate-in delay-2">
+            <div class="card-title" style="justify-content:center;"><span class="dot" style="background:var(--eden-green)"></span>Community Tree</div>
+            <div class="tree-visual">
+                <svg viewBox="0 0 120 120" class="tree-svg">
+                    <!-- Tree glow -->
+                    <defs>
+                        <radialGradient id="treeGlow" cx="50%" cy="60%" r="50%">
+                            <stop offset="0%" stop-color="#4ade80" stop-opacity="0.3"/>
+                            <stop offset="100%" stop-color="#4ade80" stop-opacity="0"/>
+                        </radialGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+                    <ellipse cx="60" cy="90" rx="35" ry="8" fill="url(#treeGlow)"/>
+                    <!-- Trunk -->
+                    <rect x="53" y="75" width="14" height="30" rx="4" fill="#92400e" opacity="0.7"/>
+                    <!-- Canopy layers -->
+                    <circle cx="60" cy="55" r="30" fill="rgba(34,197,94,0.18)" filter="url(#glow)"/>
+                    <circle cx="60" cy="50" r="26" fill="rgba(34,197,94,0.22)" filter="url(#glow)"/>
+                    <circle cx="60" cy="44" r="22" fill="rgba(74,222,128,0.28)" filter="url(#glow)"/>
+                    <circle cx="60" cy="40" r="17" fill="rgba(74,222,128,0.35)" filter="url(#glow)"/>
+                    <!-- Fruits -->
+                    <circle cx="45" cy="38" r="4" fill="#fbbf24" opacity="0.9" filter="url(#glow)"/>
+                    <circle cx="72" cy="36" r="3.5" fill="#f472b6" opacity="0.9" filter="url(#glow)"/>
+                    <circle cx="58" cy="30" r="3" fill="#38bdf8" opacity="0.9" filter="url(#glow)"/>
+                    <circle cx="68" cy="48" r="3" fill="#a78bfa" opacity="0.8"/>
+                    <circle cx="48" cy="50" r="2.5" fill="#fb923c" opacity="0.8"/>
+                    <!-- Sparkles -->
+                    <circle cx="38" cy="45" r="1.5" fill="white" opacity="0.5">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="82" cy="42" r="1.5" fill="white" opacity="0.5">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="2.5s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="60" cy="22" r="2" fill="#fbbf24" opacity="0.7">
+                        <animate attributeName="opacity" values="0.7;1;0.7" dur="1.8s" repeatCount="indefinite"/>
+                    </circle>
+                </svg>
+            </div>
+            <div class="tree-level-label">COMMUNITY TREE · LEVEL 7</div>
+            <div class="tree-name">🌳 ต้นไม้แห่งความหวัง</div>
+            <div class="tree-progress-bar"><div class="tree-progress-fill"></div></div>
+            <div class="tree-progress-label">72% สู่ Level 8 · ยังขาดอีก 840 ใจ</div>
+            <div class="tree-contributors">
+                <div class="tree-contrib-avatar">🌸</div>
+                <div class="tree-contrib-avatar">🌿</div>
+                <div class="tree-contrib-avatar">☀️</div>
+                <div class="tree-contrib-avatar">🍃</div>
+                <div class="tree-contrib-avatar">🌺</div>
+                <div class="tree-contrib-avatar" style="background:rgba(255,255,255,0.05); font-size:0.6rem; color:rgba(255,255,255,0.35);">+2k</div>
+            </div>
+        </div>
+
+        <!-- Live Activity -->
+        <div class="glass-card live-card animate-in delay-3">
+            <div class="live-header">
+                <div class="live-label">กิจกรรม</div>
+                <div class="live-indicator"><span class="live-pulse"></span>LIVE</div>
+            </div>
+            <div id="activityFeed">
+                <div class="activity-item">
+                    <div class="activity-avatar">🌸</div>
+                    <div class="activity-text"><strong>น้ำฝน</strong> ส่งกำลังใจให้ 3 คน</div>
+                    <div class="activity-time">ตอนนี้</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-avatar">🎉</div>
+                    <div class="activity-text"><strong>ปิ่นทอง</strong> อัพ Level 12 แล้ว!</div>
+                    <div class="activity-time">2 น.</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-avatar">🌿</div>
+                    <div class="activity-text"><strong>สมาชิกใหม่</strong> 3 คน เข้าร่วมวันนี้</div>
+                    <div class="activity-time">8 น.</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-avatar">☕</div>
+                    <div class="activity-text"><strong>วิชัย</strong> จองที่นั่ง Event คืนนี้</div>
+                    <div class="activity-time">12 น.</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-avatar">🎨</div>
+                    <div class="activity-text"><strong>สาวิตรี</strong> แชร์งาน Art ใหม่</div>
+                    <div class="activity-time">1 ชม.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events -->
+        <div class="glass-card events-card animate-in delay-3">
+            <div class="card-title"><span class="dot" style="background:var(--eden-coral)"></span>Event ที่กำลังจะมา</div>
+            <div class="event-item">
+                <div class="event-date" style="background:rgba(74,222,128,0.08); border-color:rgba(74,222,128,0.2);">
+                    <div class="event-day" style="color:var(--eden-green);">08</div>
+                    <div class="event-month">พ.ค.</div>
+                </div>
+                <div class="event-info">
+                    <div class="event-title">🌙 Campfire Night</div>
+                    <div class="event-meta">19:00 · Online · 47 ที่นั่ง</div>
+                    <span class="event-tag" style="color:var(--eden-green); border-color:rgba(74,222,128,0.25);">เหลือ 12 ที่</span>
+                </div>
+            </div>
+            <div class="event-item">
+                <div class="event-date" style="background:rgba(56,189,248,0.08); border-color:rgba(56,189,248,0.2);">
+                    <div class="event-day" style="color:var(--eden-sky);">10</div>
+                    <div class="event-month">พ.ค.</div>
+                </div>
+                <div class="event-info">
+                    <div class="event-title">🤖 AI Workshop</div>
+                    <div class="event-meta">14:00 · Zoom · 30 ที่นั่ง</div>
+                    <span class="event-tag" style="color:var(--eden-sky); border-color:rgba(56,189,248,0.25);">ฟรี!</span>
+                </div>
+            </div>
+            <div class="event-item">
+                <div class="event-date" style="background:rgba(244,114,182,0.08); border-color:rgba(244,114,182,0.2);">
+                    <div class="event-day" style="color:var(--eden-pink);">14</div>
+                    <div class="event-month">พ.ค.</div>
+                </div>
+                <div class="event-info">
+                    <div class="event-title">☕ Coffee Meetup</div>
+                    <div class="event-meta">10:00 · Offline · สวนนครสวรรค์</div>
+                    <span class="event-tag" style="color:var(--eden-pink); border-color:rgba(244,114,182,0.25);">Offline</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Find Companion -->
+        <div class="glass-card companion-card animate-in delay-4">
+            <div class="card-title"><span class="dot" style="background:var(--eden-purple)"></span>หาเพื่อน / Mentor</div>
+            <div class="companion-item">
+                <div class="companion-avatar" style="background:rgba(56,189,248,0.1); border-color:rgba(56,189,248,0.2);">🎓</div>
+                <div class="companion-info">
+                    <div class="companion-name">ดร.สมชาย วิทยา</div>
+                    <div class="companion-role">Mentor · AI & Technology</div>
+                    <div class="companion-tags">
+                        <span class="companion-tag">AI</span>
+                        <span class="companion-tag">Coding</span>
+                        <span class="companion-tag">Startup</span>
+                    </div>
+                </div>
+                <button class="connect-btn">เชื่อมต่อ</button>
+            </div>
+            <div class="companion-item">
+                <div class="companion-avatar" style="background:rgba(74,222,128,0.1); border-color:rgba(74,222,128,0.2);">🌱</div>
+                <div class="companion-info">
+                    <div class="companion-name">มะลิ สร้างดี</div>
+                    <div class="companion-role">Study Buddy · มหาวิทยาลัย</div>
+                    <div class="companion-tags">
+                        <span class="companion-tag">นักศึกษา</span>
+                        <span class="companion-tag">Design</span>
+                    </div>
+                </div>
+                <button class="connect-btn">เชื่อมต่อ</button>
+            </div>
+            <div class="companion-item">
+                <div class="companion-avatar" style="background:rgba(251,191,36,0.08); border-color:rgba(251,191,36,0.2);">☕</div>
+                <div class="companion-info">
+                    <div class="companion-name">ธนา กาแฟดี</div>
+                    <div class="companion-role">Buddy · Coffee & Life</div>
+                    <div class="companion-tags">
+                        <span class="companion-tag">Coffee</span>
+                        <span class="companion-tag">Slow Life</span>
+                    </div>
+                </div>
+                <button class="connect-btn">เชื่อมต่อ</button>
+            </div>
+        </div>
+
+    </div>
+
+</div><!-- end main-content -->
+
+<footer>
+    <div class="footer-left">SAWANNAKHON CONNECT : EDEN — COMMUNITY · V1.0</div>
+    <div class="footer-orbs">
+        <div class="footer-orb" style="background:var(--eden-green);"></div>
+        <div class="footer-orb" style="background:var(--eden-sky);"></div>
+        <div class="footer-orb" style="background:var(--eden-gold);"></div>
+        <div class="footer-orb" style="background:var(--eden-pink);"></div>
+    </div>
+</footer>
+
+</div><!-- end page-wrapper -->
+
+<script>
+// ══ CURSOR ══
+const dot = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+(function anim() {
+    rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+    dot.style.left = mx+'px'; dot.style.top = my+'px';
+    ring.style.left = rx+'px'; ring.style.top = ry+'px';
+    requestAnimationFrame(anim);
+})();
+
+// ══ PARTICLES ══
+const pc = document.getElementById('particles');
+const colors = ['rgba(74,222,128,0.4)','rgba(56,189,248,0.35)','rgba(251,191,36,0.4)','rgba(244,114,182,0.3)','rgba(167,139,250,0.35)'];
+for(let i=0;i<35;i++){
+    const p = document.createElement('div');
+    p.className='particle';
+    const s=Math.random()*3+1;
+    const tx=(Math.random()-0.5)*180;
+    p.style.cssText=`
+        left:${Math.random()*100}%;
+        width:${s}px;height:${s}px;
+        border-radius:50%;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        animation-duration:${Math.random()*14+10}s;
+        animation-delay:${Math.random()*10}s;
+        --tx:${tx}px;
+    `;
+    pc.appendChild(p);
+}
+
+// ══ CARD GLOW ══
+document.querySelectorAll('.glass-card').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+        const r=card.getBoundingClientRect();
+        card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+        card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+    });
+});
+
+// ══ MOOD ══
+document.querySelectorAll('.mood-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        showToast('😊','อัปเดตอารมณ์แล้ว!','มีพลังงานดีๆ ทั้งวันนะ 🌟');
+    });
+});
+
+// ══ FEED TABS ══
+function switchTab(el){
+    document.querySelectorAll('.feed-tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+}
+
+// ══ REACTIONS ══
+function toggleReaction(btn){
+    const wasActive = btn.classList.contains('active');
+    const countEl = btn.querySelector('.reaction-count');
+    let count = parseInt(countEl.textContent);
+    if(wasActive){ btn.classList.remove('active'); countEl.textContent = count-1; }
+    else { btn.classList.add('active'); countEl.textContent = count+1; }
+}
+
+// ══ ENCOURAGE ══
+function toggleEncourage(){
+    const popup = document.getElementById('encouragePopup');
+    popup.classList.toggle('open');
+}
+function sendEncouragement(icon, label){
+    document.getElementById('encouragePopup').classList.remove('open');
+    showToast(icon, 'ส่ง'+label+' แล้ว!', 'กำลังใจของคุณถึงชุมชนแล้ว 💫');
+}
+document.addEventListener('click', e=>{
+    const f = document.querySelector('.encourage-float');
+    if(!f.contains(e.target)) document.getElementById('encouragePopup').classList.remove('open');
+});
+
+// ══ TOAST ══
+function showToast(icon, title, msg){
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = `<div class="toast-icon">${icon}</div><div><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
+    c.appendChild(t);
+    setTimeout(()=>t.remove(), 5000);
+}
+
+// ══ AUTO TOASTS ══
+const autoToasts = [
+    ['🌱','สมาชิกใหม่','น้องดาว เพิ่งเข้าร่วม EDEN!'],
+    ['🎉','กิจกรรมคืนนี้','Campfire Night เหลือที่ 12 ที่ — จองเลย!'],
+    ['⭐','ความสำเร็จ','ปิ่นทอง อัพ Level 12 แล้ว! 🎊'],
+    ['💧','รดน้ำใจ','มีคนส่งกำลังใจให้คุณ 🌱'],
+    ['🌿','Community Tree','ต้นไม้โตขึ้นจาก 71% → 72%! 🌳'],
+];
+let ti=0;
+setTimeout(()=>{
+    const fn=()=>{ const [i,t,m]=autoToasts[ti%autoToasts.length]; showToast(i,t,m); ti++; };
+    fn(); setInterval(fn,11000);
+},3500);
+
+// ══ LIVE ACTIVITY AUTO-UPDATE ══
+const newActivities = [
+    {av:'🌺',text:'<strong>มาลี</strong> เข้าร่วมกลุ่ม Healing Space',time:'ตอนนี้'},
+    {av:'⭐',text:'<strong>ธนา</strong> ได้รับ Badge ใหม่',time:'ตอนนี้'},
+    {av:'💬',text:'<strong>สมาชิก</strong> โพสต์ใหม่ใน Safe Space',time:'ตอนนี้'},
+    {av:'🎵',text:'<strong>โน้ต</strong> เปิดห้อง Music Garden',time:'ตอนนี้'},
+];
+let ai=0;
+setInterval(()=>{
+    const feed=document.getElementById('activityFeed');
+    const item=newActivities[ai%newActivities.length]; ai++;
+    const el=document.createElement('div');
+    el.className='activity-item';
+    el.style.cssText='opacity:0;transition:opacity 0.5s;';
+    el.innerHTML=`<div class="activity-avatar">${item.av}</div><div class="activity-text">${item.text}</div><div class="activity-time">${item.time}</div>`;
+    feed.insertBefore(el,feed.firstChild);
+    if(feed.children.length>6) feed.removeChild(feed.lastChild);
+    setTimeout(()=>el.style.opacity='1',50);
+},8000);
+
+// ══ XP BARS ANIMATE ══
+window.addEventListener('load',()=>{
+    document.querySelectorAll('.profile-xp-fill,.tree-progress-fill,.challenge-fill').forEach(bar=>{
+        const w=bar.style.width;
+        bar.style.width='0';
+        bar.style.transition='width 1.2s cubic-bezier(0.34,1.0,0.64,1)';
+        setTimeout(()=>bar.style.width=w, 800);
+    });
+});
+</script>
+</body>
+</html>

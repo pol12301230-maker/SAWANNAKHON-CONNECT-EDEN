@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GROW - SAWANNAKHON CONNECT : EDEN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --eden-green: #4ade80;
+            --eden-sky: #38bdf8;
+            --eden-gold: #fbbf24;
+            --eden-pink: #f472b6;
+            --eden-purple: #a78bfa;
+            --eden-mint: #6ee7b7;
+            --glass-bg: rgba(255,255,255,0.07);
+            --glass-border: rgba(255,255,255,0.15);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: #020a0f;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ═══════════════════════════════
+           CURSOR
+        ═══════════════════════════════ */
+        .cursor-dot {
+            width: 8px; height: 8px;
+            background: var(--eden-green);
+            border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s;
+        }
+        .cursor-ring {
+            width: 36px; height: 36px;
+            border: 1.5px solid rgba(74,222,128,0.5);
+            border-radius: 50%; position: fixed;
+            pointer-events: none; z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: all 0.15s ease;
+        }
+
+        /* ═══════════════════════════════
+           ANIMATED BG
+        ═══════════════════════════════ */
+        .bg-layer {
+            position: fixed; inset: 0; z-index: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 15% 20%, rgba(74,222,128,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 85% 70%, rgba(56,189,248,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at bottom, rgba(0,10,20,0.9) 0%, transparent 70%),
+                #020a0f;
+        }
+        .bg-orbs {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+        }
+        .bg-orb {
+            position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: 0.07;
+            animation: orb-drift 20s ease-in-out infinite;
+        }
+        .bg-orb:nth-child(1) { width: 600px; height: 600px; background: #4ade80; top: -200px; left: -100px; animation-delay: 0s; }
+        .bg-orb:nth-child(2) { width: 400px; height: 400px; background: #38bdf8; top: 50%; right: -150px; animation-delay: -7s; }
+        .bg-orb:nth-child(3) { width: 300px; height: 300px; background: #6ee7b7; bottom: -100px; left: 30%; animation-delay: -14s; }
+        @keyframes orb-drift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -20px) scale(1.05); }
+            66% { transform: translate(-20px, 30px) scale(0.95); }
+        }
+
+        /* Floating leaves */
+        .leaves { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+        .leaf {
+            position: absolute;
+            font-size: 1rem; opacity: 0;
+            animation: leaf-fall linear infinite;
+        }
+        @keyframes leaf-fall {
+            0%   { transform: translateY(-5vh) translateX(0) rotate(0deg); opacity: 0; }
+            10%  { opacity: 0.4; }
+            90%  { opacity: 0.2; }
+            100% { transform: translateY(110vh) translateX(var(--lx)) rotate(var(--lr)); opacity: 0; }
+        }
+
+        /* ═══════════════════════════════
+           LAYOUT
+        ═══════════════════════════════ */
+        .page-wrapper {
+            position: relative; z-index: 3;
+            min-height: 100vh; display: flex; flex-direction: column;
+        }
+
+        /* ═══════════════════════════════
+           NAV
+        ═══════════════════════════════ */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 48px; height: 72px;
+            background: rgba(2,10,20,0.6);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .nav-logo { display: flex; align-items: center; gap: 14px; }
+        .nav-brand { font-size: 0.9rem; font-weight: 300; letter-spacing: 0.12em; color: rgba(255,255,255,0.7); text-transform: uppercase; }
+        .nav-brand strong { color: var(--eden-sky); font-weight: 600; }
+        @keyframes shine-eden {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .eden-badge {
+            font-size: 1.35rem; font-weight: 700; letter-spacing: 0.25em;
+            background: linear-gradient(90deg, #34d399, #38bdf8, #a78bfa, #f472b6, #fbbf24, #34d399);
+            background-size: 300%;
+            animation: shine-eden 5s linear infinite;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .nav-links { display: flex; gap: 40px; list-style: none; }
+        .nav-links li {
+            font-size: 0.85rem; letter-spacing: 0.08em; color: rgba(255,255,255,0.55);
+            cursor: pointer; transition: color 0.25s; position: relative; padding-bottom: 4px;
+        }
+        .nav-links li::after {
+            content: ''; position: absolute; bottom: 0; left: 0;
+            height: 1px; width: 0; background: var(--eden-green); transition: width 0.3s ease;
+        }
+        .nav-links li:hover { color: white; }
+        .nav-links li:hover::after { width: 100%; }
+        .nav-links li.active { color: var(--eden-green); }
+        .nav-links li.active::after { width: 100%; background: var(--eden-green); }
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .status-badge {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 16px; background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; font-size: 0.82rem;
+        }
+        .status-dot {
+            width: 8px; height: 8px; background: var(--eden-green); border-radius: 50%;
+            animation: pulse-green 2s ease infinite; box-shadow: 0 0 0 0 rgba(74,222,128,0.4);
+        }
+        @keyframes pulse-green {
+            0%   { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
+            70%  { box-shadow: 0 0 0 8px rgba(74,222,128,0); }
+            100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+        }
+        .logout-btn {
+            font-size: 0.82rem; color: rgba(255,255,255,0.4); background: none; border: none;
+            cursor: pointer; font-family: 'Kanit', sans-serif; letter-spacing: 0.06em; transition: color 0.2s;
+        }
+        .logout-btn:hover { color: white; }
+
+        /* ═══════════════════════════════
+           HERO
+        ═══════════════════════════════ */
+        .hero {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; padding: 70px 24px 30px; text-align: center;
+        }
+        .hero-eyebrow {
+            font-size: 0.75rem; letter-spacing: 0.35em; color: var(--eden-green);
+            text-transform: uppercase; margin-bottom: 20px; opacity: 0.8;
+        }
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 5vw, 3.6rem);
+            font-weight: 700; line-height: 1.15; color: white;
+            margin-bottom: 12px; text-shadow: 0 0 80px rgba(74,222,128,0.25);
+        }
+        .hero-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, #fff 20%, rgba(74,222,128,0.9));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero-sub {
+            font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.45);
+            letter-spacing: 0.06em; line-height: 1.8; max-width: 480px;
+        }
+        .hero-divider {
+            width: 80px; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--eden-green), transparent);
+            margin: 20px auto;
+            box-shadow: 0 0 12px var(--eden-green);
+        }
+
+        /* ═══════════════════════════════
+           TICKER
+        ═══════════════════════════════ */
+        .ticker-wrapper {
+            width: 100%; overflow: hidden;
+            background: rgba(74,222,128,0.04);
+            border-top: 1px solid rgba(74,222,128,0.12);
+            border-bottom: 1px solid rgba(74,222,128,0.12);
+            padding: 10px 0; margin-bottom: 50px;
+        }
+        .ticker-track { display: flex; gap: 64px; animation: ticker 35s linear infinite; white-space: nowrap; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .ticker-item {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.78rem; color: rgba(255,255,255,0.5); letter-spacing: 0.06em; flex-shrink: 0;
+        }
+        .ticker-item span { color: var(--eden-green); font-weight: 600; }
+        .ticker-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--eden-green); opacity: 0.4; }
+
+        /* ═══════════════════════════════
+           MAIN CONTENT WRAPPER
+        ═══════════════════════════════ */
+        .content-section { padding: 0 32px 60px; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        /* ═══════════════════════════════
+           GROWTH TREE + MY STATUS — TOP GRID
+        ═══════════════════════════════ */
+        .top-grid {
+            display: grid; grid-template-columns: 1fr 1.6fr;
+            gap: 20px; margin-bottom: 20px;
+        }
+
+        /* Glass card base */
+        .glass-card {
+            border-radius: 28px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            overflow: hidden; position: relative;
+            transition: border-color 0.3s, background 0.3s;
+        }
+        .glass-card:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(74,222,128,0.2);
+        }
+        .glass-card-inner { padding: 32px; }
+
+        .section-label {
+            font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+            color: rgba(255,255,255,0.3); margin-bottom: 20px;
+        }
+        .section-label span { color: var(--eden-green); }
+
+        /* ═══════ TREE CARD ═══════ */
+        .tree-card { display: flex; flex-direction: column; align-items: center; }
+
+        .tree-stage-tabs {
+            display: flex; gap: 6px; margin-bottom: 24px; align-self: stretch;
+        }
+        .stage-tab {
+            flex: 1; padding: 6px; border-radius: 8px; text-align: center;
+            font-size: 0.62rem; letter-spacing: 0.08em; cursor: pointer;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.3); transition: all 0.25s;
+        }
+        .stage-tab.active {
+            background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.35);
+            color: var(--eden-green);
+        }
+
+        /* SVG Tree */
+        .tree-visual {
+            position: relative; width: 160px; height: 200px; margin: 10px 0;
+        }
+        .tree-svg { width: 100%; height: 100%; }
+
+        @keyframes tree-glow {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(74,222,128,0.4)); }
+            50%       { filter: drop-shadow(0 0 20px rgba(74,222,128,0.7)) drop-shadow(0 0 40px rgba(74,222,128,0.3)); }
+        }
+        .tree-svg .tree-crown { animation: tree-glow 3s ease-in-out infinite; }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-2deg); transform-origin: bottom center; }
+            50%       { transform: rotate(2deg); transform-origin: bottom center; }
+        }
+        .tree-svg .tree-group { animation: sway 4s ease-in-out infinite; }
+
+        .tree-level-badge {
+            margin-top: 8px;
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 14px; border-radius: 999px;
+            background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3);
+            font-size: 0.78rem; color: var(--eden-green); letter-spacing: 0.1em;
+        }
+
+        .tree-xp-bar {
+            width: 100%; margin-top: 16px;
+        }
+        .xp-label {
+            display: flex; justify-content: space-between;
+            font-size: 0.65rem; color: rgba(255,255,255,0.3); margin-bottom: 6px;
+        }
+        .xp-track {
+            height: 5px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden;
+        }
+        .xp-bar {
+            height: 100%; width: 68%; border-radius: 99px;
+            background: linear-gradient(90deg, #4ade80, #6ee7b7);
+            box-shadow: 0 0 10px rgba(74,222,128,0.5);
+            animation: xp-fill 2s cubic-bezier(0.4,0,0.2,1) forwards;
+        }
+        @keyframes xp-fill { from { width: 0; } to { width: 68%; } }
+
+        /* ═══════ STATUS CARD ═══════ */
+        .status-card {}
+        .status-header {
+            display: flex; align-items: center; gap: 16px; margin-bottom: 28px;
+        }
+        .avatar-wrap {
+            width: 64px; height: 64px; border-radius: 18px;
+            background: linear-gradient(135deg, rgba(74,222,128,0.2), rgba(56,189,248,0.1));
+            border: 1px solid rgba(74,222,128,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; flex-shrink: 0;
+            position: relative;
+        }
+        .avatar-ring {
+            position: absolute; inset: -3px; border-radius: 20px;
+            border: 1.5px solid rgba(74,222,128,0.2);
+            animation: ring-pulse 2.5s ease infinite;
+        }
+        @keyframes ring-pulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.03); }
+        }
+        .avatar-info {}
+        .avatar-name { font-size: 1.1rem; font-weight: 600; color: white; }
+        .avatar-title {
+            font-size: 0.72rem; color: var(--eden-green); letter-spacing: 0.1em;
+            margin-top: 2px;
+        }
+
+        .stats-row {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px;
+        }
+        .stat-box {
+            padding: 14px 10px; border-radius: 14px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+            text-align: center; transition: all 0.25s; cursor: default;
+        }
+        .stat-box:hover { background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.2); }
+        .stat-box-val { font-size: 1.3rem; font-weight: 700; color: white; line-height: 1; }
+        .stat-box-val.gold { color: var(--eden-gold); }
+        .stat-box-val.green { color: var(--eden-green); }
+        .stat-box-val.sky { color: var(--eden-sky); }
+        .stat-box-val.purple { color: var(--eden-purple); }
+        .stat-box-label { font-size: 0.62rem; color: rgba(255,255,255,0.3); margin-top: 4px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+        .mood-row {
+            margin-bottom: 20px;
+        }
+        .mood-title { font-size: 0.72rem; color: rgba(255,255,255,0.35); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+        .mood-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .mood-btn {
+            padding: 7px 14px; border-radius: 99px; cursor: pointer;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Kanit', sans-serif; font-size: 0.78rem; color: rgba(255,255,255,0.55);
+            transition: all 0.2s;
+        }
+        .mood-btn:hover { background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.3); color: var(--eden-green); }
+        .mood-btn.selected { background: rgba(74,222,128,0.15); border-color: rgba(74,222,128,0.4); color: var(--eden-green); }
+
+        .streak-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 12px 16px; border-radius: 14px;
+            background: rgba(251,191,36,0.07); border: 1px solid rgba(251,191,36,0.15);
+        }
+        .streak-flame { font-size: 1.3rem; }
+        .streak-text { font-size: 0.82rem; color: rgba(255,255,255,0.7); flex: 1; }
+        .streak-count { font-size: 1.1rem; font-weight: 700; color: var(--eden-gold); }
+
+        /* ═══════════════════════════════
+           DAILY MISSIONS
+        ═══════════════════════════════ */
+        .mid-grid {
+            display: grid; grid-template-columns: 1.2fr 1fr;
+            gap: 20px; margin-bottom: 20px;
+        }
+
+        .mission-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+        }
+        .mission-title-row { display: flex; align-items: center; gap: 10px; }
+        .mission-title { font-size: 1.05rem; font-weight: 600; }
+        .mission-progress-pill {
+            padding: 3px 10px; border-radius: 99px; font-size: 0.68rem;
+            background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3);
+            color: var(--eden-green); letter-spacing: 0.06em;
+        }
+        .overall-bar { margin-bottom: 20px; }
+        .overall-bar-track { height: 4px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; }
+        .overall-bar-fill {
+            height: 100%; width: 60%; border-radius: 99px;
+            background: linear-gradient(90deg, #4ade80, #38bdf8);
+            box-shadow: 0 0 8px rgba(74,222,128,0.4);
+            animation: bar-fill 1.8s ease forwards;
+        }
+        @keyframes bar-fill { from { width: 0; } to { width: 60%; } }
+
+        .mission-list { display: flex; flex-direction: column; gap: 10px; }
+        .mission-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 14px; border-radius: 14px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .mission-item:hover { background: rgba(74,222,128,0.05); border-color: rgba(74,222,128,0.15); }
+        .mission-item.done { opacity: 0.6; }
+        .mission-item.done .mission-text { text-decoration: line-through; color: rgba(255,255,255,0.3); }
+        .mission-check {
+            width: 22px; height: 22px; border-radius: 8px;
+            border: 1.5px solid rgba(74,222,128,0.35);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem; flex-shrink: 0; transition: all 0.2s;
+        }
+        .mission-check.done {
+            background: rgba(74,222,128,0.2); border-color: rgba(74,222,128,0.6); color: var(--eden-green);
+        }
+        .mission-emoji { font-size: 1rem; flex-shrink: 0; }
+        .mission-text { flex: 1; font-size: 0.82rem; color: rgba(255,255,255,0.7); }
+        .mission-pts { font-size: 0.7rem; color: var(--eden-gold); flex-shrink: 0; }
+
+        /* ═══════ MENTOR / GROWTH COMPANION ═══════ */
+        .mentor-card {}
+        .mentor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .mentor-badge {
+            font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase;
+            padding: 4px 10px; border-radius: 99px;
+            background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.25);
+            color: var(--eden-purple);
+        }
+        .mentor-list { display: flex; flex-direction: column; gap: 14px; }
+        .mentor-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px; border-radius: 14px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .mentor-row:hover { background: rgba(167,139,250,0.07); border-color: rgba(167,139,250,0.2); }
+        .mentor-avatar {
+            width: 42px; height: 42px; border-radius: 12px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0;
+        }
+        .mentor-info { flex: 1; min-width: 0; }
+        .mentor-name { font-size: 0.84rem; font-weight: 500; color: white; }
+        .mentor-role { font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-top: 1px; }
+        .mentor-action-btn {
+            padding: 5px 12px; border-radius: 8px; font-family: 'Kanit', sans-serif;
+            font-size: 0.7rem; cursor: pointer; transition: all 0.2s;
+            background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.25);
+            color: var(--eden-purple); letter-spacing: 0.04em;
+        }
+        .mentor-action-btn:hover { background: rgba(167,139,250,0.2); }
+
+        /* ═══════════════════════════════
+           GROWTH PATHS
+        ═══════════════════════════════ */
+        .paths-section { margin-bottom: 20px; }
+        .paths-section-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+        }
+        .paths-section-title { font-size: 1.05rem; font-weight: 600; }
+        .paths-see-all {
+            font-size: 0.75rem; color: rgba(255,255,255,0.35); cursor: pointer;
+            letter-spacing: 0.08em; transition: color 0.2s;
+        }
+        .paths-see-all:hover { color: var(--eden-green); }
+
+        .paths-grid {
+            display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;
+        }
+        .path-card {
+            border-radius: 20px; padding: 20px 14px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer; transition: all 0.3s; text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .path-card::before {
+            content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s;
+            background: radial-gradient(circle at 50% 60%, var(--path-color) 0%, transparent 70%);
+        }
+        .path-card:hover::before { opacity: 0.1; }
+        .path-card:hover { transform: translateY(-6px); border-color: var(--path-color); box-shadow: 0 16px 40px rgba(0,0,0,0.3), 0 0 20px color-mix(in srgb, var(--path-color) 10%, transparent); }
+        .path-icon { font-size: 1.8rem; margin-bottom: 10px; display: block; }
+        .path-name { font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.7); line-height: 1.3; }
+        .path-count { font-size: 0.62rem; color: rgba(255,255,255,0.3); margin-top: 4px; letter-spacing: 0.05em; }
+
+        .path-mindset   { --path-color: #a78bfa; }
+        .path-career    { --path-color: #38bdf8; }
+        .path-relation  { --path-color: #f472b6; }
+        .path-wellness  { --path-color: #4ade80; }
+        .path-creative  { --path-color: #fbbf24; }
+        .path-purpose   { --path-color: #6ee7b7; }
+
+        /* ═══════════════════════════════
+           BOTTOM GRID : COMMUNITY FEED + REST
+        ═══════════════════════════════ */
+        .bottom-grid {
+            display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; margin-bottom: 20px;
+        }
+
+        /* Community Feed */
+        .feed-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .feed-title { font-size: 1.05rem; font-weight: 600; }
+        .live-dot {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.7rem; color: var(--eden-green); letter-spacing: 0.1em;
+        }
+        .live-dot::before {
+            content: ''; width: 6px; height: 6px; background: var(--eden-green); border-radius: 50%;
+            animation: pulse-g 1.5s infinite; box-shadow: 0 0 0 0 rgba(74,222,128,0.4);
+        }
+        @keyframes pulse-g {
+            0%   { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
+            70%  { box-shadow: 0 0 0 6px rgba(74,222,128,0); }
+            100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+        }
+        .feed-list { display: flex; flex-direction: column; gap: 12px; }
+        .feed-item {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 12px 14px; border-radius: 14px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            transition: background 0.2s;
+        }
+        .feed-item:hover { background: rgba(255,255,255,0.06); }
+        .feed-avatar {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .feed-content { flex: 1; min-width: 0; }
+        .feed-text { font-size: 0.78rem; color: rgba(255,255,255,0.65); line-height: 1.6; }
+        .feed-text strong { color: white; font-weight: 600; }
+        .feed-time { font-size: 0.64rem; color: rgba(255,255,255,0.25); margin-top: 3px; }
+        .feed-badge {
+            font-size: 0.62rem; padding: 2px 8px; border-radius: 99px;
+            flex-shrink: 0; align-self: flex-start; margin-top: 2px;
+        }
+        .badge-grow { background: rgba(74,222,128,0.12); color: var(--eden-green); border: 1px solid rgba(74,222,128,0.2); }
+        .badge-support { background: rgba(167,139,250,0.12); color: var(--eden-purple); border: 1px solid rgba(167,139,250,0.2); }
+        .badge-mission { background: rgba(251,191,36,0.1); color: var(--eden-gold); border: 1px solid rgba(251,191,36,0.2); }
+
+        /* Rest Area */
+        .rest-card { text-align: center; }
+        .rest-inner { display: flex; flex-direction: column; align-items: center; height: 100%; }
+        .rest-icon { font-size: 3rem; margin-bottom: 12px; animation: float-icon 3s ease-in-out infinite; }
+        @keyframes float-icon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .rest-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; }
+        .rest-desc { font-size: 0.78rem; color: rgba(255,255,255,0.4); line-height: 1.7; margin-bottom: 24px; max-width: 240px; }
+        .rest-quote {
+            padding: 16px 20px; border-radius: 16px; margin-bottom: 20px; width: 100%;
+            background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.15);
+            font-size: 0.84rem; color: rgba(255,255,255,0.7); line-height: 1.7;
+            font-style: italic; text-align: left;
+        }
+        .rest-quote cite { font-size: 0.68rem; color: rgba(255,255,255,0.3); display: block; margin-top: 8px; font-style: normal; }
+        .rest-btn {
+            width: 100%; padding: 12px; border-radius: 14px; cursor: pointer;
+            background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25);
+            color: var(--eden-green); font-family: 'Kanit', sans-serif;
+            font-size: 0.84rem; letter-spacing: 0.08em; transition: all 0.25s;
+        }
+        .rest-btn:hover { background: rgba(74,222,128,0.2); box-shadow: 0 0 20px rgba(74,222,128,0.15); }
+
+        /* ═══════════════════════════════
+           SKILL HUB
+        ═══════════════════════════════ */
+        .hub-section { margin-bottom: 60px; }
+        .hub-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .hub-title { font-size: 1.05rem; font-weight: 600; }
+        .hub-subtitle { font-size: 0.75rem; color: rgba(255,255,255,0.35); }
+        .hub-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+        .hub-card {
+            border-radius: 18px; padding: 20px 12px; text-align: center;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .hub-card:hover { background: rgba(56,189,248,0.07); border-color: rgba(56,189,248,0.25); transform: translateY(-4px); }
+        .hub-icon { font-size: 1.6rem; margin-bottom: 8px; display: block; }
+        .hub-role { font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.65); }
+        .hub-avail { font-size: 0.6rem; color: var(--eden-sky); margin-top: 4px; }
+
+        /* ═══════════════════════════════
+           FOOTER
+        ═══════════════════════════════ */
+        footer {
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding: 24px 48px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .footer-left { font-size: 0.72rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.2); text-transform: uppercase; }
+        .footer-orbs { display: flex; gap: 8px; }
+        .footer-orb { width: 8px; height: 8px; border-radius: 50%; opacity: 0.4; }
+
+        /* ═══════════════════════════════
+           TOASTS
+        ═══════════════════════════════ */
+        .toast-container { position: fixed; bottom: 32px; right: 32px; display: flex; flex-direction: column; gap: 12px; z-index: 200; }
+        .toast {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 20px; background: rgba(10,20,35,0.92);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 16px;
+            backdrop-filter: blur(20px); min-width: 280px;
+            animation: slideInRight 0.5s ease, fadeOut 0.5s ease 4s forwards;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+        }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+        .toast-icon { font-size: 1.3rem; flex-shrink: 0; }
+        .toast-title { font-size: 0.82rem; font-weight: 600; color: white; }
+        .toast-msg { font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+        /* ═══════════════════════════════
+           ANIMATIONS
+        ═══════════════════════════════ */
+        @keyframes fadeUp {
+            from { opacity:0; transform: translateY(30px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+        .animate-in { opacity: 0; animation: fadeUp 0.7s ease forwards; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.35s; }
+        .delay-4 { animation-delay: 0.5s; }
+        .delay-5 { animation-delay: 0.65s; }
+        .delay-6 { animation-delay: 0.8s; }
+        .delay-7 { animation-delay: 0.95s; }
+
+        /* ═══════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════ */
+        @media (max-width: 1100px) {
+            .top-grid, .mid-grid, .bottom-grid { grid-template-columns: 1fr; }
+            .paths-grid, .hub-grid { grid-template-columns: repeat(3, 1fr); }
+            nav { padding: 0 24px; }
+            .nav-links { display: none; }
+        }
+        @media (max-width: 600px) {
+            .content-section { padding: 0 16px 40px; }
+            .paths-grid, .hub-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            footer { flex-direction: column; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- BG -->
+    <div class="bg-layer"></div>
+    <div class="bg-orbs">
+        <div class="bg-orb"></div>
+        <div class="bg-orb"></div>
+        <div class="bg-orb"></div>
+    </div>
+
+    <!-- Floating leaves -->
+    <div class="leaves" id="leaves"></div>
+
+    <!-- Toasts -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="page-wrapper">
+
+        <!-- NAV -->
+        <nav>
+            <div class="nav-logo">
+                <div class="nav-brand">SAWANNAKHON <strong>CONNECT</strong></div>
+                <div style="width:1px; height:28px; background:rgba(255,255,255,0.12);"></div>
+                <div class="eden-badge">EDEN</div>
+            </div>
+            <ul class="nav-links">
+                <li>Home</li>
+                <li>Rest</li>
+                <li class="active">Grow</li>
+                <li>Community</li>
+                <li>Support</li>
+                <li>Mission</li>
+            </ul>
+            <div class="nav-right">
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    <span style="font-size:0.82rem; color:rgba(255,255,255,0.75);">ต้นกล้าน้อย</span>
+                    <span style="font-size:0.7rem; color:var(--eden-gold); margin-left:4px;">Lv.3</span>
+                </div>
+                <button class="logout-btn">Logout</button>
+            </div>
+        </nav>
+
+        <!-- HERO -->
+        <div class="hero animate-in delay-1">
+            <p class="hero-eyebrow">✦ GROW YOUR GARDEN · สวน EDEN ✦</p>
+            <h1 class="hero-title">เติบโต<em>อย่างมีรากแก้ว</em></h1>
+            <div class="hero-divider"></div>
+            <p class="hero-sub">การเติบโตไม่จำเป็นต้องรีบร้อน<br>ทุกต้นไม้มีฤดูกาลของตัวเอง</p>
+        </div>
+
+        <!-- TICKER -->
+        <div class="ticker-wrapper animate-in delay-2">
+            <div class="ticker-track" id="tickerTrack">
+                <div class="ticker-item"><span>🌱</span> มินอ่านบทความครบ <span>7 วัน</span><div class="ticker-dot"></div></div>
+                <div class="ticker-item"><span>🌳</span> โจเพิ่งเลื่อนระดับเป็น <span>Fruit Bearer</span><div class="ticker-dot"></div></div>
+                <div class="ticker-item"><span>☀️</span> ส่งกำลังใจกันแล้ว <span>28 ครั้ง</span> วันนี้<div class="ticker-dot"></div></div>
+                <div class="ticker-item"><span>🎯</span> Daily Mission วันนี้ทำแล้ว <span>60%</span><div class="ticker-dot"></div></div>
+                <div class="ticker-item"><span>🌿</span> นุ้ยเริ่ม journey ใหม่แล้ว<div class="ticker-dot"></div></div>
+                <div class="ticker-item"><span>✨</span> Growth Point รวม <span>1,842 XP</span> วันนี้<div class="ticker-dot"></div></div>
+                <div class="ticker-item"><span>🤝</span> Mentor ใหม่เปิดรับ <span>5 คน</span><div class="ticker-dot"></div></div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="content-section">
+
+            <!-- TOP GRID : TREE + STATUS -->
+            <div class="top-grid animate-in delay-3">
+
+                <!-- TREE CARD -->
+                <div class="glass-card">
+                    <div class="glass-card-inner tree-card">
+                        <p class="section-label">✦ <span>ต้นไม้แห่งชีวิต</span> · The Growth Tree</p>
+
+                        <div class="tree-stage-tabs">
+                            <div class="stage-tab">🌾 Seed</div>
+                            <div class="stage-tab">🌿 Sprout</div>
+                            <div class="stage-tab active">🌳 Tree</div>
+                            <div class="stage-tab">🍎 Fruit</div>
+                        </div>
+
+                        <div class="tree-visual">
+                            <svg class="tree-svg" viewBox="0 0 160 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g class="tree-group">
+                                    <!-- Ground glow -->
+                                    <ellipse cx="80" cy="192" rx="40" ry="5" fill="rgba(74,222,128,0.15)"/>
+                                    <!-- Trunk -->
+                                    <path d="M72 190 C70 160 68 140 70 120 C72 100 76 90 80 85 C84 90 88 100 90 120 C92 140 90 160 88 190 Z" fill="#5a3a1a" opacity="0.8"/>
+                                    <path d="M78 190 C77 165 76 145 77 125 C78 110 79 95 80 88 C81 95 82 110 83 125 C84 145 83 165 82 190 Z" fill="#3d2710" opacity="0.6"/>
+                                    <!-- Roots -->
+                                    <path d="M72 185 C60 188 52 192 45 193" stroke="#5a3a1a" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+                                    <path d="M88 185 C100 188 108 192 115 193" stroke="#5a3a1a" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+                                    <path d="M75 189 C65 195 58 198 52 200" stroke="#5a3a1a" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+                                    <!-- Crown outer glow layer -->
+                                    <circle cx="80" cy="72" r="58" fill="rgba(74,222,128,0.04)"/>
+                                    <circle cx="80" cy="72" r="50" fill="rgba(74,222,128,0.06)"/>
+                                    <!-- Crown main -->
+                                    <circle class="tree-crown" cx="80" cy="72" r="42" fill="rgba(34,197,94,0.22)" stroke="rgba(74,222,128,0.4)" stroke-width="1.5"/>
+                                    <circle cx="58" cy="88" r="28" fill="rgba(22,163,74,0.2)" stroke="rgba(74,222,128,0.3)" stroke-width="1"/>
+                                    <circle cx="102" cy="85" r="26" fill="rgba(22,163,74,0.2)" stroke="rgba(74,222,128,0.3)" stroke-width="1"/>
+                                    <circle cx="80" cy="55" r="32" fill="rgba(34,197,94,0.25)" stroke="rgba(74,222,128,0.45)" stroke-width="1.5"/>
+                                    <!-- Inner detail -->
+                                    <circle cx="70" cy="65" r="14" fill="rgba(74,222,128,0.12)"/>
+                                    <circle cx="92" cy="62" r="12" fill="rgba(74,222,128,0.1)"/>
+                                    <circle cx="80" cy="48" r="16" fill="rgba(110,231,183,0.12)"/>
+                                    <!-- Sparkle dots -->
+                                    <circle cx="55" cy="55" r="2.5" fill="#4ade80" opacity="0.7"/>
+                                    <circle cx="108" cy="60" r="2" fill="#6ee7b7" opacity="0.6"/>
+                                    <circle cx="80" cy="35" r="2.5" fill="#4ade80" opacity="0.8"/>
+                                    <circle cx="65" cy="45" r="1.5" fill="#a7f3d0" opacity="0.5"/>
+                                    <circle cx="95" cy="42" r="1.5" fill="#a7f3d0" opacity="0.5"/>
+                                    <!-- Small fruits -->
+                                    <circle cx="68" cy="78" r="4.5" fill="rgba(251,191,36,0.6)" stroke="rgba(251,191,36,0.3)" stroke-width="1"/>
+                                    <circle cx="94" cy="74" r="4" fill="rgba(251,191,36,0.5)" stroke="rgba(251,191,36,0.2)" stroke-width="1"/>
+                                    <circle cx="80" cy="90" r="4" fill="rgba(251,191,36,0.5)" stroke="rgba(251,191,36,0.2)" stroke-width="1"/>
+                                </g>
+                            </svg>
+                        </div>
+
+                        <div class="tree-level-badge">🌳 Level 3 · ต้นไม้ใหญ่</div>
+
+                        <div class="tree-xp-bar">
+                            <div class="xp-label">
+                                <span>680 XP</span>
+                                <span>ต้องการ 1,000 XP สำหรับ Level 4</span>
+                            </div>
+                            <div class="xp-track"><div class="xp-bar"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATUS CARD -->
+                <div class="glass-card">
+                    <div class="glass-card-inner">
+                        <p class="section-label">✦ <span>สวนของฉัน</span> · My Garden</p>
+
+                        <div class="status-header">
+                            <div class="avatar-wrap">
+                                🌱
+                                <div class="avatar-ring"></div>
+                            </div>
+                            <div class="avatar-info">
+                                <div class="avatar-name">ต้นกล้าน้อย</div>
+                                <div class="avatar-title">🌿 Sprout Gardener · Lv.3</div>
+                            </div>
+                        </div>
+
+                        <div class="stats-row">
+                            <div class="stat-box">
+                                <div class="stat-box-val gold">842</div>
+                                <div class="stat-box-label">Growth XP</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-box-val green">14</div>
+                                <div class="stat-box-label">Day Streak</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-box-val sky">3</div>
+                                <div class="stat-box-label">Companion</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-box-val purple">27</div>
+                                <div class="stat-box-label">Missions</div>
+                            </div>
+                        </div>
+
+                        <div class="mood-row">
+                            <div class="mood-title">🌤 ตอนนี้รู้สึกอย่างไร?</div>
+                            <div class="mood-options">
+                                <button class="mood-btn" onclick="selectMood(this)">😊 สดใส</button>
+                                <button class="mood-btn selected" onclick="selectMood(this)">🌿 สงบ</button>
+                                <button class="mood-btn" onclick="selectMood(this)">💪 มีพลัง</button>
+                                <button class="mood-btn" onclick="selectMood(this)">🤔 ครุ่นคิด</button>
+                                <button class="mood-btn" onclick="selectMood(this)">🌧 เหนื่อยนิดหน่อย</button>
+                            </div>
+                        </div>
+
+                        <div class="streak-row">
+                            <span class="streak-flame">🔥</span>
+                            <span class="streak-text">Streak ต่อเนื่องของคุณ</span>
+                            <span class="streak-count">14 วัน</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MID GRID : DAILY MISSIONS + MENTOR -->
+            <div class="mid-grid animate-in delay-4">
+
+                <!-- DAILY MISSIONS -->
+                <div class="glass-card">
+                    <div class="glass-card-inner">
+                        <div class="mission-header">
+                            <div class="mission-title-row">
+                                <span class="mission-title">🎯 ภารกิจวันนี้</span>
+                                <span class="mission-progress-pill">3/5 เสร็จ</span>
+                            </div>
+                        </div>
+                        <div class="overall-bar">
+                            <div class="overall-bar-track"><div class="overall-bar-fill"></div></div>
+                        </div>
+                        <div class="mission-list">
+                            <div class="mission-item done" onclick="toggleMission(this)">
+                                <div class="mission-check done">✓</div>
+                                <span class="mission-emoji">🌱</span>
+                                <span class="mission-text">เขียน Gratitude 1 อย่างในวันนี้</span>
+                                <span class="mission-pts">+20 XP</span>
+                            </div>
+                            <div class="mission-item done" onclick="toggleMission(this)">
+                                <div class="mission-check done">✓</div>
+                                <span class="mission-emoji">📖</span>
+                                <span class="mission-text">อ่านบทความความรู้ 1 เรื่อง</span>
+                                <span class="mission-pts">+30 XP</span>
+                            </div>
+                            <div class="mission-item done" onclick="toggleMission(this)">
+                                <div class="mission-check done">✓</div>
+                                <span class="mission-emoji">☀️</span>
+                                <span class="mission-text">ส่งกำลังใจให้เพื่อนในชุมชน</span>
+                                <span class="mission-pts">+15 XP</span>
+                            </div>
+                            <div class="mission-item" onclick="toggleMission(this)">
+                                <div class="mission-check"></div>
+                                <span class="mission-emoji">💧</span>
+                                <span class="mission-text">ดื่มน้ำครบ 8 แก้วหรือออกกำลังกาย</span>
+                                <span class="mission-pts">+25 XP</span>
+                            </div>
+                            <div class="mission-item" onclick="toggleMission(this)">
+                                <div class="mission-check"></div>
+                                <span class="mission-emoji">🤝</span>
+                                <span class="mission-text">คุยหรือ check-in กับ Growth Companion</span>
+                                <span class="mission-pts">+40 XP</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MENTOR -->
+                <div class="glass-card">
+                    <div class="glass-card-inner mentor-card">
+                        <div class="mentor-header">
+                            <span class="mission-title">🤝 Growth Companions</span>
+                            <span class="mentor-badge">คนสวนของคุณ</span>
+                        </div>
+                        <div class="mentor-list">
+                            <div class="mentor-row" onclick="showToast('🌳','พี่นิค','กำลังส่งกำลังใจ...')">
+                                <div class="mentor-avatar">🧑</div>
+                                <div class="mentor-info">
+                                    <div class="mentor-name">พี่นิค · Gardener</div>
+                                    <div class="mentor-role">ดูแลคุณอยู่ · ออนไลน์เมื่อ 5 นาทีก่อน</div>
+                                </div>
+                                <button class="mentor-action-btn">ส่งใจ 💜</button>
+                            </div>
+                            <div class="mentor-row" onclick="showToast('🌸','พี่แอม','กำลังนัดคุย...')">
+                                <div class="mentor-avatar">👩</div>
+                                <div class="mentor-info">
+                                    <div class="mentor-name">พี่แอม · Fruit Bearer</div>
+                                    <div class="mentor-role">ผู้ดูแลด้านความสัมพันธ์</div>
+                                </div>
+                                <button class="mentor-action-btn">นัดคุย</button>
+                            </div>
+                            <div class="mentor-row" onclick="showToast('🌿','น้องโจ','กำลังส่งกำลังใจ...')">
+                                <div class="mentor-avatar">👦</div>
+                                <div class="mentor-info">
+                                    <div class="mentor-name">น้องโจ · Sprout</div>
+                                    <div class="mentor-role">คุณกำลังดูแลน้องอยู่ 🌱</div>
+                                </div>
+                                <button class="mentor-action-btn">ส่งใจ 💚</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GROWTH PATHS -->
+            <div class="glass-card paths-section animate-in delay-5">
+                <div class="glass-card-inner">
+                    <div class="paths-section-header">
+                        <span class="paths-section-title">🌿 Growth Paths · เส้นทางการเติบโต</span>
+                        <span class="paths-see-all" onclick="showToast('📚','Growth Paths','กำลังเปิดคลังความรู้...')">ดูทั้งหมด →</span>
+                    </div>
+                    <div class="paths-grid">
+                        <div class="path-card path-mindset" onclick="showToast('🧠','Mindset','กำลังเข้าสู่ Path นี้...')">
+                            <span class="path-icon">🧠</span>
+                            <div class="path-name">Mindset</div>
+                            <div class="path-count">12 บทความ</div>
+                        </div>
+                        <div class="path-card path-career" onclick="showToast('💼','Career','กำลังเข้าสู่ Path นี้...')">
+                            <span class="path-icon">💼</span>
+                            <div class="path-name">Career</div>
+                            <div class="path-count">8 บทความ</div>
+                        </div>
+                        <div class="path-card path-relation" onclick="showToast('❤️','Relationships','กำลังเข้าสู่ Path นี้...')">
+                            <span class="path-icon">❤️</span>
+                            <div class="path-name">Relationships</div>
+                            <div class="path-count">15 บทความ</div>
+                        </div>
+                        <div class="path-card path-wellness" onclick="showToast('🌿','Mental Wellness','กำลังเข้าสู่ Path นี้...')">
+                            <span class="path-icon">🌿</span>
+                            <div class="path-name">Mental Wellness</div>
+                            <div class="path-count">20 บทความ</div>
+                        </div>
+                        <div class="path-card path-creative" onclick="showToast('🎨','Creativity','กำลังเข้าสู่ Path นี้...')">
+                            <span class="path-icon">🎨</span>
+                            <div class="path-name">Creativity</div>
+                            <div class="path-count">9 บทความ</div>
+                        </div>
+                        <div class="path-card path-purpose" onclick="showToast('✨','Purpose','กำลังเข้าสู่ Path นี้...')">
+                            <span class="path-icon">✨</span>
+                            <div class="path-name">Purpose</div>
+                            <div class="path-count">11 บทความ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTOM GRID : FEED + REST -->
+            <div class="bottom-grid animate-in delay-6">
+
+                <!-- COMMUNITY FEED -->
+                <div class="glass-card">
+                    <div class="glass-card-inner">
+                        <div class="feed-header">
+                            <span class="feed-title">🌍 Community Growth Feed</span>
+                            <span class="live-dot">LIVE</span>
+                        </div>
+                        <div class="feed-list">
+                            <div class="feed-item">
+                                <div class="feed-avatar">🌿</div>
+                                <div class="feed-content">
+                                    <div class="feed-text"><strong>มิน</strong> อ่านบทความครบ 7 วันติดต่อกันแล้ว 🎉</div>
+                                    <div class="feed-time">5 นาทีที่แล้ว</div>
+                                </div>
+                                <span class="feed-badge badge-grow">Grow</span>
+                            </div>
+                            <div class="feed-item">
+                                <div class="feed-avatar">🌱</div>
+                                <div class="feed-content">
+                                    <div class="feed-text"><strong>โจ</strong> เริ่มต้น Journey ใหม่ในหมวด Mental Wellness</div>
+                                    <div class="feed-time">12 นาทีที่แล้ว</div>
+                                </div>
+                                <span class="feed-badge badge-grow">Grow</span>
+                            </div>
+                            <div class="feed-item">
+                                <div class="feed-avatar">💜</div>
+                                <div class="feed-content">
+                                    <div class="feed-text">มีคน<strong>ส่งกำลังใจ</strong>ให้กัน 28 ครั้งแล้ววันนี้ 🌸</div>
+                                    <div class="feed-time">24 นาทีที่แล้ว</div>
+                                </div>
+                                <span class="feed-badge badge-support">Support</span>
+                            </div>
+                            <div class="feed-item">
+                                <div class="feed-avatar">⭐</div>
+                                <div class="feed-content">
+                                    <div class="feed-text"><strong>นุ้ย</strong> ทำ Daily Mission ครบทุกข้อเป็นวันที่ 5</div>
+                                    <div class="feed-time">38 นาทีที่แล้ว</div>
+                                </div>
+                                <span class="feed-badge badge-mission">Mission</span>
+                            </div>
+                            <div class="feed-item">
+                                <div class="feed-avatar">🍎</div>
+                                <div class="feed-content">
+                                    <div class="feed-text"><strong>พี่แอม</strong> เพิ่งเลื่อนระดับเป็น Fruit Bearer แล้ว 🌟</div>
+                                    <div class="feed-time">1 ชั่วโมงที่แล้ว</div>
+                                </div>
+                                <span class="feed-badge badge-grow">Level Up!</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REST AREA -->
+                <div class="glass-card">
+                    <div class="glass-card-inner rest-inner">
+                        <p class="section-label" style="align-self:flex-start">✦ <span>มุมพักใจ</span> · Rest Area</p>
+                        <div class="rest-icon">🌸</div>
+                        <div class="rest-title">เติมพลังก่อนเติบโตต่อ</div>
+                        <div class="rest-desc">บางครั้งการหยุดพักคือการเดินหน้าที่ดีที่สุด</div>
+                        <div class="rest-quote" id="restQuote">
+                            "เมล็ดพันธุ์ที่ดีต้องการทั้งแสงแดดและความมืด<br>เพื่อเจริญเติบโตอย่างสมบูรณ์"
+                            <cite>— Wisdom from the Garden</cite>
+                        </div>
+                        <button class="rest-btn" onclick="newQuote()">🍃 เปลี่ยนคำคม</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SKILL HUB -->
+            <div class="glass-card hub-section animate-in delay-7">
+                <div class="glass-card-inner">
+                    <div class="hub-header">
+                        <div>
+                            <div class="hub-title">🧩 Skill & Mentor Hub</div>
+                            <div class="hub-subtitle" style="font-size:0.75rem; color:rgba(255,255,255,0.35); margin-top:4px;">ขอคำแนะนำจากผู้เชี่ยวชาญในสาขาต่างๆ</div>
+                        </div>
+                        <span class="paths-see-all" onclick="showToast('🧩','Skill Hub','กำลังเปิด Hub ทั้งหมด...')">ดูทั้งหมด →</span>
+                    </div>
+                    <div class="hub-grid">
+                        <div class="hub-card" onclick="showToast('💼','นักธุรกิจ','กำลังค้นหา Mentor...')">
+                            <span class="hub-icon">💼</span>
+                            <div class="hub-role">นักธุรกิจ</div>
+                            <div class="hub-avail">3 คนพร้อม</div>
+                        </div>
+                        <div class="hub-card" onclick="showToast('⚖️','ทนาย','กำลังค้นหา Mentor...')">
+                            <span class="hub-icon">⚖️</span>
+                            <div class="hub-role">ทนายความ</div>
+                            <div class="hub-avail">1 คนพร้อม</div>
+                        </div>
+                        <div class="hub-card" onclick="showToast('📚','ครู','กำลังค้นหา Mentor...')">
+                            <span class="hub-icon">📚</span>
+                            <div class="hub-role">ครู-อาจารย์</div>
+                            <div class="hub-avail">5 คนพร้อม</div>
+                        </div>
+                        <div class="hub-card" onclick="showToast('🎨','นักออกแบบ','กำลังค้นหา Mentor...')">
+                            <span class="hub-icon">🎨</span>
+                            <div class="hub-role">นักออกแบบ</div>
+                            <div class="hub-avail">2 คนพร้อม</div>
+                        </div>
+                        <div class="hub-card" onclick="showToast('💻','โปรแกรมเมอร์','กำลังค้นหา Mentor...')">
+                            <span class="hub-icon">💻</span>
+                            <div class="hub-role">โปรแกรมเมอร์</div>
+                            <div class="hub-avail">4 คนพร้อม</div>
+                        </div>
+                        <div class="hub-card" onclick="showToast('🏥','พยาบาล','กำลังค้นหา Mentor...')">
+                            <span class="hub-icon">🏥</span>
+                            <div class="hub-role">พยาบาล-แพทย์</div>
+                            <div class="hub-avail">2 คนพร้อม</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- end content-section -->
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-left">EDEN · SAWANNAKHON CONNECT · GROW v1.0</div>
+            <div class="footer-orbs">
+                <div class="footer-orb" style="background:#4ade80;"></div>
+                <div class="footer-orb" style="background:#38bdf8;"></div>
+                <div class="footer-orb" style="background:#a78bfa;"></div>
+                <div class="footer-orb" style="background:#fbbf24;"></div>
+                <div class="footer-orb" style="background:#f472b6;"></div>
+            </div>
+        </footer>
+
+    </div><!-- end page-wrapper -->
+
+    <script>
+        // ── Custom Cursor ──
+        const dot  = document.getElementById('cursorDot');
+        const ring = document.getElementById('cursorRing');
+        document.addEventListener('mousemove', e => {
+            dot.style.left  = e.clientX + 'px';
+            dot.style.top   = e.clientY + 'px';
+            setTimeout(() => {
+                ring.style.left = e.clientX + 'px';
+                ring.style.top  = e.clientY + 'px';
+            }, 80);
+        });
+
+        // ── Ticker duplicate ──
+        const track = document.getElementById('tickerTrack');
+        track.innerHTML += track.innerHTML;
+
+        // ── Floating leaves ──
+        const leavesContainer = document.getElementById('leaves');
+        const leafEmojis = ['🍃','🌿','🍀','🌱','🌾'];
+        for (let i = 0; i < 18; i++) {
+            const l = document.createElement('div');
+            l.className = 'leaf';
+            l.textContent = leafEmojis[Math.floor(Math.random() * leafEmojis.length)];
+            l.style.cssText = `
+                left: ${Math.random()*100}%;
+                animation-duration: ${12 + Math.random()*18}s;
+                animation-delay: ${-Math.random()*25}s;
+                font-size: ${0.6 + Math.random()*0.8}rem;
+                --lx: ${(Math.random()-0.5)*200}px;
+                --lr: ${(Math.random()-0.5)*360}deg;
+            `;
+            leavesContainer.appendChild(l);
+        }
+
+        // ── Toast ──
+        function showToast(icon, title, msg) {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.innerHTML = `<div class="toast-icon">${icon}</div><div><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 4800);
+        }
+
+        // ── Mission toggle ──
+        function toggleMission(el) {
+            const isDone = el.classList.toggle('done');
+            const check = el.querySelector('.mission-check');
+            check.classList.toggle('done', isDone);
+            check.textContent = isDone ? '✓' : '';
+            if (isDone) showToast('⭐','ภารกิจสำเร็จ!','คุณได้รับ XP แล้ว 🌱');
+        }
+
+        // ── Mood select ──
+        function selectMood(btn) {
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            showToast('🌤','บันทึก Mood แล้ว','ขอบคุณที่แบ่งปัน ❤️');
+        }
+
+        // ── Quotes ──
+        const quotes = [
+            { q: '"เมล็ดพันธุ์ที่ดีต้องการทั้งแสงแดดและความมืด<br>เพื่อเจริญเติบโตอย่างสมบูรณ์"', cite: '— Wisdom from the Garden' },
+            { q: '"ต้นไม้ทุกต้นเคยเป็นเมล็ดเล็กๆ<br>ที่ยังไม่รู้ว่าตัวเองจะยิ่งใหญ่แค่ไหน"', cite: '— The Gardener\'s Journal' },
+            { q: '"การเติบโตที่แท้จริงเกิดขึ้น<br>ในความเงียบและความอดทน"', cite: '— Roots & Wings' },
+            { q: '"รดน้ำความฝันของคุณทุกวัน<br>แม้ในวันที่ฝนไม่ตก"', cite: '— Garden of Life' },
+        ];
+        let qi = 0;
+        function newQuote() {
+            qi = (qi + 1) % quotes.length;
+            const el = document.getElementById('restQuote');
+            el.style.opacity = '0';
+            setTimeout(() => {
+                el.innerHTML = `${quotes[qi].q}<cite>${quotes[qi].cite}</cite>`;
+                el.style.opacity = '1';
+                el.style.transition = 'opacity 0.5s ease';
+            }, 300);
+        }
+
+        // ── Stage tabs ──
+        document.querySelectorAll('.stage-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.stage-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // ── Welcome toast ──
+        setTimeout(() => showToast('🌱', 'ยินดีต้อนรับสู่ Grow!', 'สวนของคุณรอคุณอยู่แล้ว 🌳'), 1200);
+        setTimeout(() => showToast('🔥', 'Streak 14 วัน!', 'คุณทำได้ดีมาก อย่าหยุดนะ ✨'), 3000);
+    </script>
+</body>
+</html>
