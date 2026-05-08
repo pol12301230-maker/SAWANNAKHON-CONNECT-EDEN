@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MISSION — SAWANNAKHON CONNECT : EDEN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --eden-green:  #4ade80;
+            --eden-sky:    #38bdf8;
+            --eden-gold:   #fbbf24;
+            --eden-pink:   #f472b6;
+            --eden-purple: #a78bfa;
+            /* tree world */
+            --tree-a: #67e8f9;
+            --tree-b: #86efac;
+            --tree-c: #bae6fd;
+            /* gardener world */
+            --gard-a: #4ade80;
+            --gard-b: #38bdf8;
+            --gard-c: #fbbf24;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: #020a0f;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ── CUSTOM CURSOR ── */
+        .cursor-dot {
+            width: 7px; height: 7px;
+            background: var(--eden-sky);
+            border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9999;
+            transform: translate(-50%,-50%);
+        }
+        .cursor-ring {
+            width: 34px; height: 34px;
+            border: 1.5px solid rgba(56,189,248,0.45);
+            border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: all 0.12s ease;
+        }
+
+        /* ── SLIDESHOW BG ── */
+        .slideshow-container {
+            position: fixed; inset: 0; z-index: 0;
+        }
+        .slide {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+            opacity: 0; transition: opacity 2.5s ease-in-out;
+        }
+        .slide.active { opacity: 1; }
+        .slideshow-overlay {
+            position: fixed; inset: 0; z-index: 1;
+            background:
+                radial-gradient(ellipse at top, rgba(0,30,60,0.72) 0%, transparent 60%),
+                radial-gradient(ellipse at bottom, rgba(0,10,20,0.88) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,5,15,0.5) 100%);
+        }
+
+        /* ── PARTICLES ── */
+        .particles {
+            position: fixed; inset: 0; z-index: 2;
+            pointer-events: none; overflow: hidden;
+        }
+        .particle {
+            position: absolute; width: 2px; height: 2px;
+            background: rgba(255,255,255,0.6); border-radius: 50%;
+            animation: drift linear infinite;
+        }
+        @keyframes drift {
+            0%   { transform: translateY(110vh) translateX(0); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 0.4; }
+            100% { transform: translateY(-10vh) translateX(var(--tx)); opacity: 0; }
+        }
+
+        /* ── PAGE WRAPPER ── */
+        .page-wrapper {
+            position: relative; z-index: 3;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* ══════════════════════════════════════
+           NAV
+        ══════════════════════════════════════ */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 48px; height: 72px;
+            background: rgba(2,10,20,0.65);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .nav-logo { display: flex; align-items: center; gap: 14px; }
+        .nav-brand {
+            font-size: 0.88rem; font-weight: 300;
+            letter-spacing: 0.12em; color: rgba(255,255,255,0.65);
+            text-transform: uppercase;
+        }
+        .nav-brand strong { color: var(--eden-sky); font-weight: 600; }
+
+        @keyframes shine-eden {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .eden-badge {
+            font-size: 1.3rem; font-weight: 700; letter-spacing: 0.25em;
+            background: linear-gradient(90deg,#34d399,#38bdf8,#a78bfa,#f472b6,#fbbf24,#34d399);
+            background-size: 300%;
+            animation: shine-eden 5s linear infinite;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-links {
+            display: flex; gap: 36px; list-style: none;
+        }
+        .nav-links li {
+            font-size: 0.83rem; letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.5); cursor: pointer;
+            transition: color 0.25s; position: relative; padding-bottom: 4px;
+        }
+        .nav-links li::after {
+            content:''; position: absolute; bottom: 0; left: 0;
+            height: 1px; width: 0;
+            background: var(--eden-sky);
+            transition: width 0.3s ease;
+        }
+        .nav-links li:hover { color: white; }
+        .nav-links li:hover::after { width: 100%; }
+        .nav-links li.active { color: var(--eden-gold); }
+        .nav-links li.active::after { width: 100%; background: var(--eden-gold); }
+
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .status-badge {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 16px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px; font-size: 0.8rem;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            background: var(--eden-green); border-radius: 50%;
+            animation: pulse-g 2s ease infinite;
+            box-shadow: 0 0 0 0 rgba(74,222,128,0.4);
+        }
+        @keyframes pulse-g {
+            0%  { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(74,222,128,0); }
+            100%{ box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+        }
+
+        /* ══════════════════════════════════════
+           HERO
+        ══════════════════════════════════════ */
+        .hero {
+            padding: 72px 48px 0;
+            text-align: center;
+        }
+        .hero-eyebrow {
+            font-size: 0.72rem; letter-spacing: 0.4em;
+            color: var(--eden-gold); text-transform: uppercase;
+            margin-bottom: 18px; opacity: 0.8;
+        }
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+            font-weight: 700; color: white; line-height: 1.15;
+            margin-bottom: 14px;
+            text-shadow: 0 0 80px rgba(56,189,248,0.18);
+        }
+        .hero-title em {
+            font-style: italic;
+            background: linear-gradient(135deg,#fbbf24,#f472b6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-sub {
+            font-size: 1rem; font-weight: 300;
+            color: rgba(255,255,255,0.5); line-height: 1.8;
+            max-width: 560px; margin: 0 auto 40px;
+        }
+        .hero-divider {
+            width: 80px; height: 2px; margin: 0 auto 48px;
+            background: linear-gradient(90deg, transparent, var(--eden-gold), transparent);
+            box-shadow: 0 0 12px var(--eden-gold);
+        }
+
+        /* ══════════════════════════════════════
+           ROLE TOGGLE
+        ══════════════════════════════════════ */
+        .role-toggle-wrap {
+            display: flex; justify-content: center;
+            padding: 0 48px 52px;
+        }
+        .role-toggle {
+            display: flex;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 6px; gap: 6px;
+        }
+        .role-btn {
+            display: flex; align-items: center; gap: 10px;
+            padding: 14px 32px; border-radius: 14px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.9rem; font-weight: 400;
+            cursor: pointer; border: none;
+            background: transparent; color: rgba(255,255,255,0.45);
+            transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            letter-spacing: 0.06em;
+        }
+        .role-btn .role-icon { font-size: 1.4rem; transition: transform 0.35s; }
+        .role-btn:hover { color: rgba(255,255,255,0.75); }
+
+        .role-btn.tree-active {
+            background: linear-gradient(135deg,rgba(103,232,249,0.18),rgba(134,239,172,0.12));
+            border: 1px solid rgba(103,232,249,0.3);
+            color: #cffafe;
+            box-shadow: 0 0 30px rgba(103,232,249,0.12), inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+        .role-btn.tree-active .role-icon { transform: scale(1.2) rotate(-5deg); }
+
+        .role-btn.gard-active {
+            background: linear-gradient(135deg,rgba(74,222,128,0.18),rgba(56,189,248,0.12));
+            border: 1px solid rgba(74,222,128,0.3);
+            color: #dcfce7;
+            box-shadow: 0 0 30px rgba(74,222,128,0.12), inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+        .role-btn.gard-active .role-icon { transform: scale(1.2) rotate(5deg); }
+
+        /* ══════════════════════════════════════
+           WORLDS
+        ══════════════════════════════════════ */
+        .world { display: none; }
+        .world.active { display: block; }
+
+        /* ══════════════════════════════════════
+           QUEST BOARD HEADER
+        ══════════════════════════════════════ */
+        .section-wrap {
+            max-width: 1320px; margin: 0 auto;
+            padding: 0 36px 100px;
+        }
+
+        /* Tab Strip */
+        .tab-strip {
+            display: flex; gap: 8px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            display: flex; align-items: center; gap: 7px;
+            padding: 9px 20px; border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.78rem; letter-spacing: 0.07em;
+            color: rgba(255,255,255,0.4);
+            cursor: pointer; transition: all 0.25s;
+        }
+        .tab-btn:hover { color: white; background: rgba(255,255,255,0.09); }
+        .tab-btn.on {
+            color: white;
+        }
+        .tab-btn .tab-count {
+            background: rgba(255,255,255,0.15);
+            border-radius: 999px; padding: 1px 7px;
+            font-size: 0.68rem;
+        }
+
+        /* Tree tabs active */
+        .tree-world .tab-btn.on {
+            background: rgba(103,232,249,0.12);
+            border-color: rgba(103,232,249,0.3);
+            color: #cffafe;
+        }
+        .tree-world .tab-btn.on .tab-count { background: rgba(103,232,249,0.2); }
+
+        /* Gardener tabs active */
+        .gard-world .tab-btn.on {
+            background: rgba(74,222,128,0.12);
+            border-color: rgba(74,222,128,0.3);
+            color: #dcfce7;
+        }
+        .gard-world .tab-btn.on .tab-count { background: rgba(74,222,128,0.2); }
+
+        /* ── World Banner ── */
+        .world-banner {
+            border-radius: 28px; padding: 36px 44px;
+            margin-bottom: 36px;
+            position: relative; overflow: hidden;
+            border: 1px solid;
+        }
+        .world-banner::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+            opacity: 0.06;
+        }
+        .tree-banner {
+            background: linear-gradient(135deg, rgba(6,20,35,0.9), rgba(3,30,50,0.85));
+            border-color: rgba(103,232,249,0.2);
+        }
+        .gard-banner {
+            background: linear-gradient(135deg, rgba(5,20,10,0.9), rgba(3,25,15,0.85));
+            border-color: rgba(74,222,128,0.2);
+        }
+
+        .world-banner-inner {
+            display: flex; align-items: center; gap: 32px;
+            position: relative; z-index: 1;
+        }
+        .world-banner-icon { font-size: 4rem; filter: drop-shadow(0 0 20px rgba(255,255,255,0.2)); }
+        .world-banner-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem; font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .tree-banner .world-banner-title { color: #cffafe; }
+        .gard-banner .world-banner-title { color: #dcfce7; }
+        .world-banner-desc {
+            font-size: 0.85rem; font-weight: 300;
+            color: rgba(255,255,255,0.5); line-height: 1.8;
+            max-width: 480px;
+        }
+        .world-banner-stats {
+            margin-left: auto; display: flex; gap: 28px; flex-shrink: 0;
+        }
+        .wbs { text-align: center; }
+        .wbs-val {
+            font-size: 1.8rem; font-weight: 700; line-height: 1;
+            margin-bottom: 4px;
+        }
+        .tree-banner .wbs-val { color: var(--tree-a); }
+        .gard-banner .wbs-val { color: var(--gard-a); }
+        .wbs-label {
+            font-size: 0.65rem; color: rgba(255,255,255,0.35);
+            letter-spacing: 0.1em; text-transform: uppercase;
+        }
+
+        /* ── Community Goal Bar ── */
+        .community-goal {
+            border-radius: 20px; padding: 24px 32px;
+            margin-bottom: 36px;
+            display: flex; align-items: center; gap: 24px;
+            background: rgba(167,139,250,0.06);
+            border: 1px solid rgba(167,139,250,0.15);
+        }
+        .cg-icon { font-size: 2.4rem; flex-shrink: 0; }
+        .cg-body { flex: 1; }
+        .cg-label {
+            font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--eden-purple); margin-bottom: 6px;
+        }
+        .cg-title { font-size: 1rem; font-weight: 600; margin-bottom: 12px; }
+        .cg-bar-track {
+            height: 6px; background: rgba(255,255,255,0.08);
+            border-radius: 99px; overflow: hidden;
+        }
+        .cg-bar-fill {
+            height: 100%; border-radius: 99px;
+            background: linear-gradient(90deg, var(--eden-purple), var(--eden-sky));
+            box-shadow: 0 0 10px rgba(167,139,250,0.5);
+            transition: width 2s cubic-bezier(0.4,0,0.2,1);
+        }
+        .cg-numbers {
+            font-size: 0.75rem; color: rgba(255,255,255,0.35);
+            margin-top: 8px; letter-spacing: 0.04em;
+        }
+        .cg-reward {
+            text-align: center; flex-shrink: 0;
+        }
+        .cg-reward-icon { font-size: 2rem; margin-bottom: 4px; }
+        .cg-reward-label { font-size: 0.65rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; }
+
+        /* ── Mission Grid ── */
+        .mission-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 18px;
+        }
+
+        /* ── Mission Card ── */
+        .mcard {
+            border-radius: 24px; padding: 28px 30px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(16px);
+            position: relative; overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.35s cubic-bezier(0.34,1.3,0.64,1),
+                        border-color 0.3s, background 0.3s, box-shadow 0.3s;
+        }
+        .mcard:hover {
+            transform: translateY(-8px);
+        }
+        .mcard-glow {
+            position: absolute; inset: 0;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+        }
+        .mcard:hover .mcard-glow { opacity: 1; }
+
+        .mcard-header {
+            display: flex; align-items: flex-start; gap: 16px; margin-bottom: 18px;
+        }
+        .mcard-emoji {
+            font-size: 2rem; flex-shrink: 0;
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .mcard:hover .mcard-emoji { transform: scale(1.2) rotate(-6deg); }
+
+        .mcard-meta {}
+        .mcard-tag {
+            display: inline-block;
+            font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
+            padding: 2px 9px; border-radius: 999px; border: 1px solid;
+            margin-bottom: 6px;
+        }
+        .mcard-name {
+            font-size: 1.02rem; font-weight: 600; line-height: 1.3;
+        }
+
+        .mcard-desc {
+            font-size: 0.8rem; font-weight: 300;
+            color: rgba(255,255,255,0.45); line-height: 1.75;
+            margin-bottom: 20px;
+        }
+
+        .mcard-rewards {
+            display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .mcard-reward-chip {
+            display: flex; align-items: center; gap: 5px;
+            padding: 4px 11px; border-radius: 999px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.7rem; color: rgba(255,255,255,0.6);
+        }
+
+        .mcard-footer {
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .mcard-progress-wrap { flex: 1; margin-right: 16px; }
+        .mcard-progress-track {
+            height: 3px; background: rgba(255,255,255,0.07);
+            border-radius: 99px; overflow: hidden;
+        }
+        .mcard-progress-bar {
+            height: 100%; border-radius: 99px;
+            transition: width 1.8s cubic-bezier(0.4,0,0.2,1);
+        }
+        .mcard-progress-label {
+            font-size: 0.62rem; color: rgba(255,255,255,0.28);
+            margin-top: 5px; letter-spacing: 0.04em;
+        }
+
+        .mcard-cta {
+            padding: 8px 18px; border-radius: 10px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.75rem; font-weight: 400;
+            cursor: pointer; border: 1px solid;
+            transition: all 0.25s; flex-shrink: 0;
+            letter-spacing: 0.05em;
+        }
+
+        .mcard-done {
+            position: absolute; top: 18px; right: 18px;
+            width: 28px; height: 28px; border-radius: 8px;
+            background: rgba(74,222,128,0.2);
+            border: 1px solid rgba(74,222,128,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem;
+        }
+        .mcard-hidden-badge {
+            position: absolute; top: 18px; right: 18px;
+            font-size: 0.6rem; letter-spacing: 0.12em;
+            padding: 3px 9px; border-radius: 999px;
+            background: rgba(167,139,250,0.15);
+            border: 1px solid rgba(167,139,250,0.3);
+            color: var(--eden-purple);
+            text-transform: uppercase;
+        }
+
+        /* TREE colors */
+        .m-tree-daily  { --mc: #67e8f9; --mc-soft: rgba(103,232,249,0.12); --mc-border: rgba(103,232,249,0.25); }
+        .m-tree-social { --mc: #86efac; --mc-soft: rgba(134,239,172,0.12); --mc-border: rgba(134,239,172,0.25); }
+        .m-tree-life   { --mc: #fde68a; --mc-soft: rgba(253,230,138,0.1);  --mc-border: rgba(253,230,138,0.22); }
+        .m-tree-explore{ --mc: #c4b5fd; --mc-soft: rgba(196,181,253,0.1);  --mc-border: rgba(196,181,253,0.22); }
+        .m-tree-faith  { --mc: #fda4af; --mc-soft: rgba(253,164,175,0.1);  --mc-border: rgba(253,164,175,0.22); }
+
+        /* GARDENER colors */
+        .m-gard-care   { --mc: #4ade80; --mc-soft: rgba(74,222,128,0.12); --mc-border: rgba(74,222,128,0.28); }
+        .m-gard-growth { --mc: #38bdf8; --mc-soft: rgba(56,189,248,0.12); --mc-border: rgba(56,189,248,0.25); }
+        .m-gard-skill  { --mc: #fbbf24; --mc-soft: rgba(251,191,36,0.1);  --mc-border: rgba(251,191,36,0.22); }
+        .m-gard-out    { --mc: #f472b6; --mc-soft: rgba(244,114,182,0.1); --mc-border: rgba(244,114,182,0.22); }
+        .m-gard-team   { --mc: #a78bfa; --mc-soft: rgba(167,139,250,0.12);--mc-border: rgba(167,139,250,0.25); }
+
+        .mcard {
+            border-color: var(--mc-border, rgba(255,255,255,0.08));
+        }
+        .mcard:hover {
+            border-color: color-mix(in srgb, var(--mc, white) 60%, transparent);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 30px color-mix(in srgb, var(--mc, white) 12%, transparent);
+            background: var(--mc-soft, rgba(255,255,255,0.06));
+        }
+        .mcard-glow {
+            background: radial-gradient(circle at 60% -10%, color-mix(in srgb, var(--mc, white) 14%, transparent), transparent 65%);
+        }
+        .mcard-tag {
+            background: var(--mc-soft, rgba(255,255,255,0.06));
+            border-color: var(--mc-border, rgba(255,255,255,0.1));
+            color: var(--mc, rgba(255,255,255,0.5));
+        }
+        .mcard-progress-bar { background: var(--mc, #38bdf8); box-shadow: 0 0 6px var(--mc, #38bdf8); }
+        .mcard-cta {
+            background: var(--mc-soft, rgba(255,255,255,0.07));
+            border-color: var(--mc-border, rgba(255,255,255,0.12));
+            color: var(--mc, white);
+        }
+        .mcard-cta:hover { background: color-mix(in srgb, var(--mc, white) 22%, transparent); }
+
+        /* ── SEASONAL / EVENT Banner ── */
+        .event-banner {
+            border-radius: 24px; padding: 28px 36px;
+            margin-bottom: 36px;
+            display: flex; align-items: center; gap: 28px;
+            background: linear-gradient(135deg, rgba(30,5,30,0.7), rgba(10,5,25,0.85));
+            border: 1px solid rgba(244,114,182,0.25);
+            position: relative; overflow: hidden;
+        }
+        .event-banner::after {
+            content: '';
+            position: absolute; top: -40%; right: -8%;
+            width: 320px; height: 320px;
+            background: radial-gradient(circle, rgba(244,114,182,0.12), transparent 70%);
+            pointer-events: none;
+        }
+        .event-icon { font-size: 3.2rem; filter: drop-shadow(0 0 14px rgba(244,114,182,0.4)); }
+        .event-body { flex: 1; }
+        .event-tag {
+            font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--eden-pink); margin-bottom: 6px;
+        }
+        .event-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
+        .event-desc { font-size: 0.82rem; color: rgba(255,255,255,0.45); line-height: 1.7; }
+        .event-countdown {
+            text-align: center; flex-shrink: 0;
+            background: rgba(244,114,182,0.1); border: 1px solid rgba(244,114,182,0.2);
+            border-radius: 16px; padding: 16px 24px;
+        }
+        .event-time { font-size: 1.6rem; font-weight: 700; color: var(--eden-pink); line-height: 1; }
+        .event-time-label { font-size: 0.62rem; color: rgba(255,255,255,0.3); letter-spacing: 0.12em; margin-top: 4px; }
+
+        /* ── HIDDEN ACHIEVEMENT section ── */
+        .hidden-section {
+            margin-top: 48px;
+        }
+        .hidden-title {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+            color: rgba(255,255,255,0.3); margin-bottom: 20px;
+        }
+        .hidden-title::before, .hidden-title::after {
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        .hidden-grid {
+            display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 14px;
+        }
+        .hidden-card {
+            border-radius: 18px; padding: 22px 20px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(167,139,250,0.12);
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .hidden-card:hover {
+            background: rgba(167,139,250,0.08);
+            border-color: rgba(167,139,250,0.3);
+            transform: translateY(-4px);
+        }
+        .hidden-card-icon { font-size: 2.4rem; margin-bottom: 10px; filter: grayscale(0.3); }
+        .hidden-card-name { font-size: 0.82rem; font-weight: 600; margin-bottom: 5px; }
+        .hidden-card-hint { font-size: 0.7rem; color: rgba(255,255,255,0.3); line-height: 1.6; }
+        .hidden-card-locked .hidden-card-icon { filter: grayscale(1) opacity(0.3); }
+        .hidden-card-locked .hidden-card-name { color: rgba(255,255,255,0.2); }
+        .hidden-card.unlocked {
+            background: rgba(167,139,250,0.1);
+            border-color: rgba(167,139,250,0.3);
+        }
+        .hidden-card.unlocked .hidden-card-icon { filter: none; }
+
+        /* ── PROGRESS Journey Bar ── */
+        .journey-bar {
+            border-radius: 20px; padding: 28px 36px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            margin-bottom: 36px;
+        }
+        .journey-top {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 20px;
+        }
+        .journey-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.35); }
+        .journey-level {
+            font-size: 0.82rem; font-weight: 600; color: var(--eden-gold);
+        }
+        .journey-xp-track {
+            height: 8px; border-radius: 99px;
+            background: rgba(255,255,255,0.06); overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .journey-xp-fill {
+            height: 100%; border-radius: 99px;
+            transition: width 2s cubic-bezier(0.4,0,0.2,1);
+        }
+        .tree-xp { background: linear-gradient(90deg, #67e8f9, #86efac); box-shadow: 0 0 10px rgba(103,232,249,0.4); }
+        .gard-xp { background: linear-gradient(90deg, #4ade80, #38bdf8); box-shadow: 0 0 10px rgba(74,222,128,0.4); }
+        .journey-nodes {
+            display: flex; justify-content: space-between; position: relative;
+        }
+        .journey-node { text-align: center; }
+        .journey-node-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: rgba(255,255,255,0.15); margin: 0 auto 6px;
+            transition: all 0.3s;
+        }
+        .journey-node.done .journey-node-dot { background: var(--eden-green); box-shadow: 0 0 8px var(--eden-green); }
+        .journey-node.current .journey-node-dot {
+            background: var(--eden-gold); box-shadow: 0 0 10px var(--eden-gold);
+            animation: pulse-g 1.5s ease infinite;
+        }
+        .journey-node-label {
+            font-size: 0.6rem; color: rgba(255,255,255,0.25);
+            letter-spacing: 0.08em;
+        }
+        .journey-node.done .journey-node-label { color: rgba(74,222,128,0.6); }
+        .journey-node.current .journey-node-label { color: rgba(251,191,36,0.7); }
+
+        /* ── Toast ── */
+        #toastContainer {
+            position: fixed; bottom: 28px; right: 28px;
+            z-index: 9000; display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 20px; border-radius: 16px; min-width: 280px;
+            background: rgba(10,20,35,0.92);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            animation: toast-in 0.45s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        @keyframes toast-in {
+            from { transform: translateX(100px); opacity: 0; }
+            to   { transform: translateX(0); opacity: 1; }
+        }
+        .toast-icon { font-size: 1.5rem; flex-shrink: 0; }
+        .toast-title { font-size: 0.82rem; font-weight: 600; margin-bottom: 2px; }
+        .toast-msg { font-size: 0.73rem; color: rgba(255,255,255,0.45); }
+
+        /* ── ANIMATE IN ── */
+        .animate-in {
+            opacity: 0; transform: translateY(24px);
+            animation: fade-up 0.7s forwards;
+        }
+        @keyframes fade-up {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .d1 { animation-delay: 0.05s; }
+        .d2 { animation-delay: 0.15s; }
+        .d3 { animation-delay: 0.25s; }
+        .d4 { animation-delay: 0.35s; }
+        .d5 { animation-delay: 0.45s; }
+        .d6 { animation-delay: 0.55s; }
+        .d7 { animation-delay: 0.65s; }
+
+        /* ── FOOTER ── */
+        footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 48px;
+            background: rgba(0,0,0,0.25); backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.72rem; color: rgba(255,255,255,0.25);
+            letter-spacing: 0.08em;
+        }
+        .footer-orbs { display: flex; gap: 8px; }
+        .footer-orb {
+            width: 6px; height: 6px; border-radius: 50%;
+            animation: pulse-g 2s ease infinite;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .nav-links { display: none; }
+            .hero { padding: 48px 20px 0; }
+            .role-toggle-wrap { padding: 0 20px 36px; }
+            .role-btn { padding: 12px 20px; font-size: 0.82rem; }
+            .section-wrap { padding: 0 16px 60px; }
+            .world-banner-inner { flex-direction: column; gap: 20px; }
+            .world-banner-stats { margin-left: 0; }
+            .mission-grid { grid-template-columns: 1fr; }
+            footer { flex-direction: column; gap: 10px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- PARTICLES -->
+<div class="particles" id="particles"></div>
+
+<!-- SLIDESHOW BG -->
+<div class="slideshow-container">
+    <div class="slide active" style="background-image:url('EDEN1.png');"></div>
+    <div class="slide" style="background-image:url('EDEN2.png');"></div>
+    <div class="slide" style="background-image:url('EDEN3.png');"></div>
+</div>
+<div class="slideshow-overlay"></div>
+
+<!-- TOAST -->
+<div id="toastContainer"></div>
+
+<div class="page-wrapper">
+
+    <!-- NAV -->
+    <nav>
+        <div class="nav-logo">
+            <div class="eden-badge">EDEN</div>
+            <div class="nav-brand">SAWANNAKHON <strong>CONNECT</strong></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="home.html" style="color:inherit;text-decoration:none;">Home</a></li>
+            <li>Rest</li>
+            <li>Grow</li>
+            <li>Community</li>
+            <li>Support</li>
+            <li class="active">Mission</li>
+        </ul>
+        <div class="nav-right">
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                <span>เมล็ดพันธุ์ดี</span>
+            </div>
+            <button style="background:none;border:none;font-family:Kanit,sans-serif;font-size:0.82rem;color:rgba(255,255,255,0.4);cursor:pointer;letter-spacing:0.06em;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Login</button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero animate-in d1">
+        <div class="hero-eyebrow">🎯 Quest Board — EDEN MISSION SYSTEM</div>
+        <h1 class="hero-title">ภารกิจแห่ง<em>การเติบโต</em></h1>
+        <p class="hero-sub">ทุกก้าวที่คุณเดินในสวนนี้มีความหมาย — ไม่ว่าจะเป็นต้นไม้ที่กำลังงอกงาม หรือคนสวนที่รักษาสวนให้ชุ่มชื่น</p>
+        <div class="hero-divider"></div>
+    </div>
+
+    <!-- ROLE TOGGLE -->
+    <div class="role-toggle-wrap animate-in d2">
+        <div class="role-toggle">
+            <button class="role-btn tree-active" id="btnTree" onclick="switchWorld('tree')">
+                <span class="role-icon">🌱</span>
+                ฉันคือ ต้นไม้
+            </button>
+            <button class="role-btn" id="btnGard" onclick="switchWorld('gard')">
+                <span class="role-icon">🌿</span>
+                ฉันคือ คนสวน
+            </button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         TREE WORLD
+    ══════════════════════════════════════ -->
+    <div class="world active" id="worldTree">
+    <div class="section-wrap tree-world">
+
+        <!-- Journey Bar -->
+        <div class="journey-bar animate-in d3">
+            <div class="journey-top">
+                <div>
+                    <div class="journey-label">เส้นทางการเติบโตของคุณ</div>
+                </div>
+                <div class="journey-level">🌱 Level 3 — ต้นกล้าแรกงอก · 740 / 1,000 XP</div>
+            </div>
+            <div class="journey-xp-track">
+                <div class="journey-xp-fill tree-xp" style="width:74%" id="treeXp"></div>
+            </div>
+            <div class="journey-nodes">
+                <div class="journey-node done"><div class="journey-node-dot"></div><div class="journey-node-label">เมล็ด</div></div>
+                <div class="journey-node done"><div class="journey-node-dot"></div><div class="journey-node-label">ราก</div></div>
+                <div class="journey-node done"><div class="journey-node-dot"></div><div class="journey-node-label">ต้นกล้า</div></div>
+                <div class="journey-node current"><div class="journey-node-dot"></div><div class="journey-node-label">ใบแรก</div></div>
+                <div class="journey-node"><div class="journey-node-dot"></div><div class="journey-node-label">กิ่งก้าน</div></div>
+                <div class="journey-node"><div class="journey-node-dot"></div><div class="journey-node-label">ดอกบาน</div></div>
+                <div class="journey-node"><div class="journey-node-dot"></div><div class="journey-node-label">ผลสุก</div></div>
+            </div>
+        </div>
+
+        <!-- Community Goal -->
+        <div class="community-goal animate-in d3">
+            <div class="cg-icon">🌳</div>
+            <div class="cg-body">
+                <div class="cg-label">🤝 ภารกิจชุมชนร่วมกัน</div>
+                <div class="cg-title">ส่งกำลังใจให้กัน 500 ครั้ง — สวนกลางจะโตขึ้น!</div>
+                <div class="cg-bar-track">
+                    <div class="cg-bar-fill" style="width:68%" id="cgTree"></div>
+                </div>
+                <div class="cg-numbers">342 / 500 ครั้ง · เหลืออีก 158 ครั้ง · 58 คนกำลังร่วมมือ</div>
+            </div>
+            <div class="cg-reward">
+                <div class="cg-reward-icon">🏡</div>
+                <div class="cg-reward-label">Unlock: Garden Hut</div>
+            </div>
+        </div>
+
+        <!-- Event Banner -->
+        <div class="event-banner animate-in d3">
+            <div class="event-icon">🌙</div>
+            <div class="event-body">
+                <div class="event-tag">✨ EDEN NIGHT EVENT — Limited</div>
+                <div class="event-title">Eden Night: ค่ำคืนแห่งดวงดาว</div>
+                <div class="event-desc">กิจกรรมพิเศษคืนนี้ — ฟังเรื่องราว แชร์ความฝัน และรับ Badge สุดพิเศษ ที่มีเพียงครั้งเดียว</div>
+            </div>
+            <div class="event-countdown">
+                <div class="event-time" id="countdown">18:42:07</div>
+                <div class="event-time-label">เหลือเวลา</div>
+            </div>
+        </div>
+
+        <!-- Tab Strip -->
+        <div class="tab-strip animate-in d4" id="treeTabStrip">
+            <button class="tab-btn on" onclick="filterTab('tree','all',this)">🌿 ทั้งหมด <span class="tab-count">18</span></button>
+            <button class="tab-btn" onclick="filterTab('tree','daily',this)">☀️ Daily <span class="tab-count">4</span></button>
+            <button class="tab-btn" onclick="filterTab('tree','social',this)">🤝 Social <span class="tab-count">3</span></button>
+            <button class="tab-btn" onclick="filterTab('tree','life',this)">💚 Life <span class="tab-count">4</span></button>
+            <button class="tab-btn" onclick="filterTab('tree','explore',this)">🔭 Explore <span class="tab-count">4</span></button>
+            <button class="tab-btn" onclick="filterTab('tree','faith',this)">📖 Hope <span class="tab-count">3</span></button>
+        </div>
+
+        <!-- Mission Grid TREE -->
+        <div class="mission-grid animate-in d5" id="treeMissionGrid">
+
+            <!-- Daily -->
+            <div class="mcard m-tree-daily" data-cat="daily">
+                <div class="mcard-done">✓</div>
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">☀️</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Daily Growth</div>
+                        <div class="mcard-name">เขียนสิ่งดีๆ 1 อย่างในวันนี้</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">เปิดสมุดบันทึกในสวน แล้วเขียนสิ่งหนึ่งที่คุณขอบคุณในวันนี้ — ไม่ต้องยิ่งใหญ่ แค่จริงใจ</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +50 XP</div>
+                    <div class="mcard-reward-chip">💧 +1 หยดน้ำ</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:100%"></div></div>
+                        <div class="mcard-progress-label">สำเร็จแล้ว ✓</div>
+                    </div>
+                    <button class="mcard-cta" style="opacity:0.5;cursor:default;">Done ✓</button>
+                </div>
+            </div>
+
+            <div class="mcard m-tree-daily" data-cat="daily">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🎵</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Daily Growth</div>
+                        <div class="mcard-name">ฟัง Healing Audio 10 นาที</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">เลือก playlist ที่ชอบในโซน Rest และให้ใจได้หายใจ — แค่ 10 นาทีก็พอ</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +80 XP</div>
+                    <div class="mcard-reward-chip">🎀 Calm Ribbon</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ฟัง Healing Audio')">เริ่ม →</button>
+                </div>
+            </div>
+
+            <div class="mcard m-tree-daily" data-cat="daily">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">📖</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Daily Growth</div>
+                        <div class="mcard-name">อ่านบทความในสวน 1 เรื่อง</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">เลือกบทความที่คุณสนใจ อ่านแล้วกดหัวใจ — แค่นั้นก็นับได้แล้ว</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +100 XP</div>
+                    <div class="mcard-reward-chip">📚 Reader Badge</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'อ่านบทความ')">เริ่ม →</button>
+                </div>
+            </div>
+
+            <div class="mcard m-tree-daily" data-cat="daily">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🎬</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Daily Growth</div>
+                        <div class="mcard-name">ดูคลิปสร้างแรงบันดาลใจ</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">วันนี้มีคลิปพิเศษจากชุมชน — ดูแล้วแชร์ความรู้สึกสั้นๆ ได้เลย</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +70 XP</div>
+                    <div class="mcard-reward-chip">⭐ Spark Point</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ดูคลิป')">เริ่ม →</button>
+                </div>
+            </div>
+
+            <!-- Social -->
+            <div class="mcard m-tree-social" data-cat="social">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">👋</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Social</div>
+                        <div class="mcard-name">ทักเพื่อนใหม่ในสวน 1 คน</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">ส่งข้อความสั้นๆ ทักทายสมาชิกใหม่หรือใครก็ได้ที่คุณยังไม่เคยคุย — "สวัสดีครับ/ค่ะ" ก็พอ</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +120 XP</div>
+                    <div class="mcard-reward-chip">🌸 Friendship Seed</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ทักเพื่อนใหม่')">เริ่ม →</button>
+                </div>
+            </div>
+
+            <div class="mcard m-tree-social" data-cat="social">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">💬</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Social</div>
+                        <div class="mcard-name">เข้าห้อง Community วันนี้</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">เข้าไปอยู่ในห้องชุมชน — แค่อ่านก็ได้ ไม่ต้องพูดถ้าไม่พร้อม สวนรู้ว่าคุณอยู่ที่นี่</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +90 XP</div>
+                    <div class="mcard-reward-chip">🏠 Cozy Point</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'เข้าห้อง Community')">เริ่ม →</button>
+                </div>
+            </div>
+
+            <div class="mcard m-tree-social" data-cat="social">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🌟</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Social</div>
+                        <div class="mcard-name">แชร์สิ่งดีๆ ของวันนี้</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">โพสต์ในชุมชนเรื่องราวเล็กๆ ของวันนี้ — ไม่ต้องสวยงาม แค่จริงใจ ชุมชนรอฟังอยู่</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +150 XP</div>
+                    <div class="mcard-reward-chip">🌈 Sharer Badge</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'แชร์สิ่งดีๆ')">เริ่ม →</button>
+                </div>
+            </div>
+
+            <!-- Life -->
+            <div class="mcard m-tree-life" data-cat="life">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">💧</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Life Care</div>
+                        <div class="mcard-name">ดื่มน้ำ 8 แก้ววันนี้</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">ร่างกายของคุณก็คือสวนที่ต้องรดน้ำ — tap เพื่อบันทึกทุกครั้งที่คุณดื่ม</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +60 XP</div>
+                    <div class="mcard-reward-chip">💧 Hydra Leaf</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:37%"></div></div>
+                        <div class="mcard-progress-label">3 / 8 แก้ว</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ดื่มน้ำ')">+1 แก้ว</button>
+                </div>
+            </div>
+
+            <div class="mcard m-tree-life" data-cat="life">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">👁️</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Life Care</div>
+                        <div class="mcard-name">พักสายตา 20-20-20</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">ทุก 20 นาที มองไกล 20 ฟุต นาน 20 วินาที — ตั้ง timer ได้ในสวน</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +40 XP</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'พักสายตา')">ตั้ง Timer</button>
+                </div>
+            </div>
+
+            <div class="mcard m-tree-life" data-cat="life">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🚶</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Life Care</div>
+                        <div class="mcard-name">เดินเล่น 10 นาที</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">ออกไปข้างนอก หรือเดินในบ้านก็ได้ — ให้ร่างกายได้ขยับ จิตใจจะเปิดขึ้นเอง</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +80 XP</div>
+                    <div class="mcard-reward-chip">👟 Active Leaf</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'เดินเล่น')">เริ่ม →</button>
+                </div>
+            </div>
+
+            <div class="mcard m-tree-life" data-cat="life">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🗂️</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Life Care</div>
+                        <div class="mcard-name">จัดโต๊ะ/พื้นที่ของตัวเอง</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">ความสงบข้างในเริ่มจากความเป็นระเบียบข้างนอก — จัดโต๊ะ 5 นาที แล้วถ่ายรูปบันทึก</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +60 XP</div>
+                    <div class="mcard-reward-chip">✨ Clarity Gem</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'จัดโต๊ะ')">เริ่ม →</button>
+                </div>
+            </div>
+
+            <!-- Explore -->
+            <div class="mcard m-tree-explore" data-cat="explore">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🗺️</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Explore</div>
+                        <div class="mcard-name">สำรวจโซนใหม่ในสวน</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">เข้าไปในโซนที่คุณยังไม่เคยลอง — อาจพบบางอย่างที่คุณชอบโดยบังเอิญ</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +200 XP</div>
+                    <div class="mcard-reward-chip">🔑 Explorer Key</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'สำรวจโซนใหม่')">เข้าสำรวจ</button>
+                </div>
+            </div>
+
+            <div class="mcard m-tree-explore" data-cat="explore">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🎪</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Explore</div>
+                        <div class="mcard-name">ลองกิจกรรมที่ไม่เคยทำ</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">เลือกกิจกรรมหนึ่งที่คุณยังไม่เคยเข้าร่วม — ลองดูสักครั้ง ชีวิตอาจเปลี่ยนไปเลย</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +180 XP</div>
+                    <div class="mcard-reward-chip">🌺 Bloom Token</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'กิจกรรมใหม่')">ค้นพบ →</button>
+                </div>
+            </div>
+
+            <!-- Faith / Hope -->
+            <div class="mcard m-tree-faith" data-cat="faith">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🌅</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Hope</div>
+                        <div class="mcard-name">อ่านข้อความแห่งความหวัง</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">ข้อความสั้นๆ ที่อาจทำให้วันของคุณสว่างขึ้น — แค่อ่านแล้วบันทึกความรู้สึก</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +90 XP</div>
+                    <div class="mcard-reward-chip">☀️ Hope Petal</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ข้อความหวัง')">อ่านเลย →</button>
+                </div>
+            </div>
+
+            <div class="mcard m-tree-faith" data-cat="faith">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🎤</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Hope</div>
+                        <div class="mcard-name">ฟัง Testimony จากชุมชน</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">ฟังเรื่องราวจริงของคนในสวน — บางทีชีวิตคนอื่นช่วยทำให้เราเชื่อมั่นในของตัวเองได้</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +110 XP</div>
+                    <div class="mcard-reward-chip">💫 Story Gem</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ฟัง Testimony')">ฟังเลย →</button>
+                </div>
+            </div>
+
+            <div class="mcard m-tree-faith" data-cat="faith">
+                <div class="mcard-glow"></div>
+                <div class="mcard-hidden-badge">🔮 Hidden</div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">❓</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Hope</div>
+                        <div class="mcard-name">ถามคำถามชีวิตที่ค้างใจ</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">มีคำถามอะไรในใจอยู่ไหม? — โพสต์ในห้อง Q&amp;A แล้วให้ชุมชนช่วยกันคิด</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +130 XP</div>
+                    <div class="mcard-reward-chip">🌙 Wonder Badge</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ถามคำถามชีวิต')">ถามเลย →</button>
+                </div>
+            </div>
+
+        </div><!-- end treeMissionGrid -->
+
+        <!-- Hidden Achievements -->
+        <div class="hidden-section animate-in d6">
+            <div class="hidden-title">✨ Hidden Achievements — ปลดล็อกได้โดยไม่รู้ตัว</div>
+            <div class="hidden-grid">
+                <div class="hidden-card unlocked" onclick="showToast('✨','Halo Leaves','คุณปลดล็อก Halo Leaves แล้ว!')">
+                    <div class="hidden-card-icon">🍃</div>
+                    <div class="hidden-card-name">Halo Leaves</div>
+                    <div class="hidden-card-hint">ส่งกำลังใจ 50 ครั้ง</div>
+                </div>
+                <div class="hidden-card hidden-card-locked">
+                    <div class="hidden-card-icon">🌙</div>
+                    <div class="hidden-card-name">Night Bloom</div>
+                    <div class="hidden-card-hint">เข้าสวนหลังเที่ยงคืน 3 ครั้ง</div>
+                </div>
+                <div class="hidden-card hidden-card-locked">
+                    <div class="hidden-card-icon">🦋</div>
+                    <div class="hidden-card-name">Flutter Wing</div>
+                    <div class="hidden-card-hint">เสร็จภารกิจ 7 วันติดกัน</div>
+                </div>
+                <div class="hidden-card hidden-card-locked">
+                    <div class="hidden-card-icon">⭐</div>
+                    <div class="hidden-card-name">First Light</div>
+                    <div class="hidden-card-hint">???</div>
+                </div>
+                <div class="hidden-card hidden-card-locked">
+                    <div class="hidden-card-icon">🌊</div>
+                    <div class="hidden-card-name">Deep Root</div>
+                    <div class="hidden-card-hint">???</div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end section-wrap tree -->
+    </div><!-- end worldTree -->
+
+
+    <!-- ══════════════════════════════════════
+         GARDENER WORLD
+    ══════════════════════════════════════ -->
+    <div class="world" id="worldGard">
+    <div class="section-wrap gard-world">
+
+        <!-- Journey Bar -->
+        <div class="journey-bar animate-in d3">
+            <div class="journey-top">
+                <div>
+                    <div class="journey-label">เส้นทางการดูแลของคุณ</div>
+                </div>
+                <div class="journey-level">🌿 Level 7 — คนสวนมือทอง · 1,820 / 2,500 XP</div>
+            </div>
+            <div class="journey-xp-track">
+                <div class="journey-xp-fill gard-xp" style="width:73%" id="gardXp"></div>
+            </div>
+            <div class="journey-nodes">
+                <div class="journey-node done"><div class="journey-node-dot"></div><div class="journey-node-label">ผู้ช่วย</div></div>
+                <div class="journey-node done"><div class="journey-node-dot"></div><div class="journey-node-label">พี่เลี้ยง</div></div>
+                <div class="journey-node done"><div class="journey-node-dot"></div><div class="journey-node-label">Mentor</div></div>
+                <div class="journey-node done"><div class="journey-node-dot"></div><div class="journey-node-label">ผู้ดูแล</div></div>
+                <div class="journey-node current"><div class="journey-node-dot"></div><div class="journey-node-label">มือทอง</div></div>
+                <div class="journey-node"><div class="journey-node-dot"></div><div class="journey-node-label">ปรมาจารย์</div></div>
+                <div class="journey-node"><div class="journey-node-dot"></div><div class="journey-node-label">ผู้สร้างสวน</div></div>
+            </div>
+        </div>
+
+        <!-- Community Goal Gardener -->
+        <div class="community-goal animate-in d3" style="border-color:rgba(74,222,128,0.2); background:rgba(74,222,128,0.05);">
+            <div class="cg-icon">🏆</div>
+            <div class="cg-body">
+                <div class="cg-label" style="color:var(--gard-a);">🌿 ภารกิจทีม — สัปดาห์นี้</div>
+                <div class="cg-title">คนสวนทีม Welcome ต้อนรับสมาชิกใหม่ 100 คน</div>
+                <div class="cg-bar-track">
+                    <div class="cg-bar-fill" style="width:82%; background:linear-gradient(90deg,#4ade80,#38bdf8); box-shadow:0 0 10px rgba(74,222,128,0.5);" id="cgGard"></div>
+                </div>
+                <div class="cg-numbers">82 / 100 คน · เหลืออีก 18 คน · ทีมมี 12 คน</div>
+            </div>
+            <div class="cg-reward">
+                <div class="cg-reward-icon">🥇</div>
+                <div class="cg-reward-label">Team Trophy</div>
+            </div>
+        </div>
+
+        <!-- Event Banner Gardener -->
+        <div class="event-banner animate-in d3" style="border-color:rgba(74,222,128,0.25); background:linear-gradient(135deg,rgba(5,20,10,0.8),rgba(3,25,15,0.85));">
+            <div class="event-icon">🌿</div>
+            <div class="event-body">
+                <div class="event-tag" style="color:var(--eden-green);">🌿 EDEN NIGHT — คนสวนมีภารกิจพิเศษ</div>
+                <div class="event-title">ต้อนรับ &amp; ดูแลผู้มาใหม่คืนนี้</div>
+                <div class="event-desc">Eden Night คืนนี้มีสมาชิกใหม่จะเข้ามา — คนสวนมีภารกิจ: ต้อนรับ ดูแล และ connect ให้พวกเขารู้สึกว่านี่คือบ้าน</div>
+            </div>
+            <div class="event-countdown" style="background:rgba(74,222,128,0.08); border-color:rgba(74,222,128,0.2);">
+                <div class="event-time" style="color:var(--eden-green);" id="countdown2">18:42:07</div>
+                <div class="event-time-label">เริ่มใน</div>
+            </div>
+        </div>
+
+        <!-- Tab Strip Gardener -->
+        <div class="tab-strip animate-in d4" id="gardTabStrip">
+            <button class="tab-btn on" onclick="filterTab('gard','all',this)">🌿 ทั้งหมด <span class="tab-count">20</span></button>
+            <button class="tab-btn" onclick="filterTab('gard','care',this)">🤝 Care <span class="tab-count">4</span></button>
+            <button class="tab-btn" onclick="filterTab('gard','growth',this)">🌱 Growth <span class="tab-count">4</span></button>
+            <button class="tab-btn" onclick="filterTab('gard','skill',this)">🎨 Skill <span class="tab-count">4</span></button>
+            <button class="tab-btn" onclick="filterTab('gard','out',this)">🚀 Outreach <span class="tab-count">4</span></button>
+            <button class="tab-btn" onclick="filterTab('gard','team',this)">🏛️ Team <span class="tab-count">4</span></button>
+        </div>
+
+        <!-- Mission Grid GARDENER -->
+        <div class="mission-grid animate-in d5" id="gardMissionGrid">
+
+            <!-- Care -->
+            <div class="mcard m-gard-care" data-cat="care">
+                <div class="mcard-done">✓</div>
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🌸</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Care Mission</div>
+                        <div class="mcard-name">ทักต้นไม้ใหม่ 3 คน</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">ส่งข้อความต้อนรับสมาชิกใหม่ 3 คน — บอกว่าพวกเขาอยู่ในที่ที่ดีแล้ว</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +150 XP</div>
+                    <div class="mcard-reward-chip">💚 Care Point x3</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:100%"></div></div>
+                        <div class="mcard-progress-label">สำเร็จแล้ว ✓</div>
+                    </div>
+                    <button class="mcard-cta" style="opacity:0.5;cursor:default;">Done ✓</button>
+                </div>
+            </div>
+
+            <div class="mcard m-gard-care" data-cat="care">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">❤️</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Care Mission</div>
+                        <div class="mcard-name">ส่งกำลังใจให้ใครสักคน</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">หาคนในชุมชนที่ดูเหนื่อยหรือต้องการกำลังใจ แล้วส่งข้อความหรือ react ด้วยใจจริง</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +120 XP</div>
+                    <div class="mcard-reward-chip">💌 Warmth Token</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ส่งกำลังใจ')">ส่งเลย →</button>
+                </div>
+            </div>
+
+            <div class="mcard m-gard-care" data-cat="care">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🙏</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Care Mission</div>
+                        <div class="mcard-name">อธิษฐานเผื่อ 3 คนในสวน</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">เลือกชื่อ 3 คนจากชุมชน บันทึกการอธิษฐาน — สวนจะแจ้งให้พวกเขารู้ว่ามีคนนึกถึง</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +200 XP</div>
+                    <div class="mcard-reward-chip">🌟 Prayer Seed</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'อธิษฐานเผื่อ')">บันทึก →</button>
+                </div>
+            </div>
+
+            <div class="mcard m-gard-care" data-cat="care">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">💬</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Care Mission</div>
+                        <div class="mcard-name">ตอบคำถามใน Community</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">มีต้นไม้ถามอะไรในชุมชน — ตอบด้วยใจจริง 1 คำถาม แบ่งปันประสบการณ์ที่คุณมี</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +170 XP</div>
+                    <div class="mcard-reward-chip">🎓 Wisdom Leaf</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ตอบคำถาม')">ตอบเลย →</button>
+                </div>
+            </div>
+
+            <!-- Growth -->
+            <div class="mcard m-gard-growth" data-cat="growth">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🌱</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Growth Mission</div>
+                        <div class="mcard-name">ดูแลต้นกล้าประจำสัปดาห์</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">ติดตามต้นไม้ที่คุณรับดูแล — check-in ดูความคืบหน้า ส่งข้อความกำลังใจ</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +250 XP</div>
+                    <div class="mcard-reward-chip">🌿 Mentor Mark</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:60%"></div></div>
+                        <div class="mcard-progress-label">3 / 5 ต้น check-in แล้ว</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ดูแลต้นกล้า')">Check-in →</button>
+                </div>
+            </div>
+
+            <div class="mcard m-gard-growth" data-cat="growth">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🎙️</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Growth Mission</div>
+                        <div class="mcard-name">นัด Mentor Session ครั้งนี้</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">จัดเวลา 1-on-1 กับต้นไม้ที่คุณดูแล — พูดคุยชีวิต ฟังเขา และแบ่งปันสิ่งที่คุณผ่านมา</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +400 XP</div>
+                    <div class="mcard-reward-chip">💛 Deep Root Badge</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'Mentor Session')">นัดเลย →</button>
+                </div>
+            </div>
+
+            <!-- Skill -->
+            <div class="mcard m-gard-skill" data-cat="skill">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🎨</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Skill Mission</div>
+                        <div class="mcard-name">ใช้ทักษะของคุณช่วยชุมชน</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">ไม่ว่าจะ design / สอน / ให้คำปรึกษา / ทำอาหาร — ใช้สิ่งที่คุณทำได้เพื่อชุมชนสักครั้ง</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +300 XP</div>
+                    <div class="mcard-reward-chip">🏅 Skill Crown</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ใช้ทักษะ')">เสนอตัว →</button>
+                </div>
+            </div>
+
+            <div class="mcard m-gard-skill" data-cat="skill">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">📝</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Skill Mission</div>
+                        <div class="mcard-name">เขียนบทความแชร์ประสบการณ์</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">เขียนเรื่องราวหรือบทเรียนชีวิตที่คุณผ่านมา — ให้ต้นไม้ในสวนได้เรียนรู้จากประสบการณ์จริง</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +350 XP</div>
+                    <div class="mcard-reward-chip">📖 Author Tag</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'เขียนบทความ')">เขียนเลย →</button>
+                </div>
+            </div>
+
+            <!-- Outreach -->
+            <div class="mcard m-gard-out" data-cat="out">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🚀</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Outreach</div>
+                        <div class="mcard-name">ชวนเพื่อนนอกสวนเข้า Event</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">แชร์ link กิจกรรม Eden Night ให้เพื่อนที่คิดว่าจะชอบ — ไม่ต้องกดดัน แค่เชิญ</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +300 XP</div>
+                    <div class="mcard-reward-chip">🌍 Inviter Badge</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ชวนเพื่อน')">Copy Link</button>
+                </div>
+            </div>
+
+            <div class="mcard m-gard-out" data-cat="out">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">📱</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Outreach</div>
+                        <div class="mcard-name">ทำ Content แชร์สวน EDEN</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">สร้าง post / story / clip สั้นๆ เกี่ยวกับสิ่งที่คุณได้รับจากสวนนี้ — แชร์ในแบบของคุณเอง</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +500 XP</div>
+                    <div class="mcard-reward-chip">📣 Creator Mark</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">ยังไม่เริ่ม</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ทำ Content')">เริ่มสร้าง →</button>
+                </div>
+            </div>
+
+            <!-- Team -->
+            <div class="mcard m-gard-team" data-cat="team">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">👥</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Team Mission</div>
+                        <div class="mcard-name">ทีม Welcome: ต้อนรับ Eden Night</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">ประจำการที่ประตูสวน — ต้อนรับคนใหม่ให้รู้สึกอบอุ่น ไม่แปลกหน้า และปลอดภัย</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +400 XP</div>
+                    <div class="mcard-reward-chip">🏅 Team Medal</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">คืนนี้</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ทีม Welcome')">ลงทะเบียน →</button>
+                </div>
+            </div>
+
+            <div class="mcard m-gard-team" data-cat="team">
+                <div class="mcard-glow"></div>
+                <div class="mcard-header">
+                    <div class="mcard-emoji">🎬</div>
+                    <div class="mcard-meta">
+                        <div class="mcard-tag">Team Mission</div>
+                        <div class="mcard-name">ทีม Media: บันทึก Eden Night</div>
+                    </div>
+                </div>
+                <div class="mcard-desc">ถ่ายภาพ / ตัดต่อ clip highlight ของกิจกรรมคืนนี้ เพื่อให้ชุมชนได้ย้อนดูและแชร์</div>
+                <div class="mcard-rewards">
+                    <div class="mcard-reward-chip">🌾 +450 XP</div>
+                    <div class="mcard-reward-chip">🎥 Filmmaker Badge</div>
+                </div>
+                <div class="mcard-footer">
+                    <div class="mcard-progress-wrap">
+                        <div class="mcard-progress-track"><div class="mcard-progress-bar" style="width:0%"></div></div>
+                        <div class="mcard-progress-label">คืนนี้</div>
+                    </div>
+                    <button class="mcard-cta" onclick="startMission(this,'ทีม Media')">ลงทะเบียน →</button>
+                </div>
+            </div>
+
+        </div><!-- end gardMissionGrid -->
+
+        <!-- Hidden Achievements Gardener -->
+        <div class="hidden-section animate-in d6">
+            <div class="hidden-title">🌟 Legendary Achievements — คนสวนเท่านั้น</div>
+            <div class="hidden-grid">
+                <div class="hidden-card unlocked" onclick="showToast('🌳','Garden Master','คุณคือผู้พิทักษ์สวน!')">
+                    <div class="hidden-card-icon">🌳</div>
+                    <div class="hidden-card-name">Garden Master</div>
+                    <div class="hidden-card-hint">ดูแลต้นไม้ครบ 20 คน</div>
+                </div>
+                <div class="hidden-card unlocked">
+                    <div class="hidden-card-icon">🔥</div>
+                    <div class="hidden-card-name">Streak Keeper</div>
+                    <div class="hidden-card-hint">ดูแลชุมชน 30 วันติดกัน</div>
+                </div>
+                <div class="hidden-card hidden-card-locked">
+                    <div class="hidden-card-icon">👑</div>
+                    <div class="hidden-card-name">Garden King</div>
+                    <div class="hidden-card-hint">???</div>
+                </div>
+                <div class="hidden-card hidden-card-locked">
+                    <div class="hidden-card-icon">🌈</div>
+                    <div class="hidden-card-name">Rainbow Root</div>
+                    <div class="hidden-card-hint">???</div>
+                </div>
+                <div class="hidden-card hidden-card-locked">
+                    <div class="hidden-card-icon">💎</div>
+                    <div class="hidden-card-name">Diamond Soil</div>
+                    <div class="hidden-card-hint">???</div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end section-wrap gard -->
+    </div><!-- end worldGard -->
+
+    <!-- FOOTER -->
+    <footer>
+        <div>SAWANNAKHON CONNECT : EDEN — MISSION SYSTEM · V1.0</div>
+        <div class="footer-orbs">
+            <div class="footer-orb" style="background:#4ade80;"></div>
+            <div class="footer-orb" style="background:#38bdf8;"></div>
+            <div class="footer-orb" style="background:#fbbf24;"></div>
+            <div class="footer-orb" style="background:#f472b6;"></div>
+        </div>
+    </footer>
+
+</div><!-- end page-wrapper -->
+
+<div id="toastContainer"></div>
+
+<script>
+// ── SLIDESHOW ──
+const slides = document.querySelectorAll('.slide');
+let cur = 0;
+if(slides.length > 0) {
+    setInterval(() => {
+        slides[cur].classList.remove('active');
+        cur = (cur+1) % slides.length;
+        slides[cur].classList.add('active');
+    }, 6000);
+}
+
+// ── PARTICLES ──
+const pCont = document.getElementById('particles');
+for (let i=0; i<50; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random()*3+1;
+    const tx = (Math.random()-0.5)*200;
+    p.style.cssText = `
+        left:${Math.random()*100}%;
+        width:${size}px; height:${size}px;
+        opacity:${Math.random()*0.4+0.1};
+        animation-duration:${Math.random()*15+10}s;
+        animation-delay:${Math.random()*12}s;
+        --tx:${tx}px;
+    `;
+    pCont.appendChild(p);
+}
+
+// ── CURSOR ──
+const dot  = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+(function animCursor() {
+    rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+    dot.style.left  = mx+'px'; dot.style.top  = my+'px';
+    ring.style.left = rx+'px'; ring.style.top = ry+'px';
+    requestAnimationFrame(animCursor);
+})();
+
+// ── WORLD SWITCH ──
+function switchWorld(world) {
+    const btnTree = document.getElementById('btnTree');
+    const btnGard = document.getElementById('btnGard');
+    const wTree   = document.getElementById('worldTree');
+    const wGard   = document.getElementById('worldGard');
+
+    if (world === 'tree') {
+        btnTree.classList.add('tree-active');
+        btnGard.classList.remove('gard-active');
+        wTree.classList.add('active');
+        wGard.classList.remove('active');
+    } else {
+        btnGard.classList.add('gard-active');
+        btnTree.classList.remove('tree-active');
+        wGard.classList.add('active');
+        wTree.classList.remove('active');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── TAB FILTER ──
+function filterTab(world, cat, btn) {
+    const stripId = world === 'tree' ? 'treeTabStrip' : 'gardTabStrip';
+    const gridId  = world === 'tree' ? 'treeMissionGrid' : 'gardMissionGrid';
+    document.querySelectorAll(`#${stripId} .tab-btn`).forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    document.querySelectorAll(`#${gridId} .mcard`).forEach(card => {
+        if (cat === 'all' || card.dataset.cat === cat) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// ── MISSION START ──
+function startMission(btn, name) {
+    const card = btn.closest('.mcard');
+    const bar  = card.querySelector('.mcard-progress-bar');
+    const lbl  = card.querySelector('.mcard-progress-label');
+    let pct = 0;
+    const iv = setInterval(() => {
+        pct = Math.min(pct + Math.random()*15+5, 100);
+        bar.style.width = pct+'%';
+        if (pct >= 100) {
+            clearInterval(iv);
+            lbl.textContent = 'กำลังโหลด...';
+            setTimeout(() => {
+                lbl.textContent = 'สำเร็จแล้ว ✓';
+                btn.textContent = 'Done ✓';
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'default';
+                showToast('✅', 'Mission สำเร็จ!', `"${name}" — XP เพิ่มแล้ว 🌾`);
+                const done = document.createElement('div');
+                done.className = 'mcard-done';
+                done.textContent = '✓';
+                card.insertBefore(done, card.firstChild);
+            }, 300);
+        }
+    }, 120);
+    lbl.textContent = 'กำลังดำเนินการ...';
+}
+
+// ── COUNTDOWN ──
+function updateCountdown() {
+    const now = new Date();
+    const end = new Date(); end.setHours(23,0,0,0);
+    const diff = Math.max(0, end - now);
+    const h = String(Math.floor(diff/3600000)).padStart(2,'0');
+    const m = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+    const s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+    const t = `${h}:${m}:${s}`;
+    ['countdown','countdown2'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = t;
+    });
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// ── PROGRESS BARS ANIMATE ON LOAD ──
+window.addEventListener('load', () => {
+    document.querySelectorAll('.mcard-progress-bar, .journey-xp-fill, .cg-bar-fill').forEach(bar => {
+        const w = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => { bar.style.width = w; }, 700);
+    });
+});
+
+// ── CARD GLOW MOUSE ──
+document.querySelectorAll('.mcard').forEach(card => {
+    card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width) * 100;
+        const y = ((e.clientY - r.top)  / r.height) * 100;
+        card.style.setProperty('--mx', x+'%');
+        card.style.setProperty('--my', y+'%');
+    });
+});
+
+// ── TOAST ──
+function showToast(icon, title, msg) {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = `<div class="toast-icon">${icon}</div><div><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
+    c.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(80px)'; t.style.transition='all 0.4s'; setTimeout(()=>t.remove(),400); }, 4500);
+}
+
+// Auto toasts
+const toasts = [
+    ['🌱','สมาชิกใหม่','น้องดาวเพิ่งเข้าสวน EDEN!'],
+    ['🎉','ชุมชน Goal','ส่งกำลังใจครบ 342 / 500 แล้ว!'],
+    ['⭐','Streak 7 วัน!','คุณทำภารกิจต่อเนื่อง 7 วัน 🔥'],
+];
+let ti=0;
+setTimeout(() => {
+    const fn = () => { const [i,t,m]=toasts[ti%toasts.length]; showToast(i,t,m); ti++; };
+    fn(); setInterval(fn, 12000);
+}, 2500);
+</script>
+</body>
+</html>
