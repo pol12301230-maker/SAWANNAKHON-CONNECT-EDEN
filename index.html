@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAWANNAKHON CONNECT : EDEN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Kanit', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* ระบบ Slideshow พื้นหลัง */
+        .slideshow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: #000; /* กันจังหวะภาพยังไม่โหลด */
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            opacity: 0;
+            transition: opacity 2s ease-in-out; /* ความเร็วตอนจางสลับ */
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        /* Overlay เพื่อให้ตัวหนังสืออ่านง่ายขึ้น */
+        .bg-overlay {
+            background: rgba(0, 0, 0, 0.15); /* ปรับให้เข้มขึ้นเล็กน้อยเพื่อให้สีขาว-ฟ้าเด่น */
+            min-height: 100vh;
+            display: flex;
+            flex-grow: 1;
+            flex-direction: column;
+        }
+
+        /* Animation สำหรับคำว่า EDEN */
+        @keyframes shine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .eden-text {
+            background: linear-gradient(90deg, #059669, #3b82f6, #ec4899, #059669);
+            background-size: 300% 300%;
+            animation: shine 3s infinite linear;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
+
+        .btn-enter {
+            transition: all 0.3s;
+            background: #2d6a4f;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .btn-enter:hover {
+            transform: scale(1.05) translateY(-2px);
+            background: #1b4332;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slideshow-container">
+        <div class="slide active" style="background-image: url('EDEN1.png');"></div>
+        <div class="slide" style="background-image: url('EDEN2.png');"></div>
+        <div class="slide" style="background-image: url('EDEN3.png');"></div>
+        <div class="slide" style="background-image: url('EDEN4.png');"></div>
+        <div class="slide" style="background-image: url('EDEN5.png');"></div>
+        <div class="slide" style="background-image: url('EDEN6.png');"></div>
+    </div>
+
+    <div class="bg-overlay">
+        
+        <nav class="flex justify-between items-center px-8 py-4 bg-white/10 backdrop-blur-lg border-b border-white/20 sticky top-0 z-50">
+            <div class="text-xl font-bold drop-shadow-lg">
+                <span class="text-white border-r border-white/30 pr-3">SAWANNAKHON</span>
+                <span class="text-sky-400 pl-2">CONNECT</span>
+            </div>
+
+            <ul class="hidden md:flex space-x-8 text-white font-semibold drop-shadow-md">
+                <li class="hover:text-sky-300 cursor-pointer transition">Home</li>
+                <li class="hover:text-sky-300 cursor-pointer transition">Rest</li>
+                <li class="hover:text-sky-300 cursor-pointer transition">Grow</li>
+                <li class="hover:text-sky-300 cursor-pointer transition">Community</li>
+                <li class="hover:text-sky-300 cursor-pointer transition">Support</li>
+                <li class="hover:text-sky-300 cursor-pointer transition">Mission</li>
+            </ul>
+
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/30">
+                    <span class="w-3 h-3 bg-green-400 rounded-full mr-2 animate-pulse shadow-[0_0_8px_#4ade80]"></span>
+                    <span class="text-sm text-white font-bold drop-shadow-sm">เมล็ดพันธุ์ดี</span>
+                </div>
+                <button class="text-white font-bold hover:text-sky-300 drop-shadow-md">Login</button>
+            </div>
+        </nav>
+
+        <main class="flex-grow flex flex-col items-center justify-center text-center px-4">
+            
+            <div class="bg-white/20 backdrop-blur-md p-10 rounded-3xl border border-white/30 shadow-2xl">
+                <h1 class="text-5xl md:text-8xl font-bold text-white mb-4 drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
+                    สวน <span class="eden-text">EDEN</span> ยินดีต้อนรับ
+                </h1>
+                <p class="text-xl md:text-3xl text-sky-100 font-medium mb-10 drop-shadow-md">
+                    พื้นที่ที่มีประโยชน์สำหรับทุกคน
+                </p>
+                
+                <button class="btn-enter text-white px-12 py-5 rounded-full text-2xl font-bold uppercase tracking-wider">
+                    เข้าสู่สวน
+                </button>
+            </div>
+
+        </main>
+
+        <footer class="p-6 text-center text-white font-medium text-sm bg-black/10 backdrop-blur-sm">
+            © 2026 Sawannakho Connect : EDEN - เติบโตและแบ่งปันในสวนแห่งความสุข
+        </footer>
+
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+        const slideInterval = 5000; // เปลี่ยนภาพทุก 5 วินาที
+
+        function nextSlide() {
+            // เอาคลาส active ออกจากภาพปัจจุบัน
+            slides[currentSlide].classList.remove('active');
+            
+            // ขยับไปภาพถัดไป
+            currentSlide = (currentSlide + 1) % slides.length;
+            
+            // ใส่คลาส active ให้ภาพใหม่
+            slides[currentSlide].classList.add('active');
+        }
+
+        // เริ่มต้นวนลูป
+        if(slides.length > 0) {
+            setInterval(nextSlide, slideInterval);
+        }
+    </script>
+</body>
+</html>
